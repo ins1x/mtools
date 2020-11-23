@@ -14,3 +14,9 @@
 - Copy the mtools.amx file to the filterscripts folder
 - Open the server.cfg file in any editor and add mtools to filtescripts.
 >Note: mtools is connected after tstudio (filterscripts tstudio mtools)
+
+In the current version, mtools works with Texture Studio 2.0 and above!!
+
+### Disclaimer:
+
+this script does not claim to be original and is provided as is. The developer is not tasked with making another map editor, but supplementing the existing one for the convenience of work. This is a demo version, perhaps you will find errors and shortcomings, report them to the group messages.
