@@ -12,6 +12,7 @@
 
 - Install latest *[Texture Studio](https://vk.com/tip_mapper?w=page-89889560_49251374)*
 - Copy the mtools.amx file to the filterscripts folder
+- Create /scriptfiles/mtools folder
 - Open the server.cfg file in any editor and add mtools to filtescripts.
 >Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 
