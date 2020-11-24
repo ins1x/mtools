@@ -13,7 +13,7 @@ For the list of all server commands and features type /help
 
 # Installation:
 
-- Install latest *[Texture Studio](https://vk.com/tip_mapper?w=page-89889560_49251374)*
+- Install latest version *[Texture Studio](https://vk.com/tip_mapper?w=page-89889560_49251374)*
 - Copy the mtools.amx file to the filterscripts folder
 - Create /scriptfiles/mtools folder
 - Open the server.cfg file in any editor and add mtools to filtescripts.\
@@ -23,6 +23,6 @@ Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 
 ### Disclaimer:
 
-this script does not claim to be original and is provided as is. The developer is not tasked with making another map editor, but supplementing the existing one for the convenience of work. This is a demo version, perhaps you will find errors and shortcomings, report them to the group messages.
+this script does not claim to be original and is provided as is. The developer is not tasked with making another map editor, but supplementing the existing one for the convenience of work. **This is a demo version**, perhaps you will find errors and shortcomings, report them to the group messages.
 
-#### Homepage: https://vk.com/1nsanemapping
+#### VK Homepage: https://vk.com/1nsanemapping
