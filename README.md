@@ -11,13 +11,22 @@ For the list of all server commands and features type /help
 
 ![Menus](/img/preview.jpg)
 
-## Installation:
-
-- Install latest version *[Texture Studio](https://vk.com/tip_mapper?w=page-89889560_49251374)*
-- Copy the mtools.amx file to the filterscripts folder
-- Create /scriptfiles/mtools folder
-- Open the server.cfg file in any editor and add mtools to filtescripts.\
+# Installation:
+* Install latest version *[Texture Studio](https://vk.com/tip_mapper?w=page-89889560_49251374)*
+* Copy the mtools.amx file to the filterscripts folder
+* Create /scriptfiles/mtools folder
+* Open the server.cfg file in any editor and add mtools to filtescripts.
+```
+filterscripts tstudio mtools
+plugins crashdetect sscanf streamer filemanager
+```
 Note: mtools is connected after tstudio (filterscripts tstudio mtools)
+
+## Requirements
+* SA:MP 0.3.7 R2 server or highter (DL not supported now)
+* [Incognito Streamer plugin v 2.7.2](https://github.com/samp-incognito/samp-streamer-plugin/releases/tag/v2.7.2)
+* **mtools** works with Texture Studio 2.0 and above
+> Support for the new streamer version 2.9.4 will be added later.
 
 ## **[Wiki](https://github.com/ins1x/mtools/wiki)**
 
