@@ -19,8 +19,7 @@ For the list of all server commands and features type /help
 - Open the server.cfg file in any editor and add mtools to filtescripts.\
 Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 
-### Wiki
-[mtools wiki](https://github.com/ins1x/mtools/wiki)
+### **[mtools wiki](https://github.com/ins1x/mtools/wiki)**
 
 ### Disclaimer:
 
