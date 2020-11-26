@@ -11,7 +11,7 @@ For the list of all server commands and features type /help
 
 ![Menus](/img/preview.jpg)
 
-# Installation:
+## Installation:
 
 - Install latest version *[Texture Studio](https://vk.com/tip_mapper?w=page-89889560_49251374)*
 - Copy the mtools.amx file to the filterscripts folder
@@ -19,7 +19,7 @@ For the list of all server commands and features type /help
 - Open the server.cfg file in any editor and add mtools to filtescripts.\
 Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 
-### **[mtools wiki](https://github.com/ins1x/mtools/wiki)**
+## **[Wiki](https://github.com/ins1x/mtools/wiki)**
 
 ### Disclaimer:
 
