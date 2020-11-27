@@ -29,6 +29,8 @@ Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 > Support for the new streamer version 2.9.4 will be added later.
 
 ## **[Wiki](https://github.com/ins1x/mtools/wiki)**
+* [English](https://github.com/ins1x/mtools/wiki)
+* [Russian](https://github.com/ins1x/mtools/wiki/Home-%5BRus%5D)
 
 ### Disclaimer:
 
