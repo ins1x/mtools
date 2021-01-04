@@ -24,9 +24,8 @@ Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 
 ## Requirements
 * SA:MP 0.3.7 R2 server or highter (DL not supported now)
-* [Incognito Streamer plugin v 2.7.2](https://github.com/samp-incognito/samp-streamer-plugin/releases/tag/v2.7.2)
+* [Incognito Streamer plugin v 2.7+](https://github.com/samp-incognito/samp-streamer-plugin/releases/tag/v2.7.2)
 * **mtools** works with Texture Studio 2.0 and above
-> Support for the new streamer version 2.9.4 will be added later.
 
 ## **[Wiki](https://github.com/ins1x/mtools/wiki)**
 * [English](https://github.com/ins1x/mtools/wiki)
