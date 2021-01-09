@@ -9,8 +9,6 @@
 >The main menu is called by default on ALT (Can be changed in the settings)\
 For the list of all server commands and features type /help
 
-![Menus](/img/preview.jpg)
-
 # Installation:
 * Install latest version *[Texture Studio](https://vk.com/tip_mapper?w=page-89889560_49251374)*
 * Copy the mtools.amx file to the filterscripts folder
