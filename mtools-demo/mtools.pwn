@@ -1,28 +1,29 @@
-#if defined credits
-.--------------------------------------------------------------------.
-|                          |                                         |
-|    db d8b   db .d8888.   | filterscript: MTOOLS                    |
-|   o88 888o  88 88'  YP   | sa-mp server version: 0.3.7             |
-|    88 88V8o 88 `8bo.     | contacts:                               |
-|    88 88 V8o88   `Y8b.   | Discord: 1NS#7233                       |
-|    88 88  V888 db   8D   | site: https://vk.com/1nsanemapping	     |
-|    VP VP   V8P `8888Y'   | developer: 1NS                          |
-|                          |                                2020     |
-.--------------------------------------------------------------------.
 /*
+filterscript: MTOOLS
+
+site: https://vk.com/1nsanemapping
+homepage: https://github.com/ins1x/mtools/wiki
+
+Requirements:
+- SA:MP 0.3.7 R2 server or highter (DL not supported now)
+- Incognito Streamer plugin v 2.7+
+- mtools works with Texture Studio 2.0 and above
+
 About MTOOLS for Texture Studio SA:MP
 
 MTOOLS is a filterscript that complements Texture Studio and provides a classic dialog interface with basic map editor functionality.
 
-MTOOLS appeared as a result of the fact that I was missing some basic functions in Texture Studio, their list was replenished and the idea of merging into one filterscript came up. The task of mtools is to provide more functions to mappers for more flexible work.
+MTOOLS appeared as a result of the fact that I was missing some basic functions in Texture Studio, their list was replenished
+and the idea of ??merging into one filterscript came up. The task of mtools is to provide more functions to mappers for more flexible work.
 
-Editor options : TABSIZE 4, encoding utf-8 
+After loading, press ALT or type /mtools to open the main menu
+
+Editor options: TABSIZE 4, encoding utf-8
 */
-#endif
 
 // VERSION
-#define VERSION              	"0.3.7"
-#define BUILD_DATE             	"27.12.2020"
+#define VERSION              	"0.3.10"
+#define BUILD_DATE             	"27.01.2020"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -119,6 +120,14 @@ Editor options : TABSIZE 4, encoding utf-8
 #define COLOR_RED  				0xF40B74FF
 #define COLOR_LIME 				0x33DD1100
 
+/*
+#tryinclude <ugmp/ugmp>
+#if defined UGMP_INCLUDED
+	#include <ugmp/a_samp>
+#else
+	#include <a_samp> 
+#endif
+*/
 #include <a_samp> 
 #include <foreach>
 #if !defined foreach
@@ -243,6 +252,8 @@ new fpsBarTD = true;
 new autoLoadMap = true;
 new showEditMenu = true;
 new askDelete = true;
+new savePlayerPos = true;
+new hideMtoolsMenu = false;
 
 new mainMenuKeyCode = 1024; // ALT key
 new LangSet = 0;
@@ -275,6 +286,13 @@ forward SetPlayerLookAt(playerid,Float:x,Float:y); // cam set look at point
 forward GetVehicleRotation(vehicleid,&Float:rx,&Float:ry,&Float:rz); 
 forward MtoolsHudToggle(playerid);// on-off hud
 forward FirstPersonMode(playerid);// on-off 1-st person mode
+
+enum LastPosData
+{
+	Float:LastPosX, Float:LastPosY,
+	Float:LastPosZ, Float:LastPosA
+}
+new Float:LastPlayerPos[MAX_PLAYERS][LastPosData];
 
 enum preSets
 {
@@ -706,6 +724,14 @@ public OnPlayerSpawn(playerid)
 	{
 		SetPlayerSkin(playerid, 160);
 	}
+	if(savePlayerPos)
+	{
+		if(LastPlayerPos[playerid][LastPosX] != 0.0)
+		{
+			SetPlayerPos(playerid, LastPlayerPos[playerid][LastPosX], LastPlayerPos[playerid][LastPosY], LastPlayerPos[playerid][LastPosZ]);
+			SetActorFacingAngle(playerid, LastPlayerPos[playerid][LastPosA]);
+		}
+	}
 	return 1;
 }
 
@@ -720,6 +746,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 public OnPlayerDisconnect(playerid, reason)
 {
+	if(savePlayerPos)
+	{
+		GetPlayerPos(playerid, LastPlayerPos[playerid][LastPosX], LastPlayerPos[playerid][LastPosY], LastPlayerPos[playerid][LastPosZ]);
+		GetActorFacingAngle(playerid, LastPlayerPos[playerid][LastPosA]);
+	}
+	
 	PlayerTextDrawDestroy(playerid,	Logo[playerid]);
 	PlayerTextDrawDestroy(playerid, TDspecbar[playerid]);
 	PlayerTextDrawDestroy(playerid, TDAIM[playerid]);
@@ -731,8 +763,13 @@ public OnPlayerDisconnect(playerid, reason)
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	// Open main menu on press ALT (rcon give full menu)
-	if(newkeys == mainMenuKeyCode) 
+	if(newkeys == mainMenuKeyCode && !hideMtoolsMenu) 
 	{
+		if(mainMenuKeyCode == 131072)
+		{
+			// dirty hack (hide default menu)
+			GameTextForPlayer(playerid, "~w~", 2000, 0);
+		}
 		if(mtoolsRcon) {
 			if(IsPlayerAdmin(playerid)) ShowPlayerMenu(playerid, DIALOG_MAIN);
 		} else {
@@ -754,6 +791,21 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					ShowPlayerMenu(playerid, DIALOG_MAIN);
 				}
 			}
+		}
+	}
+	// hold menu
+	if((newkeys & KEY_WALK) && (newkeys & KEY_CROUCH)) { // C + ALT
+		if(hideMtoolsMenu) 
+		{
+			hideMtoolsMenu = false;
+			SendClientMessageEx(playerid, -1,
+			"Основное меню снова включено",
+			"Main menu is on again");
+		} else {
+			hideMtoolsMenu = true;
+			SendClientMessageEx(playerid, -1,
+			"Вы скрыли основное меню, стобы вернуть нажмите (C + ALT)",
+			"You have hidden the main menu, to return press (C + ALT)");
 		}
 	}
 	// flip H key in vehicle
@@ -1285,6 +1337,15 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		else SendClientMessage(playerid, -1, "Set drunk level. Use: /drunk [0-50000]");
 		return 1;
 	}
+	if(!strcmp(cmdtext,"/mtexture", true))
+    {
+		#if defined TEXTURE_STUDIO
+		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtextures");		
+		#else
+		SendClientMessage(playerid, -1, "Function unavaiable. Need TextureStudio");
+		#endif
+        return 1;
+    }
 	if(!strcmp(cmdtext, "/flip", true))
     {
 		if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
@@ -2083,6 +2144,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 9:	ShowPlayerMenu(playerid, DIALOG_VEHSETTINGS);
 			}
+		} else {
+			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) ShowPlayerMenu(playerid, DIALOG_MAIN);
 		}
 	}
 	if(dialogid == DIALOG_VEHSETTINGS)
@@ -2982,6 +3045,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			"UPDATE `Settings` SET Value=%d WHERE Option='mainMenuKeyCode'", mainMenuKeyCode);
 			db_query(mtoolsDB,query);
 			ShowPlayerMenu(playerid, DIALOG_KEYBINDS);
+			if(mainMenuKeyCode == 131072)
+			{
+				SendClientMessageEx(playerid, -1,
+				"Не рекомендуется использовать эту клавишу - она задействована под стандартное меню TS",
+				"Not recommended to use this key - it is used under the standard TS menu");
+			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_SETTINGS);
 	}
@@ -5503,11 +5572,19 @@ public OnPlayerUpdate(playerid)
 		GetPlayerFPS(playerid);
 		new fpsbardata[256];
 		//PlayerTextDrawColor(playerid, FPSBAR[playerid], 0xFFFFFFFF);
-		if(GetPVarInt(playerid, "fps") < 550 && GetPVarInt(playerid, "fps") > 20)
+		if(GetPVarInt(playerid, "fps") < 550 && GetPVarInt(playerid, "fps") > 10)
 		{
-			format(fpsbardata,sizeof(fpsbardata),"FPS: %.0f",floatabs(GetPVarInt(playerid, "fps")));
-			PlayerTextDrawSetString(playerid, FPSBAR[playerid], fpsbardata);
-		}
+			if(GetPVarInt(playerid, "fps") > 10 && GetPVarInt(playerid, "fps") <= 45)
+			{
+				format(fpsbardata,sizeof(fpsbardata),
+				"FPS: ~r~%.0f",floatabs(GetPVarInt(playerid, "fps")));
+				PlayerTextDrawSetString(playerid, FPSBAR[playerid], fpsbardata);
+			} else {
+				format(fpsbardata,sizeof(fpsbardata),
+				"FPS: %.0f",floatabs(GetPVarInt(playerid, "fps")));
+				PlayerTextDrawSetString(playerid, FPSBAR[playerid], fpsbardata);
+			}
+		} 
 	}
 		
 	if (GetPVarInt(playerid, "specbar") != -1 && IsPlayerConnected(GetPVarInt(playerid,"specbar")))
@@ -5549,10 +5626,6 @@ public OnPlayerUpdate(playerid)
 					
 		format(string, sizeof(string), "~w~FlyMode ~r~%d ~w~Specing ~r~%d ~w~Player speed ~r~%d~n~", GetPVarInt(specid, "FlyMode"), GetPVarInt(specid, "Specing"), GetPlayerSpeed(specid));
 		strcat(tdtext, string);			
-		
-		format(string, sizeof(string), "~w~Streamed Players ~r~%d~w~ Vehicles ~r~%d~w~~n~", 
-		GetPVarInt(specid, "StreamedPlayers"),GetPVarInt(specid, "StreamedVehicles"));
-		strcat(tdtext, string);	
 		
 		format(string, sizeof(string), "~w~PlayerCameraMode ~r~%i~w~ ~n~", 
 		GetPlayerCameraMode(playerid));
@@ -5846,24 +5919,28 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_CREATEOBJ:
 		{
+			new header[64];
 			if (GetPVarInt(playerid, "lang") == 0){
-				ShowPlayerDialog(playerid,DIALOG_CREATEOBJ,DIALOG_STYLE_INPUT,
-				"Создать объект",
+				format(header, sizeof(header), "Создать объект. Последний объект: %d",
+				EDIT_OBJECT_MODELID[playerid]);
+				ShowPlayerDialog(playerid,DIALOG_CREATEOBJ,DIALOG_STYLE_INPUT, header,
 				"{FFFFFF}Введите ID модели объекта для того чтобы его создать\n"\
 				"Объект появится перед вами, далее вы будете изменять его\n\n"\
-				"{FFD700}615-18300 GTASA: 18632-19521 SAMP\n"\
+				"{FFD700}615-18300 [GTASA], 18632-19521 [SAMP], 11754-11880 [UGMP]\n"\
 				"{FFFFFF}Список объектов по категориям можно посмотреть:\n"\
 				"на сайте {00BFFF}https://dev.prineside.com/ru",
 				"Create","Close");
 			} else {
-				ShowPlayerDialog(playerid,DIALOG_CREATEOBJ,DIALOG_STYLE_INPUT,
-				"Create object",
+				format(header, sizeof(header), "Create object. Last object modelid: %d",
+				EDIT_OBJECT_MODELID[playerid]);
+				ShowPlayerDialog(playerid,DIALOG_CREATEOBJ,DIALOG_STYLE_INPUT, header,
 				"{FFFFFF} Enter the model ID of the object to create it \n"\
 				"The object will appear in front of you, then you will modify it\n\n"\
-				"{FFD700} 615-18300 GTASA: 18632-19521 SAMP\n"\
+				"{FFD700}615-18300 [GTASA], 18632-19521 [SAMP], 11754-11880 [UGMP]\n"\
 				"{FFFFFF} The list of objects by category can be viewed:\n"\
 				"on the site {00BFFF} https://dev.prineside.com/ru",
 				"Create","Close");
+				
 			}
 		}
 		case DIALOG_SOUNDTEST:
