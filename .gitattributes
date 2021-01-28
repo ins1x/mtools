@@ -1,2 +1,3 @@
 # Auto detect text files and perform LF normalization
+*.pwn text working-tree-encoding=Windows-1251
 * text=auto
