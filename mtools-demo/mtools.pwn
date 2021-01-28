@@ -1,28 +1,36 @@
 /*
 filterscript: MTOOLS
-
 site: https://vk.com/1nsanemapping
 homepage: https://github.com/ins1x/mtools/wiki
 
+About: MTOOLS for Texture Studio SA:MP
+
+MTOOLS is a filterscript that complements Texture Studio and provides
+a classic dialog interface with basic map editor functionality.
+
 Requirements:
 - SA:MP 0.3.7 R2 server or highter (DL not supported now)
-- Incognito Streamer plugin v 2.7+
-- mtools works with Texture Studio 2.0 and above
+- Incognito Streamer plugin v 2.7+ (Last 2.9.4 supported)
+- mtools works correctly with Texture Studio 2.0 and above
 
-About MTOOLS for Texture Studio SA:MP
+> only some basic functions are available for UG-MP
 
-MTOOLS is a filterscript that complements Texture Studio and provides a classic dialog interface with basic map editor functionality.
-
-MTOOLS appeared as a result of the fact that I was missing some basic functions in Texture Studio, their list was replenished and the idea of merging into one filterscript came up. The task of mtools is to provide more functions to mappers for more flexible work.
-
+Installation:
+- Install latest version Texture Studio
+- Copy the mtools.amx file to the filterscripts folder
+- Create /scriptfiles/mtools folder
+- Open the server.cfg file in any editor and add mtools to filtescripts.
+	filterscripts tstudio mtools
+	plugins crashdetect sscanf streamer filemanager
+> Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 After loading, press ALT or type /mtools to open the main menu
 
 Editor options: TABSIZE 4, encoding utf-8
 */
 
 // VERSION
-#define VERSION              	"0.3.11"
-#define BUILD_DATE             	"27.01.2020"
+#define VERSION              	"0.3.12"
+#define BUILD_DATE             	"28.01.2020"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -716,9 +724,12 @@ public OnPlayerConnect(playerid)
 	//CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/logo");
 	//#endif
 	
-	SendClientMessageToAllEx(0x33DD1100, "Нажмите <ALT> для вызова mtools. Подробнее /help ",
+	SendClientMessageToAllEx(0x33DD1100, 
+	"Нажмите <ALT> для вызова mtools. Подробнее /help ",
 	"Press <Y> to open mtools. Use /help to get more");
-	SendClientMessageToAllEx(0x33DD1100, "Прежде чем приступать к работе создайте либо загрузите карту (/loadmap)",	"Create or load a map before getting started (/loadmap)");
+	SendClientMessageToAllEx(0x33DD1100, 
+	"Прежде чем приступать к работе создайте либо загрузите карту (/loadmap)",
+	"Create or load a map before getting started (/loadmap)");
 	
 	if(autoLoadMap)
 	{
@@ -6633,16 +6644,44 @@ stock GetDirectionInWhichPlayerLooks(playerid, Float:facing_angle = -1.0)
         return 7;
 }
 
+stock RotateAngle(Float: RotAngle)
+{
+	// Shit code. Modify later!!
+	// an example of how you don't need to write code
+	new a = floatround(RotAngle);
+	if(a % 45 != 0)
+	{
+		if(a < 180)
+		{
+			if(a < 90) {
+				if(a < 45) return 0;
+				else return 45;
+			} else {
+				if(a < 135) return 90;
+				else return 180;
+			}
+		} else {
+			if(a < 270) {
+				if(a < 225) return 180;
+				else return 225;
+			} else {
+				if(a < 315) return 270;
+				else return 0;
+			}
+		}
+	}
+	else return a;
+}
+
 stock AutoRotateObject(objectid)
 {
-	// test
+	// Automatically selects an object rotation x/y/z angle multiple of 45
 	new Float:RotX, Float:RotY, Float:RotZ;
-	new tmpstr[128];
 	GetDynamicObjectRot(objectid, RotX, RotY, RotZ);
-	
-	format(tmpstr, sizeof(tmpstr), "x: %.1f, y: %.1f, z: %.1f",
-	RotX, RotY, RotZ);
-	//SendClientMessage(playerid, -1, tmpstr);
+	RotX = RotateAngle(RotX);
+	RotY = RotateAngle(RotY);
+	RotZ = RotateAngle(RotZ);
+	SetDynamicObjectRot(objectid, RotX, RotY, RotZ);
 }
 
 stock GetClosestDynamicObject(playerid)
