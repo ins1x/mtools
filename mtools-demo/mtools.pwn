@@ -25,7 +25,7 @@ Installation:
 > Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 After loading, press ALT or type /mtools to open the main menu
 
-Editor options: TABSIZE 4, encoding utf-8
+Editor options: TABSIZE 4, encoding windows-1251
 */
 
 // VERSION
@@ -122,6 +122,7 @@ Editor options: TABSIZE 4, encoding utf-8
 #define DIALOG_GAMETEXTTEST			6088
 #define DIALOG_GAMETEXTSTYLE		6089
 #define DIALOG_ROTSET				6090
+#define DIALOG_COLORSTIP			6091
 
 #define COLOR_SERVER_GREY		0x87bae7FF
 #define COLOR_GREY 				0xAFAFAFAA
@@ -1959,7 +1960,38 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"OK","");
 					}
 				}
-				case 3:	//https://www.burgershot.gg/showthread.php?tid=174
+				case 3:
+				{
+					new tmpstr[48];
+					// random color generate
+					new c, rcolor[6];
+					do {
+						rcolor[c] = random(9);
+						c+=1;
+					} while (c != 6);
+					
+					ShowPlayerDialog(playerid, DIALOG_COLORSTIP, DIALOG_STYLE_MSGBOX,
+					"Color codes {FF0000}RR{008000}GG{0000FF}BB{FFFF00} - HEX",
+					"{FF0000}RED \t FF0000 \t 0xFF0000FF\n\
+					{008000}GREEN \t 008000 \t 0x008000FF\n\
+					{0000FF}BLUE \t 0000FF \t 0x0000FFFF\n\
+					{FFFF00}YELLOW \t FFFF00 \t 0xFFFF00FF\n\
+					{FF00FF}PINK \t FF00FF \t 0xFF0080FF\n\
+					{00ffff}AQUA \t 00FFFF \t 0x00FFFFFF\n\
+					{00ff00}LIME \t 00FF00 \t 0x00FF00FF\n\
+					{800080}PURPLE \t 800080 \t 0x800080FF\n\
+					{FFFFFF}WHITE \t FFFFFF \t 0xFFFFFFFF\n\
+					{808080}GREY \t 808080 \t 0x808080FF\n\
+					{363636}BLACK \t 000000 \t 0x000000FF\n",
+					"OK","Cancel");
+					
+					format(tmpstr, sizeof(tmpstr),
+					"Random color: {%d%d%d%d%d%d}%d%d%d%d%d%d",
+					rcolor[0],rcolor[1],rcolor[2],rcolor[3],rcolor[4],rcolor[5],
+					rcolor[0],rcolor[1],rcolor[2],rcolor[3],rcolor[4],rcolor[5]);
+					SendClientMessage(playerid, -1, tmpstr);
+				}
+				case 4:	//https://www.burgershot.gg/showthread.php?tid=174
 				{
 					PlayerPlaySound(playerid, 32402, 0.0, 0.0, 0.0); //heli slah ped 
 					ShowPlayerDialog(playerid, DIALOG_CREDITS, DIALOG_STYLE_MSGBOX, "Credits", 
@@ -1975,7 +2007,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					"Abyss Morgan - Streamer Functions\n",
 					"OK", "");
 				}
-				case 4: 
+				case 5: 
 				{
 					new tbtext[500];
 					new header[100];
@@ -3768,7 +3800,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/oprop");
 					#endif
 				}
-				case 7:
+				/*case 7:
 				{
 					#if defined TEXTURE_STUDIO
 					new param[64];
@@ -3776,22 +3808,22 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					GetDynamicObjectModel(EDIT_OBJECT_ID[playerid]));
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);					
 					#endif
-				}
-				case 8:
+				}*/
+				case 7:
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/pivot");
 					#endif
 				}
-				case 9: ShowPlayerMenu(playerid, DIALOG_TEXTUREMENU);
-				case 10: ShowPlayerMenu(playerid, DIALOG_GROUPEDIT);
-				case 11: 
+				case 8: ShowPlayerMenu(playerid, DIALOG_TEXTUREMENU);
+				case 9: ShowPlayerMenu(playerid, DIALOG_GROUPEDIT);
+				case 10: 
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/undo");
 					#endif
 				}
-				case 12: 
+				case 11: 
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/redo");
@@ -5790,6 +5822,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Команды mtools\n"\
 				"Команды TextureStudio\n"\
 				"Управление и горячие клавиши\n"\
+				"Цветовая палитра\n"\
 				"Credits\n"\
 				"О mtools\n");
 			} else {
@@ -5797,6 +5830,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Commands mtools\n"\
 				"Commands TextureStudio\n"\
 				"Controls and hotkeys\n"\
+				"Color codes\n"\
 				"Credits\n"\
 				"About mtools\n");
 			}
@@ -5891,7 +5925,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Копировать объект\t{00FF00}/clone\n"\
 				"Удалить объект\t{00FF00}/dobject\n"\
 				"Информация о текущем объектe\t{00FF00}/oprop\n"\
-				"Информация о модели объекта\t{00FF00}/minfo\n"\
 				"Установить опорную точку\t{00FF00}/pivot\n"\
 				"[>] Ретекстур\t\n"\
 				"[>] Редактирование группы\t\n"\
@@ -5907,7 +5940,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Copy object\t{00FF00}/clone\n"\
 				"Delete object\t{00FF00}/dobject\n"\
 				"Information about the current object\t{00FF00}/oprop\n"\
-				"Object model information\t{00FF00}/minfo\n"\
 				"Set anchor point\t{00FF00}/pivot\n"\
 				"[>] Textures edit\t\n"\
 				"[>] Groups edit\t\n"\
@@ -7553,49 +7585,57 @@ strtok(const string[], &index)
 
 stock IsValidObjectModel(modelid)
 {
-   if(modelid >= 321 && modelid <= 328 || modelid >= 330 && modelid <= 331) return 1;
-   else if(modelid >= 333 && modelid <= 339 || modelid >= 341 && modelid <= 373) return 1;
-   else if(modelid >= 615 && modelid <= 661 || modelid == 664) return 1; 
-   else if(modelid >= 669 && modelid <= 698 || modelid >= 700 && modelid <= 792)  return 1;
-   else if(modelid >= 800 && modelid <= 906 || modelid >= 910 && modelid <= 964) return 1;
-   else if(modelid >= 966 && modelid <= 998 || modelid >= 1000 && modelid <= 1193) return 1;
-   else if(modelid >= 1207 && modelid <= 1325 || modelid >= 1327 && modelid <= 1572) return 1;
-   else if(modelid >= 1574 && modelid <= 1698 || modelid >= 1700 && modelid <= 2882) return 1;
-   else if(modelid >= 2885 && modelid <= 3135 || modelid >= 3167 && modelid <= 3175) return 1;
-   else if(modelid == 3178 || modelid == 3187 || modelid == 3193 || modelid == 3214) return 1;
-   else if(modelid == 3221 || modelid >= 3241 && modelid <= 3244) return 1;
-   else if(modelid == 3246 || modelid >= 3249 && modelid <= 3250) return 1;
-   else if(modelid >= 3252 && modelid <= 3253 || modelid >= 3255 && modelid <= 3265) return 1;
-   else if(modelid >= 3267 && modelid <= 3347 || modelid >= 3350 && modelid <= 3415) return 1;
-   else if(modelid >= 3417 && modelid <= 3428 || modelid >= 3430 && modelid <= 3609) return 1;
-   else if(modelid >= 3612 && modelid <= 3783 || modelid >= 3785 && modelid <= 3869) return 1;
-   else if(modelid >= 3872 && modelid <= 3882 || modelid >= 3884 && modelid <= 3888) return 1;
-   else if(modelid >= 3890 && modelid <= 3973 || modelid >= 3975 && modelid <= 4541) return 1;
-   else if(modelid >= 4550 && modelid <= 4762 || modelid >= 4806 && modelid <= 5084) return 1;
-   else if(modelid >= 5086 && modelid <= 5089 || modelid >= 5105 && modelid <= 5375) return 1;
-   else if(modelid >= 5390 && modelid <= 5682 || modelid >= 5703 && modelid <= 6010) return 1;
-   else if(modelid >= 6035 && modelid <= 6253 || modelid >= 6255 && modelid <= 6257) return 1;
-   else if(modelid >= 6280 && modelid <= 6347 || modelid >= 6349 && modelid <= 6525) return 1;
-   else if(modelid >= 6863 && modelid <= 7392 || modelid >= 7415 && modelid <= 7973) return 1;
-   else if(modelid >= 7978 && modelid <= 9193 || modelid >= 9205 && modelid <= 9267) return 1;
-   else if(modelid >= 9269 && modelid <= 9478 || modelid >= 9482 && modelid <= 10310) return 1;
-   else if(modelid >= 10315 && modelid <= 10744 || modelid >= 10750 && modelid <= 11417) return 1;
-   else if(modelid >= 11420 && modelid <= 11753 || modelid >= 12800 && modelid <= 13563) return 1;
-   else if(modelid >= 13590 && modelid <= 13667 || modelid >= 13672 && modelid <= 13890) return 1;
-   else if(modelid >= 14383 && modelid <= 14528 || modelid >= 14530 && modelid <= 14554) return 1;
-   else if(modelid == 14556 || modelid >= 14558 && modelid <= 14643) return 1;
-   else if(modelid >= 14650 && modelid <= 14657 || modelid >= 14660 && modelid <= 14695) return 1;
-   else if(modelid >= 14699 && modelid <= 14728 || modelid >= 14735 && modelid <= 14765) return 1;
-   else if(modelid >= 14770 && modelid <= 14856 || modelid >= 14858 && modelid <= 14883) return 1;
-   else if(modelid >= 14885 && modelid <= 14898 || modelid >= 14900 && modelid <= 14903) return 1;
-   else if(modelid >= 15025 && modelid <= 15064 || modelid >= 16000 && modelid <= 16790) return 1;
-   else if(modelid >= 17000 && modelid <= 17474 || modelid >= 17500 && modelid <= 17974) return 1;
-   else if(modelid == 17976 || modelid == 17978 || modelid >= 18000 && modelid <= 18036) return 1;
-   else if(modelid >= 18038 && modelid <= 18102 || modelid >= 18104 && modelid <= 18105) return 1;
-   else if(modelid == 18109 || modelid == 18112 || modelid >= 18200 && modelid <= 18859) return 1;
-   else if(modelid >= 18860 && modelid <= 19274 || modelid >= 19275 && modelid <= 19595) return 1;
-   else if(modelid >= 19596 && modelid <= 19999) return 1; 
-   else return 0;
+	if(modelid >= 321 && modelid <= 328 || modelid >= 330 && modelid <= 331) return 1;
+	else if(modelid >= 333 && modelid <= 339 || modelid >= 341 && modelid <= 373) return 1;
+	else if(modelid >= 615 && modelid <= 661 || modelid == 664) return 1; 
+	else if(modelid >= 669 && modelid <= 698 || modelid >= 700 && modelid <= 792)  return 1;
+	else if(modelid >= 800 && modelid <= 906 || modelid >= 910 && modelid <= 964) return 1;
+	else if(modelid >= 966 && modelid <= 998 || modelid >= 1000 && modelid <= 1193) return 1;
+	else if(modelid >= 1207 && modelid <= 1325 || modelid >= 1327 && modelid <= 1572) return 1;
+	else if(modelid >= 1574 && modelid <= 1698 || modelid >= 1700 && modelid <= 2882) return 1;
+	else if(modelid >= 2885 && modelid <= 3135 || modelid >= 3167 && modelid <= 3175) return 1;
+	else if(modelid == 3178 || modelid == 3187 || modelid == 3193 || modelid == 3214) return 1;
+	else if(modelid == 3221 || modelid >= 3241 && modelid <= 3244) return 1;
+	else if(modelid == 3246 || modelid >= 3249 && modelid <= 3250) return 1;
+	else if(modelid >= 3252 && modelid <= 3253 || modelid >= 3255 && modelid <= 3265) return 1;
+	else if(modelid >= 3267 && modelid <= 3347 || modelid >= 3350 && modelid <= 3415) return 1;
+	else if(modelid >= 3417 && modelid <= 3428 || modelid >= 3430 && modelid <= 3609) return 1;
+	else if(modelid >= 3612 && modelid <= 3783 || modelid >= 3785 && modelid <= 3869) return 1;
+	else if(modelid >= 3872 && modelid <= 3882 || modelid >= 3884 && modelid <= 3888) return 1;
+	else if(modelid >= 3890 && modelid <= 3973 || modelid >= 3975 && modelid <= 4541) return 1;
+	else if(modelid >= 4550 && modelid <= 4762 || modelid >= 4806 && modelid <= 5084) return 1;
+	else if(modelid >= 5086 && modelid <= 5089 || modelid >= 5105 && modelid <= 5375) return 1;
+	else if(modelid >= 5390 && modelid <= 5682 || modelid >= 5703 && modelid <= 6010) return 1;
+	else if(modelid >= 6035 && modelid <= 6253 || modelid >= 6255 && modelid <= 6257) return 1;
+	else if(modelid >= 6280 && modelid <= 6347 || modelid >= 6349 && modelid <= 6525) return 1;
+	else if(modelid >= 6863 && modelid <= 7392 || modelid >= 7415 && modelid <= 7973) return 1;
+	else if(modelid >= 7978 && modelid <= 9193 || modelid >= 9205 && modelid <= 9267) return 1;
+	else if(modelid >= 9269 && modelid <= 9478 || modelid >= 9482 && modelid <= 10310) return 1;
+	else if(modelid >= 10315 && modelid <= 10744 || modelid >= 10750 && modelid <= 11417) return 1;
+	else if(modelid >= 11420 && modelid <= 11753 || modelid >= 12800 && modelid <= 13563) return 1;
+	else if(modelid >= 13590 && modelid <= 13667 || modelid >= 13672 && modelid <= 13890) return 1;
+	else if(modelid >= 14383 && modelid <= 14528 || modelid >= 14530 && modelid <= 14554) return 1;
+	else if(modelid == 14556 || modelid >= 14558 && modelid <= 14643) return 1;
+	else if(modelid >= 14650 && modelid <= 14657 || modelid >= 14660 && modelid <= 14695) return 1;
+	else if(modelid >= 14699 && modelid <= 14728 || modelid >= 14735 && modelid <= 14765) return 1;
+	else if(modelid >= 14770 && modelid <= 14856 || modelid >= 14858 && modelid <= 14883) return 1;
+	else if(modelid >= 14885 && modelid <= 14898 || modelid >= 14900 && modelid <= 14903) return 1;
+	else if(modelid >= 15025 && modelid <= 15064 || modelid >= 16000 && modelid <= 16790) return 1;
+	else if(modelid >= 17000 && modelid <= 17474 || modelid >= 17500 && modelid <= 17974) return 1;
+	else if(modelid == 17976 || modelid == 17978 || modelid >= 18000 && modelid <= 18036) return 1;
+	else if(modelid >= 18038 && modelid <= 18102 || modelid >= 18104 && modelid <= 18105) return 1;
+	else if(modelid == 18109 || modelid == 18112 || modelid >= 18200 && modelid <= 18859) return 1;
+	else if(modelid >= 18860 && modelid <= 19274 || modelid >= 19275 && modelid <= 19595) return 1;
+	else if(modelid >= 19596 && modelid <= 19999) return 1; 
+	//UG-MP Valid Object Models
+	#if defined UGMP_INCLUDED
+	if(modelid >= 11754 && modelid <= 11756) return 1;
+	else if(modelid >= 11759 && modelid <= 11803) return 1;
+	else if(modelid >= 11808 && modelid <= 11859) return 1;
+	else if(modelid >= 11863 && modelid <= 11865) return 1;
+	else if(modelid >= 11875 && modelid <= 11880) return 1;
+	#endif
+	else return 0;
 }
 
 public MtoolsHudToggle(playerid)
