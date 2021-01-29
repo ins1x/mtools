@@ -25,12 +25,13 @@ Installation:
 > Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 After loading, press ALT or type /mtools to open the main menu
 
-Editor options: TABSIZE 4, encoding windows-1251
+Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
+
 */
 
 // VERSION
 #define VERSION              	"0.3.12"
-#define BUILD_DATE             	"28.01.2020"
+#define BUILD_DATE             	"29.01.2020"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -383,24 +384,24 @@ enum
 
 new AttachmentBones[18][15] =
 {
-	{"Спина"},
-	{"Голова"},
-	{"Л. плечо"},
-	{"Пр. плечо"},
-	{"Л. кисть"},
-	{"Пр. кисть"},
-	{"Л. бедро"},
-	{"Пр. бедро"},
-	{"Л. стопа"},
-	{"Пр. стопа"},
-	{"Пр. голень"},
-	{"Л. голень"},
-	{"Л. предплечье"},
-	{"Пр. предплечье"},
-	{"Л. ключица"},
-	{"Пр. ключица"},
-	{"Шея"},
-	{"Челюсть"}
+	{"РЎРїРёРЅР°"},
+	{"Р“РѕР»РѕРІР°"},
+	{"Р›. РїР»РµС‡Рѕ"},
+	{"РџСЂ. РїР»РµС‡Рѕ"},
+	{"Р›. РєРёСЃС‚СЊ"},
+	{"РџСЂ. РєРёСЃС‚СЊ"},
+	{"Р›. Р±РµРґСЂРѕ"},
+	{"РџСЂ. Р±РµРґСЂРѕ"},
+	{"Р›. СЃС‚РѕРїР°"},
+	{"РџСЂ. СЃС‚РѕРїР°"},
+	{"РџСЂ. РіРѕР»РµРЅСЊ"},
+	{"Р›. РіРѕР»РµРЅСЊ"},
+	{"Р›. РїСЂРµРґРїР»РµС‡СЊРµ"},
+	{"РџСЂ. РїСЂРµРґРїР»РµС‡СЊРµ"},
+	{"Р›. РєР»СЋС‡РёС†Р°"},
+	{"РџСЂ. РєР»СЋС‡РёС†Р°"},
+	{"РЁРµСЏ"},
+	{"Р§РµР»СЋСЃС‚СЊ"}
 };
 
 new AttachmentBonesEN[18][15] =
@@ -623,7 +624,7 @@ public OnPlayerConnect(playerid)
 	#undef STREAMER_OBJECT_DD
 	#define STREAMER_OBJECT_DD 550.0
 	
-		// use if there are many objects in the interiors and they don’t hope to load
+		// use if there are many objects in the interiors and they donвЂ™t hope to load
 		#if defined AddSimpleModel // DL-SUPPORT
 			Streamer_SetVisibleItems(STREAMER_TYPE_OBJECT, 1500);
 		#else
@@ -726,10 +727,10 @@ public OnPlayerConnect(playerid)
 	//#endif
 	
 	SendClientMessageToAllEx(0x33DD1100, 
-	"Нажмите <ALT> для вызова mtools. Подробнее /help ",
+	"РќР°Р¶РјРёС‚Рµ <ALT> РґР»СЏ РІС‹Р·РѕРІР° mtools. РџРѕРґСЂРѕР±РЅРµРµ /help ",
 	"Press <Y> to open mtools. Use /help to get more");
 	SendClientMessageToAllEx(0x33DD1100, 
-	"Прежде чем приступать к работе создайте либо загрузите карту (/loadmap)",
+	"РџСЂРµР¶РґРµ С‡РµРј РїСЂРёСЃС‚СѓРїР°С‚СЊ Рє СЂР°Р±РѕС‚Рµ СЃРѕР·РґР°Р№С‚Рµ Р»РёР±Рѕ Р·Р°РіСЂСѓР·РёС‚Рµ РєР°СЂС‚Сѓ (/loadmap)",
 	"Create or load a map before getting started (/loadmap)");
 	
 	if(autoLoadMap)
@@ -825,12 +826,12 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		{
 			hideMtoolsMenu = false;
 			SendClientMessageEx(playerid, -1,
-			"Основное меню снова включено",
+			"РћСЃРЅРѕРІРЅРѕРµ РјРµРЅСЋ СЃРЅРѕРІР° РІРєР»СЋС‡РµРЅРѕ",
 			"Main menu is on again");
 		} else {
 			hideMtoolsMenu = true;
 			SendClientMessageEx(playerid, -1,
-			"Вы скрыли основное меню, стобы вернуть нажмите (C + ALT)",
+			"Р’С‹ СЃРєСЂС‹Р»Рё РѕСЃРЅРѕРІРЅРѕРµ РјРµРЅСЋ, СЃС‚РѕР±С‹ РІРµСЂРЅСѓС‚СЊ РЅР°Р¶РјРёС‚Рµ (C + ALT)",
 			"You have hidden the main menu, to return press (C + ALT)");
 		}
 	}
@@ -1254,7 +1255,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if (!cmdtext[3])
 		{
 			SendClientMessageEx(playerid, COLOR_GREY,
-			"Использование: /v [vehicleid]", "Use: /v [vehicleid]");
+			"РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ: /v [vehicleid]", "Use: /v [vehicleid]");
 			#if defined TEXTURE_STUDIO
 			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/tcar");		
 			#endif
@@ -1268,7 +1269,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	{
 		if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER){
 			return SendClientMessageEx(playerid, -1,
-			"Вы должны быть в машине", "You must be in the car");
+			"Р’С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РІ РјР°С€РёРЅРµ", "You must be in the car");
 		}
 		tmp = strtok(cmdtext, idx);
 		if (strlen(tmp) == 0){
@@ -1279,7 +1280,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if(c1 < 0 || c1 > 255)
 		{
 			return SendClientMessageEx(playerid, -1,
-			"Неверное значение. Доступные 0-255", "Incorrect value. Available 0-255");
+			"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ. Р”РѕСЃС‚СѓРїРЅС‹Рµ 0-255", "Incorrect value. Available 0-255");
 		}
 		
 		tmp = strtok(cmdtext, idx);
@@ -1291,7 +1292,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if(c2 < 0 || c2 > 255)
 		{
 			return SendClientMessageEx(playerid, -1,
-			"Неверное значение. Доступные 0-255", "Incorrect value. Available 0-255");
+			"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ. Р”РѕСЃС‚СѓРїРЅС‹Рµ 0-255", "Incorrect value. Available 0-255");
 		}
 		new tmpstr[64];
 		new vehicleid = GetPlayerVehicleID(playerid);
@@ -1305,12 +1306,12 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	{
 		if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER){
 			return SendClientMessageEx(playerid, -1,
-			"Вы должны быть в машине", "You must be in the car");
+			"Р’С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РІ РјР°С€РёРЅРµ", "You must be in the car");
 		}
 		new vehicleid = GetPlayerVehicleID(playerid);
 		ChangeVehiclePaintjob(vehicleid, 3);
 		return SendClientMessageEx(playerid, -1,
-		"Раскраска успешно удалена.", "Paintjob successfully deleted");
+		"Р Р°СЃРєСЂР°СЃРєР° СѓСЃРїРµС€РЅРѕ СѓРґР°Р»РµРЅР°.", "Paintjob successfully deleted");
 	}
 	// vae
 	if(!strcmp("/vae", cmd, true))
@@ -1329,7 +1330,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	if(!strcmp("/vaestop", cmd, true))
 	{
 		KillTimer(VaeData[playerid][timer]);
-		return SendClientMessageEx(playerid, -1, "Редактирование закончено.", "Editing is complete");
+		return SendClientMessageEx(playerid, -1, "Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Р·Р°РєРѕРЅС‡РµРЅРѕ.", "Editing is complete");
 	}
 	if(!strcmp("/vaesave", cmd, true))
 	{		
@@ -1339,7 +1340,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		format(str, 200, "\r\nAttachObjectToVehicle(objectid, vehicleid, %f, %f, %f, %f, %f, %f); //Object Model: %d | %s", VaeData[playerid][OffSetX], VaeData[playerid][OffSetY], VaeData[playerid][OffSetZ], VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ], VaeData[playerid][objmodel], tmp);
 		fwrite(file, str);
 		fclose(file);
-		return SendClientMessageEx(playerid, -1, "Всё сохранено в \"vaeditions.txt\".", "Saved to \"vaeditions.txt\".");
+		return SendClientMessageEx(playerid, -1, "Р’СЃС‘ СЃРѕС…СЂР°РЅРµРЅРѕ РІ \"vaeditions.txt\".", "Saved to \"vaeditions.txt\".");
 	}
 	if(!strcmp("/vaemodel", cmd, true))
 	{
@@ -1356,7 +1357,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if (strlen(tmp) == 0){
 			SendClientMessage(playerid, -1, "Set drunk level. Use: /drunk [0-50000]");
 			SendClientMessageEx(playerid, -1, 
-			"Когда уровень опьянения игрока выше 5000, скрывается HUD",
+			"РљРѕРіРґР° СѓСЂРѕРІРµРЅСЊ РѕРїСЊСЏРЅРµРЅРёСЏ РёРіСЂРѕРєР° РІС‹С€Рµ 5000, СЃРєСЂС‹РІР°РµС‚СЃСЏ HUD",
 			"When the player's intoxication level is above 5000, the HUD is hidden.");
 			SetPVarInt(playerid, "drunk", 0);
 			SetPlayerDrunkLevel(playerid, 0);
@@ -1475,12 +1476,12 @@ public OnPlayerCommandText(playerid, cmdtext[])
 				specid = playerid;
 				PlayerTextDrawShow(playerid, TDspecbar[playerid]);
 				SetPVarInt(playerid, "specbar", specid);
-				//SendClientMessageEx(playerid, COLOR_GREY, "Для перемещения между игроками используйте клавиши <Num4> и <Num6>", "Use the <Num4> and <Num6> keys to move between players");
+				//SendClientMessageEx(playerid, COLOR_GREY, "Р”Р»СЏ РїРµСЂРµРјРµС‰РµРЅРёСЏ РјРµР¶РґСѓ РёРіСЂРѕРєР°РјРё РёСЃРїРѕР»СЊР·СѓР№С‚Рµ РєР»Р°РІРёС€Рё <Num4> Рё <Num6>", "Use the <Num4> and <Num6> keys to move between players");
 				return true;
 			} else {
 				PlayerTextDrawHide(playerid, TDspecbar[playerid]);
 				SetPVarInt(playerid, "specbar",-1);
-				//SendClientMessageEx(playerid, COLOR_GREY, "Спекбар был отключен. Введите /specbar <ID> чтобы включить", "Specbar was disabled. Use /specbar <ID> to enable");
+				//SendClientMessageEx(playerid, COLOR_GREY, "РЎРїРµРєР±Р°СЂ Р±С‹Р» РѕС‚РєР»СЋС‡РµРЅ. Р’РІРµРґРёС‚Рµ /specbar <ID> С‡С‚РѕР±С‹ РІРєР»СЋС‡РёС‚СЊ", "Specbar was disabled. Use /specbar <ID> to enable");
 				return true;
 			}
 		}
@@ -1488,7 +1489,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		specid = strval(cmdtext[9]);
 		PlayerTextDrawShow(playerid, TDspecbar[playerid]);
 		SetPVarInt(playerid, "specbar", specid);
-		//SendClientMessageEx(playerid, COLOR_GREY, "Для перемещения между игроками используйте клавиши <Num4> и <Num6>", "Use the <Num4> and <Num6> keys to move between players");
+		//SendClientMessageEx(playerid, COLOR_GREY, "Р”Р»СЏ РїРµСЂРµРјРµС‰РµРЅРёСЏ РјРµР¶РґСѓ РёРіСЂРѕРєР°РјРё РёСЃРїРѕР»СЊР·СѓР№С‚Рµ РєР»Р°РІРёС€Рё <Num4> Рё <Num6>", "Use the <Num4> and <Num6> keys to move between players");
 		return true;
 	}
 	// EDITOR cmds
@@ -1517,7 +1518,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
  
 		if(EDIT_OBJECT_ID[playerid] == -1) 
 			return SendClientMessageEx(playerid, -1,
-			"сперва нужно выбрать объект!", "first you need to select an object!");
+			"СЃРїРµСЂРІР° РЅСѓР¶РЅРѕ РІС‹Р±СЂР°С‚СЊ РѕР±СЉРµРєС‚!", "first you need to select an object!");
 		
 		#if defined TEXTURE_STUDIO
 		new param[24];
@@ -1586,7 +1587,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
  
 		if(EDIT_OBJECT_ID[playerid] == -1) 
 			return SendClientMessageEx(playerid, -1,
-			"сперва нужно выбрать объект!", "first you need to select an object!");
+			"СЃРїРµСЂРІР° РЅСѓР¶РЅРѕ РІС‹Р±СЂР°С‚СЊ РѕР±СЉРµРєС‚!", "first you need to select an object!");
 		
 		#if defined TEXTURE_STUDIO
 		new param[24];
@@ -1652,7 +1653,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		
 		if(height < 100 || height > 2000) {
 			return SendClientMessageEx(playerid, -1,
-			"Неккоректное значение. Допустимые от 100 до 2000",
+			"РќРµРєРєРѕСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ. Р”РѕРїСѓСЃС‚РёРјС‹Рµ РѕС‚ 100 РґРѕ 2000",
 			"Incorrect value. Valid from 100 to 2000");
 		}
 		new Float:x, Float:y, Float:z;
@@ -1671,7 +1672,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 			format(tmpstr, sizeof(tmpstr), "Nearest object -  objectid: %i modelid: %i",
 			objectid, GetDynamicObjectModel(objectid));
 		} else {
-			format(tmpstr, sizeof(tmpstr), "Ближайший объект - objectid: %i modelid: %i",
+			format(tmpstr, sizeof(tmpstr), "Р‘Р»РёР¶Р°Р№С€РёР№ РѕР±СЉРµРєС‚ - objectid: %i modelid: %i",
 			objectid, GetDynamicObjectModel(objectid));
 		}
 		SendClientMessage(playerid, -1, tmpstr);
@@ -1696,7 +1697,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 			GetPlayerFacingAngle(playerid, Angle);
 		}
 		SendClientMessageEx(playerid, -1,
-		"Введите /retcam для того чтобы вернуть камеру",
+		"Р’РІРµРґРёС‚Рµ /retcam РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ РІРµСЂРЅСѓС‚СЊ РєР°РјРµСЂСѓ",
 		"Enter /retcam to return the camera");
 		return 1;
 	}
@@ -1748,11 +1749,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		{
 			TogglePlayerControllable(playerid, true);
 			SetPVarInt(playerid,"freezed",0);
-			SendClientMessageEx(playerid, -1, "Вы размороженны","You are unfreezed");
+			SendClientMessageEx(playerid, -1, "Р’С‹ СЂР°Р·РјРѕСЂРѕР¶РµРЅРЅС‹","You are unfreezed");
 		} else {
 			TogglePlayerControllable(playerid, false);
 			SetPVarInt(playerid,"freezed",1);
-			SendClientMessageEx(playerid, -1, "Вы замороженны","You are freezed");
+			SendClientMessageEx(playerid, -1, "Р’С‹ Р·Р°РјРѕСЂРѕР¶РµРЅРЅС‹","You are freezed");
 		}
 		return 1;
 	}
@@ -1760,7 +1761,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	{
 		TogglePlayerControllable(playerid, true);
 		SetPVarInt(playerid,"freezed",0);
-		SendClientMessageEx(playerid, -1, "Вы замороженны","You are freezed");
+		SendClientMessageEx(playerid, -1, "Р’С‹ Р·Р°РјРѕСЂРѕР¶РµРЅРЅС‹","You are freezed");
 		return 1;
 	}
 	if(!strcmp(cmdtext, "/slowmo", true))
@@ -1768,7 +1769,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if(GetGravity() == 0.008)
 		{
 			SendClientMessageEx(playerid, COLOR_LIME,
-			"Включен режим слоумо",
+			"Р’РєР»СЋС‡РµРЅ СЂРµР¶РёРј СЃР»РѕСѓРјРѕ",
 			"Slow motion mode enabled");
 			SetGravity(0.001);
 		} else {
@@ -1781,7 +1782,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	    if (GetPlayerState(playerid) != PLAYER_STATE_ONFOOT)
 	    {
 	        SendClientMessageEx(playerid, COLOR_GREY,
-			"Сейчас Вы не можете заспавниться.", "You can't respawn yourself right now.");
+			"РЎРµР№С‡Р°СЃ Р’С‹ РЅРµ РјРѕР¶РµС‚Рµ Р·Р°СЃРїР°РІРЅРёС‚СЊСЃСЏ.", "You can't respawn yourself right now.");
 	        return true;
 	    }
 		SpawnPlayer(playerid);
@@ -1800,7 +1801,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	if (!strcmp(cmdtext, "/weather", true))
 	{
 	    SendClientMessageEx(playerid, COLOR_GREY,
-		"Использование: /weather [№ погоды]", "Use: /weather [weather ID]");
+		"РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ: /weather [в„– РїРѕРіРѕРґС‹]", "Use: /weather [weather ID]");
 		ShowPlayerDialog(playerid, DIALOG_WEATHER, DIALOG_STYLE_INPUT,
 		"Set weather",
 		"Weather IDs 1-22 appear to work correctly (max 255)\n"\
@@ -1810,7 +1811,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	if (!strcmp(cmdtext, "/time", true))
 	{
 		SendClientMessageEx(playerid, COLOR_GREY,
-		"Использование: /time [час]", "Use: /time [hour]");
+		"РСЃРїРѕР»СЊР·РѕРІР°РЅРёРµ: /time [С‡Р°СЃ]", "Use: /time [hour]");
 		ShowPlayerDialog(playerid, DIALOG_TIME, DIALOG_STYLE_INPUT,
 		"Set time", "Enter time [0-23]. Default [12].", "Ok", "Cancel");
 		return true;
@@ -1820,14 +1821,14 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if (GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
 		{
 			SendClientMessageEx(playerid, COLOR_GREY, 
-			"Вы не можете использовать джетпак в наблюдении.", 
+			"Р’С‹ РЅРµ РјРѕР¶РµС‚Рµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РґР¶РµС‚РїР°Рє РІ РЅР°Р±Р»СЋРґРµРЅРёРё.", 
 			"You can't use jetpack while spectating.");
 			return true;
 		}
 		if (GetPlayerState(playerid) == SPECIAL_ACTION_USEJETPACK)
 		{
 			SendClientMessageEx(playerid, COLOR_GREY,
-			"Вы уже на джетпаке.", "You already have jetpack.");
+			"Р’С‹ СѓР¶Рµ РЅР° РґР¶РµС‚РїР°РєРµ.", "You already have jetpack.");
 			return true;
 		}
 		useJetpack = true;
@@ -1856,12 +1857,12 @@ public OnPlayerCommandText(playerid, cmdtext[])
 			SendRconCommand("unloadfs mtools");
 			SendRconCommand("loadfs mtools");
 			SendClientMessageEx(playerid, COLOR_GREY, 
-			"filterscript mtools был перезагружен",
+			"filterscript mtools Р±С‹Р» РїРµСЂРµР·Р°РіСЂСѓР¶РµРЅ",
 			"filterscript mtools reloaded");
 			return 1;
 		} else {
 			return SendClientMessageEx(playerid, COLOR_GREY,
-			"Для использования этих функций нужны RCON права", 
+			"Р”Р»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ СЌС‚РёС… С„СѓРЅРєС†РёР№ РЅСѓР¶РЅС‹ RCON РїСЂР°РІР°", 
 			"To use these functions, you need RCON rights!");
 		}
 	}
@@ -1918,33 +1919,33 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						ShowPlayerDialog(playerid, DIALOG_TUTORIAL, DIALOG_STYLE_MSGBOX, 
 						"Hotkeys",
-						"{FFFFFF}Горячие клавиши mtools:\n"\
-						"ALT - откроет меню редатора карт\n"\
-						"Escape - чтобы выйти из редактора, или выбора объекта\n"\
-						"Space - чтобы вращать камеру во время редактирования\n"\
-						"В машине\n"\
-						"2 - автотюнинг\n\n"\
-						"Горячие клавиши Texture Studio:\n"\
-						"Открыть меню:\n"\
-						" в flymode - Shift в обычном режиме - N\n\n"\
-						"При включенном ежиме выбора текстуры /mtextures\n"\
-						"нажмите Alt и текстура встанет на объект\n\n"\
-						"В flymode чтобы листать текстуры:\n"\
-						" вниз - зажмите F+Num4\n"\
-						" вверх - зажмите F+Num6\n"\
-						" страница влево - Num4\n"\
-						" страница вправо - Num6\n"\
-						"Листать текстуры не в /flymode:\n"\
-						" вниз - H\n"\
-						" вверх - Y\n"\
-						" страница влево - Num4\n"\
-						" страница вправо - Num6\n\n"\
-						"Добавить текстуру в тему:\n"\
-						" в флаймоде при введенной команде /csel - ПРОБЕЛ\n"\
-						" в обычном режиме - ПРОБЕЛ+ПКМ\n\n"\
-						"При включенном /editobject нажмите Alt и объект с копируется.\n"\
-						"Скопировать свойства объекта в буфер обмена - H+ЛКМ по объекту\n"\
-						"Вставить свойства объекта из буфера обмена - Alt+ЛКМ по объекту. \n",
+						"{FFFFFF}Р“РѕСЂСЏС‡РёРµ РєР»Р°РІРёС€Рё mtools:\n"\
+						"ALT - РѕС‚РєСЂРѕРµС‚ РјРµРЅСЋ СЂРµРґР°С‚РѕСЂР° РєР°СЂС‚\n"\
+						"Escape - С‡С‚РѕР±С‹ РІС‹Р№С‚Рё РёР· СЂРµРґР°РєС‚РѕСЂР°, РёР»Рё РІС‹Р±РѕСЂР° РѕР±СЉРµРєС‚Р°\n"\
+						"Space - С‡С‚РѕР±С‹ РІСЂР°С‰Р°С‚СЊ РєР°РјРµСЂСѓ РІРѕ РІСЂРµРјСЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ\n"\
+						"Р’ РјР°С€РёРЅРµ\n"\
+						"2 - Р°РІС‚РѕС‚СЋРЅРёРЅРі\n\n"\
+						"Р“РѕСЂСЏС‡РёРµ РєР»Р°РІРёС€Рё Texture Studio:\n"\
+						"РћС‚РєСЂС‹С‚СЊ РјРµРЅСЋ:\n"\
+						" РІ flymode - Shift РІ РѕР±С‹С‡РЅРѕРј СЂРµР¶РёРјРµ - N\n\n"\
+						"РџСЂРё РІРєР»СЋС‡РµРЅРЅРѕРј РµР¶РёРјРµ РІС‹Р±РѕСЂР° С‚РµРєСЃС‚СѓСЂС‹ /mtextures\n"\
+						"РЅР°Р¶РјРёС‚Рµ Alt Рё С‚РµРєСЃС‚СѓСЂР° РІСЃС‚Р°РЅРµС‚ РЅР° РѕР±СЉРµРєС‚\n\n"\
+						"Р’ flymode С‡С‚РѕР±С‹ Р»РёСЃС‚Р°С‚СЊ С‚РµРєСЃС‚СѓСЂС‹:\n"\
+						" РІРЅРёР· - Р·Р°Р¶РјРёС‚Рµ F+Num4\n"\
+						" РІРІРµСЂС… - Р·Р°Р¶РјРёС‚Рµ F+Num6\n"\
+						" СЃС‚СЂР°РЅРёС†Р° РІР»РµРІРѕ - Num4\n"\
+						" СЃС‚СЂР°РЅРёС†Р° РІРїСЂР°РІРѕ - Num6\n"\
+						"Р›РёСЃС‚Р°С‚СЊ С‚РµРєСЃС‚СѓСЂС‹ РЅРµ РІ /flymode:\n"\
+						" РІРЅРёР· - H\n"\
+						" РІРІРµСЂС… - Y\n"\
+						" СЃС‚СЂР°РЅРёС†Р° РІР»РµРІРѕ - Num4\n"\
+						" СЃС‚СЂР°РЅРёС†Р° РІРїСЂР°РІРѕ - Num6\n\n"\
+						"Р”РѕР±Р°РІРёС‚СЊ С‚РµРєСЃС‚СѓСЂСѓ РІ С‚РµРјСѓ:\n"\
+						" РІ С„Р»Р°Р№РјРѕРґРµ РїСЂРё РІРІРµРґРµРЅРЅРѕР№ РєРѕРјР°РЅРґРµ /csel - РџР РћР‘Р•Р›\n"\
+						" РІ РѕР±С‹С‡РЅРѕРј СЂРµР¶РёРјРµ - РџР РћР‘Р•Р›+РџРљРњ\n\n"\
+						"РџСЂРё РІРєР»СЋС‡РµРЅРЅРѕРј /editobject РЅР°Р¶РјРёС‚Рµ Alt Рё РѕР±СЉРµРєС‚ СЃ РєРѕРїРёСЂСѓРµС‚СЃСЏ.\n"\
+						"РЎРєРѕРїРёСЂРѕРІР°С‚СЊ СЃРІРѕР№СЃС‚РІР° РѕР±СЉРµРєС‚Р° РІ Р±СѓС„РµСЂ РѕР±РјРµРЅР° - H+Р›РљРњ РїРѕ РѕР±СЉРµРєС‚Сѓ\n"\
+						"Р’СЃС‚Р°РІРёС‚СЊ СЃРІРѕР№СЃС‚РІР° РѕР±СЉРµРєС‚Р° РёР· Р±СѓС„РµСЂР° РѕР±РјРµРЅР° - Alt+Р›РљРњ РїРѕ РѕР±СЉРµРєС‚Сѓ. \n",
 						"OK","");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_TUTORIAL, DIALOG_STYLE_MSGBOX, 
@@ -2017,13 +2018,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
 						format(tbtext, sizeof(tbtext),
-						"{FF0000}m{FFFFFF}tools — это filterscript который дополняет Texture Studio и предоставляет\n"\
-						"классический интерфейс на диалогах с основными функциями редактора карт\n\n"\
-						"Многим не хватало некоторых базовых функций в Texture Studio\n"\
-						"их список пополнялся, и пришла идея слияния мелких дополнений в один\n"\
-						"filterscript - так и появился mtools\n\n"\
-						"Домашняя страница mtools: {4682b4}vk.com/1nsanemapping{FFFFFF}\n"\
-						"Нашли баг? Сообщите о находке!\n");
+						"{FF0000}m{FFFFFF}tools вЂ” СЌС‚Рѕ filterscript РєРѕС‚РѕСЂС‹Р№ РґРѕРїРѕР»РЅСЏРµС‚ Texture Studio Рё РїСЂРµРґРѕСЃС‚Р°РІР»СЏРµС‚\n"\
+						"РєР»Р°СЃСЃРёС‡РµСЃРєРёР№ РёРЅС‚РµСЂС„РµР№СЃ РЅР° РґРёР°Р»РѕРіР°С… СЃ РѕСЃРЅРѕРІРЅС‹РјРё С„СѓРЅРєС†РёСЏРјРё СЂРµРґР°РєС‚РѕСЂР° РєР°СЂС‚\n\n"\
+						"РњРЅРѕРіРёРј РЅРµ С…РІР°С‚Р°Р»Рѕ РЅРµРєРѕС‚РѕСЂС‹С… Р±Р°Р·РѕРІС‹С… С„СѓРЅРєС†РёР№ РІ Texture Studio\n"\
+						"РёС… СЃРїРёСЃРѕРє РїРѕРїРѕР»РЅСЏР»СЃСЏ, Рё РїСЂРёС€Р»Р° РёРґРµСЏ СЃР»РёСЏРЅРёСЏ РјРµР»РєРёС… РґРѕРїРѕР»РЅРµРЅРёР№ РІ РѕРґРёРЅ\n"\
+						"filterscript - С‚Р°Рє Рё РїРѕСЏРІРёР»СЃСЏ mtools\n\n"\
+						"Р”РѕРјР°С€РЅСЏСЏ СЃС‚СЂР°РЅРёС†Р° mtools: {4682b4}vk.com/1nsanemapping{FFFFFF}\n"\
+						"РќР°С€Р»Рё Р±Р°Рі? РЎРѕРѕР±С‰РёС‚Рµ Рѕ РЅР°С…РѕРґРєРµ!\n");
 					} else {
 						format(tbtext, sizeof(tbtext),
 						"{FF0000}m{FFFFFF}tools is a filterscript that complements Texture Studio and provides\n"\
@@ -2053,12 +2054,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
 						ShowPlayerDialog(playerid, DIALOG_SCOORDS, DIALOG_STYLE_LIST, "Coords",
-						"информация о текущей позиции\n"\
-						"сохранить координаты в формате: X,Y,Z\n"\
-						"сохранить координаты в формате: X,Y,Z,angle\n"\
-						"сохранить координаты в формате: {X,Y,Z},\n"\
-						"сохранить координаты в формате: {X,Y,Z,angle,world,interior},\n"\
-						"сохранить координаты в формате: {maxX,mixX,maxY,minY},\n",
+						"РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚РµРєСѓС‰РµР№ РїРѕР·РёС†РёРё\n"\
+						"СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ С„РѕСЂРјР°С‚Рµ: X,Y,Z\n"\
+						"СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ С„РѕСЂРјР°С‚Рµ: X,Y,Z,angle\n"\
+						"СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ С„РѕСЂРјР°С‚Рµ: {X,Y,Z},\n"\
+						"СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ С„РѕСЂРјР°С‚Рµ: {X,Y,Z,angle,world,interior},\n"\
+						"СЃРѕС…СЂР°РЅРёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹ РІ С„РѕСЂРјР°С‚Рµ: {maxX,mixX,maxY,minY},\n",
 						"Select","Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_SCOORDS, DIALOG_STYLE_LIST, "Coords",
@@ -2090,14 +2091,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if (GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
 					{
 						SendClientMessageEx(playerid, COLOR_GREY,
-						"Вы не можете использовать джетпак в наблюдении.",
+						"Р’С‹ РЅРµ РјРѕР¶РµС‚Рµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РґР¶РµС‚РїР°Рє РІ РЅР°Р±Р»СЋРґРµРЅРёРё.",
 						"You can't use jetpack while spectating.");
 						return true;
 					}
 					if (GetPlayerState(playerid) == SPECIAL_ACTION_USEJETPACK)
 					{
 						SendClientMessageEx(playerid, COLOR_GREY,
-						"Вы уже на джетпаке.", "You already have jetpack.");
+						"Р’С‹ СѓР¶Рµ РЅР° РґР¶РµС‚РїР°РєРµ.", "You already have jetpack.");
 						return true;
 					}
 					useJetpack = true;
@@ -2122,7 +2123,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					// (or through the specified value by the Streamer_TickRate function).
 					Streamer_DestroyAllVisibleItems(playerid, STREAMER_TYPE_OBJECT);
 					SendClientMessageEx(playerid, -1,
-					"Все динамические объекты были обновлены","All dynamic objects have been updated");
+					"Р’СЃРµ РґРёРЅР°РјРёС‡РµСЃРєРёРµ РѕР±СЉРµРєС‚С‹ Р±С‹Р»Рё РѕР±РЅРѕРІР»РµРЅС‹","All dynamic objects have been updated");
 				}
 				case 7: ShowPlayerMenu(playerid, DIALOG_SOUNDTEST);
 				case 8: 
@@ -2211,14 +2212,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(GetPVarInt(playerid, "lang") == 0)
 					{		
 						format(tbtext, sizeof(tbtext),
-						"Опция\tcmd\n"\
-						"Цвета\t{00FF00}/avcarcolor\n"\
-						"Покрасочные работы\t{00FF00}/avpaint\n"\
-						"Телепорт в мастерскую\t{00FF00}/avmodcar\n"\
-						"Установить гидравлику\t\n"\
-						"Установить закись азота\t\n"\
-						"[>] Диски\t\n"\
-						"[>] Стайлинг\t\n");
+						"РћРїС†РёСЏ\tcmd\n"\
+						"Р¦РІРµС‚Р°\t{00FF00}/avcarcolor\n"\
+						"РџРѕРєСЂР°СЃРѕС‡РЅС‹Рµ СЂР°Р±РѕС‚С‹\t{00FF00}/avpaint\n"\
+						"РўРµР»РµРїРѕСЂС‚ РІ РјР°СЃС‚РµСЂСЃРєСѓСЋ\t{00FF00}/avmodcar\n"\
+						"РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РіРёРґСЂР°РІР»РёРєСѓ\t\n"\
+						"РЈСЃС‚Р°РЅРѕРІРёС‚СЊ Р·Р°РєРёСЃСЊ Р°Р·РѕС‚Р°\t\n"\
+						"[>] Р”РёСЃРєРё\t\n"\
+						"[>] РЎС‚Р°Р№Р»РёРЅРі\t\n");
 					} else {
 						format(tbtext, sizeof(tbtext),
 						"Option\tCommand\n"\
@@ -2240,12 +2241,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(GetPVarInt(playerid, "lang") == 0)
 					{		
 						format(tbtext, sizeof(tbtext),
-						"Откр Капот\n"\
-						"Откр Багажник\n"\
-						"[Вкл/откл] Фары\n"\
-						"Пробить все 4 колеса\n"\
-						"Пробить задние 2 колеса\n"\
-						"Сигнализация\n");
+						"РћС‚РєСЂ РљР°РїРѕС‚\n"\
+						"РћС‚РєСЂ Р‘Р°РіР°Р¶РЅРёРє\n"\
+						"[Р’РєР»/РѕС‚РєР»] Р¤Р°СЂС‹\n"\
+						"РџСЂРѕР±РёС‚СЊ РІСЃРµ 4 РєРѕР»РµСЃР°\n"\
+						"РџСЂРѕР±РёС‚СЊ Р·Р°РґРЅРёРµ 2 РєРѕР»РµСЃР°\n"\
+						"РЎРёРіРЅР°Р»РёР·Р°С†РёСЏ\n");
 					} else {
 						format(tbtext, sizeof(tbtext),
 						"Open Hood \n"\
@@ -2276,10 +2277,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(useBoost)
 					{
 						useBoost = false;
-						SendClientMessageEx(playerid, -1, "Бустер отключен.", "Boost mode disabled.");
+						SendClientMessageEx(playerid, -1, "Р‘СѓСЃС‚РµСЂ РѕС‚РєР»СЋС‡РµРЅ.", "Boost mode disabled.");
 					} else {
 						useBoost = true;
-						SendClientMessageEx(playerid, -1, "Бустер включен. Нажмите ЛКМ для ускорения", "Boost mode enabled. Press LMB to increase speed");
+						SendClientMessageEx(playerid, -1, "Р‘СѓСЃС‚РµСЂ РІРєР»СЋС‡РµРЅ. РќР°Р¶РјРёС‚Рµ Р›РљРњ РґР»СЏ СѓСЃРєРѕСЂРµРЅРёСЏ", "Boost mode enabled. Press LMB to increase speed");
 					}
 					new query[128];
 					format(query,sizeof(query),
@@ -2291,11 +2292,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(useNOS)
 					{
 						useNOS = false;
-						SendClientMessageEx(playerid, -1, "Автопополение NOS отключено.",
+						SendClientMessageEx(playerid, -1, "РђРІС‚РѕРїРѕРїРѕР»РµРЅРёРµ NOS РѕС‚РєР»СЋС‡РµРЅРѕ.",
 						"NOS refill disabled.");
 					} else {
 						useNOS = true;
-						SendClientMessageEx(playerid, -1, "Автопополение NOS включено.",
+						SendClientMessageEx(playerid, -1, "РђРІС‚РѕРїРѕРїРѕР»РµРЅРёРµ NOS РІРєР»СЋС‡РµРЅРѕ.",
 						"NOS refill enabled.");
 					}
 					new query[128];
@@ -2308,11 +2309,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(useAutoFixveh)
 					{
 						useAutoFixveh = false;
-						SendClientMessageEx(playerid, -1, "Автопопочинка отключена",
+						SendClientMessageEx(playerid, -1, "РђРІС‚РѕРїРѕРїРѕС‡РёРЅРєР° РѕС‚РєР»СЋС‡РµРЅР°",
 						"Auto vehicle repair disabled");
 					} else {
 						useAutoFixveh = true;
-						SendClientMessageEx(playerid, -1, "Автопопочинка включена",
+						SendClientMessageEx(playerid, -1, "РђРІС‚РѕРїРѕРїРѕС‡РёРЅРєР° РІРєР»СЋС‡РµРЅР°",
 						"Auto vehicle repair enabled");
 					}
 					new query[128];
@@ -2325,11 +2326,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(useAutoTune)
 					{
 						useAutoTune = false;
-						SendClientMessageEx(playerid, -1, "Автотюнинг на <2> отключен",
+						SendClientMessageEx(playerid, -1, "РђРІС‚РѕС‚СЋРЅРёРЅРі РЅР° <2> РѕС‚РєР»СЋС‡РµРЅ",
 						"Auto vehicle tuning on key <2> disabled");
 					} else {
 						useAutoTune = true;
-						SendClientMessageEx(playerid, -1, "Автотюнинг на <2> включен",
+						SendClientMessageEx(playerid, -1, "РђРІС‚РѕС‚СЋРЅРёРЅРі РЅР° <2> РІРєР»СЋС‡РµРЅ",
 						"Auto vehicle tuning on key <2> enabled");
 					}
 					new query[128];
@@ -2342,11 +2343,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(useFlip)
 					{
 						useFlip = false;
-						SendClientMessageEx(playerid, -1, "Flip на <H> отключен",
+						SendClientMessageEx(playerid, -1, "Flip РЅР° <H> РѕС‚РєР»СЋС‡РµРЅ",
 						"Flip on key <H> disabled");
 					} else {
 						useFlip = true;
-						SendClientMessageEx(playerid, -1, "Flip на <H> включен",
+						SendClientMessageEx(playerid, -1, "Flip РЅР° <H> РІРєР»СЋС‡РµРЅ",
 						"Flip on key <H> enabled");
 					}
 					new query[128];
@@ -2360,12 +2361,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						DisableRemoteVehicleCollisions(playerid, 0); //off
 						vehCollision = false;
-						SendClientMessageEx(playerid, -1, "Коллизия транспорта включена",
+						SendClientMessageEx(playerid, -1, "РљРѕР»Р»РёР·РёСЏ С‚СЂР°РЅСЃРїРѕСЂС‚Р° РІРєР»СЋС‡РµРЅР°",
 						"Vehicle collision enabled");
 					} else {
 						DisableRemoteVehicleCollisions(playerid, 1); //disable collision
 						vehCollision = true;
-						SendClientMessageEx(playerid, -1, "Коллизия транспорта отключена", 
+						SendClientMessageEx(playerid, -1, "РљРѕР»Р»РёР·РёСЏ С‚СЂР°РЅСЃРїРѕСЂС‚Р° РѕС‚РєР»СЋС‡РµРЅР°", 
 						"Vehicle collision disabled");
 					}
 					new query[128];
@@ -2376,16 +2377,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 6:
 				{
 					SendClientMessageEx(playerid, COLOR_LIME, 
-					"Эта опция работает только для траспорта вызванного через /v [id]",
+					"Р­С‚Р° РѕРїС†РёСЏ СЂР°Р±РѕС‚Р°РµС‚ С‚РѕР»СЊРєРѕ РґР»СЏ С‚СЂР°СЃРїРѕСЂС‚Р° РІС‹Р·РІР°РЅРЅРѕРіРѕ С‡РµСЂРµР· /v [id]",
 					"This option only works for a transport called via / v [id]");
 					if(removePlayerVehicleOnExit)
 					{
 						removePlayerVehicleOnExit = false;
-						SendClientMessageEx(playerid, -1, "Автоудаление транспорта игрока отключено",
+						SendClientMessageEx(playerid, -1, "РђРІС‚РѕСѓРґР°Р»РµРЅРёРµ С‚СЂР°РЅСЃРїРѕСЂС‚Р° РёРіСЂРѕРєР° РѕС‚РєР»СЋС‡РµРЅРѕ",
 						"auto delete player transport is disabled");
 					} else {
 						removePlayerVehicleOnExit = true;
-						SendClientMessageEx(playerid, -1, "Автоудаление транспорта игрока включено",
+						SendClientMessageEx(playerid, -1, "РђРІС‚РѕСѓРґР°Р»РµРЅРёРµ С‚СЂР°РЅСЃРїРѕСЂС‚Р° РёРіСЂРѕРєР° РІРєР»СЋС‡РµРЅРѕ",
 						"auto delete player transport is enabled");
 					}
 					new query[128];
@@ -2465,7 +2466,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			            PlayerPlaySound(playerid, 1133, 0.0, 0.0, 0.0);
 					} else {
 						return SendClientMessageEx(playerid, -1,
-						"Недоступно для данного транспорта","Not available for this vehicle");
+						"РќРµРґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°","Not available for this vehicle");
 					}
 				}
 				case 1:
@@ -2531,7 +2532,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			            PlayerPlaySound(playerid, 1133, 0.0, 0.0, 0.0);
 					} else {
 						return SendClientMessageEx(playerid, -1,
-						"Недоступно для данного транспорта","Not available for this vehicle");
+						"РќРµРґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°","Not available for this vehicle");
 					}
 				}
 				case 2:
@@ -2566,13 +2567,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 406,407,430,432,425,447,464,476,601:
 				{
 					return SendClientMessageEx(playerid, -1,
-					"Недоступно для данного транспорта","Not available for this vehicle"); // airveh
+					"РќРµРґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°","Not available for this vehicle"); // airveh
 				}
 				case 446,448,452,424,453,454,461,462,463,468,471,472,449,473,481,484,493,
 				509,510,521,538,522,523,532,537,570,581,586,590,569,595,604,611:
 				{
 					return SendClientMessageEx(playerid, -1,
-					"Недоступно для данного транспорта","Not available for this vehicle");
+					"РќРµРґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°","Not available for this vehicle");
 				}
 			}
 			// 1000 - Pro 1001 - Win 1002 - Drag 1003 - Alpha 1014 - Champ 1015 - Race 1016 - Worx
@@ -2593,7 +2594,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) {
 				return SendClientMessageEx(playerid, -1,
-				"Вы должны быть в машине", "You must be in the car");
+				"Р’С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РІ РјР°С€РёРЅРµ", "You must be in the car");
 			}
 			new vehicleid;
 			vehicleid = GetPlayerVehicleID(playerid);
@@ -2647,7 +2648,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if (IsABike(vehicleid) || IsABoat(vehicleid) || 
 					IsAPlane(vehicleid) || IsANoSpeed(vehicleid)) {
 						return SendClientMessageEx(playerid, -1,
-						"Недоступно для данного транспорта","Not available for this vehicle");
+						"РќРµРґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°","Not available for this vehicle");
 					}
 					new engine,lights,alarm,doors,bonnet,boot,objective;
 					GetVehicleParamsEx(vehicleid,engine,lights,alarm,doors,bonnet,boot,objective);
@@ -2664,7 +2665,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(IsABike(vehicleid) || IsABoat(vehicleid) ||
 					IsAPlane(vehicleid) || IsANoSpeed(vehicleid)) {
 						return SendClientMessageEx(playerid, -1,
-						"Недоступно для данного транспорта","Not available for this vehicle");
+						"РќРµРґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°","Not available for this vehicle");
 					}
 					new engine,lights,alarm,doors,bonnet,boot,objective;
 					GetVehicleParamsEx(vehicleid,engine,lights,alarm,doors,bonnet,boot,objective);
@@ -2681,7 +2682,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(IsABoat(vehicleid) || IsAPlane(vehicleid) ||
 					IsANoSpeed(vehicleid)){
 						return SendClientMessageEx(playerid, -1,
-						"Недоступно для данного транспорта","Not available for this vehicle");
+						"РќРµРґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°","Not available for this vehicle");
 					}
 					new engine,lights,alarm,doors,bonnet,boot,objective;
 					GetVehicleParamsEx(vehicleid,engine,lights,alarm,doors,bonnet,boot,objective);
@@ -2695,12 +2696,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(useAutoFixveh) {
 						SendClientMessageEx(playerid, -1,
-						"Рекомендуется отключить autofix в настройках для использования этой функции","it is recommended to disable auto-repair in the settings to use this function");
+						"Р РµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РѕС‚РєР»СЋС‡РёС‚СЊ autofix РІ РЅР°СЃС‚СЂРѕР№РєР°С… РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ СЌС‚РѕР№ С„СѓРЅРєС†РёРё","it is recommended to disable auto-repair in the settings to use this function");
 					}
 					new vehicleid = GetPlayerVehicleID(playerid);
 					if(IsABoat(vehicleid) || IsAPlane(vehicleid) || IsANoSpeed(vehicleid)){
 						return SendClientMessageEx(playerid, -1,
-						"Недоступно для данного транспорта","Not available for this vehicle");
+						"РќРµРґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°","Not available for this vehicle");
 					}
 					new panels, doors, lights, tires;	
 					GetVehicleDamageStatus(vehicleid, panels, doors, lights, tires);
@@ -2710,12 +2711,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(useAutoFixveh) {
 						SendClientMessageEx(playerid, -1,
-						"Рекомендуется отключить autofix в настройках для использования этой функции","it is recommended to disable auto-repair in the settings to use this function");
+						"Р РµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РѕС‚РєР»СЋС‡РёС‚СЊ autofix РІ РЅР°СЃС‚СЂРѕР№РєР°С… РґР»СЏ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ СЌС‚РѕР№ С„СѓРЅРєС†РёРё","it is recommended to disable auto-repair in the settings to use this function");
 					}
 					new vehicleid = GetPlayerVehicleID(playerid);
 					if(IsABoat(vehicleid) || IsAPlane(vehicleid) || IsANoSpeed(vehicleid)){
 						return SendClientMessageEx(playerid, -1,
-						"Недоступно для данного транспорта","Not available for this vehicle");
+						"РќРµРґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°","Not available for this vehicle");
 					}
 					new panels, doors, lights, tires;	
 					GetVehicleDamageStatus(vehicleid, panels, doors, lights, tires);
@@ -2726,7 +2727,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new vehicleid = GetPlayerVehicleID(playerid);
 					if(IsABoat(vehicleid) || IsAPlane(vehicleid) || IsANoSpeed(vehicleid)){
 						return SendClientMessageEx(playerid, -1,
-						"Недоступно для данного транспорта","Not available for this vehicle");
+						"РќРµРґРѕСЃС‚СѓРїРЅРѕ РґР»СЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°","Not available for this vehicle");
 					}
 					new engine, lights, alarm, doors, bonnet, boot, objective;
 					GetVehicleParamsEx(vehicleid, engine, lights, alarm, doors, bonnet, boot, objective);
@@ -2797,11 +2798,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						ShowPlayerDialog(playerid, DIALOG_VEHSTYLING, DIALOG_STYLE_LIST,
 						"Styling",
-						"{4682B4}Обвес Wheel Arc. Alien\n"\
-						"{FF4500}Обвес Wheel Arc. X-Flow\n"\
-						"{E6E6FA}[>] Спойлеры Transfender\n"\
-						"{B22222}Снять капот\n"\
-						"{B22222}Снять багажник\n",
+						"{4682B4}РћР±РІРµСЃ Wheel Arc. Alien\n"\
+						"{FF4500}РћР±РІРµСЃ Wheel Arc. X-Flow\n"\
+						"{E6E6FA}[>] РЎРїРѕР№Р»РµСЂС‹ Transfender\n"\
+						"{B22222}РЎРЅСЏС‚СЊ РєР°РїРѕС‚\n"\
+						"{B22222}РЎРЅСЏС‚СЊ Р±Р°РіР°Р¶РЅРёРє\n",
 						"OK", " < ");
 					} else {
 						ShowPlayerDialog (playerid, DIALOG_VEHSTYLING, DIALOG_STYLE_LIST,
@@ -2845,22 +2846,22 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
 					{
 						SendClientMessageEx(playerid, COLOR_LIME,
-						"Управление в режиме полета", "Controls in flymode:");
+						"РЈРїСЂР°РІР»РµРЅРёРµ РІ СЂРµР¶РёРјРµ РїРѕР»РµС‚Р°", "Controls in flymode:");
 						SendClientMessageEx(playerid, COLOR_LIME,
-						"Enter + Num 4 - Пред. текстура, Enter + Num 6 - След. текстура", 
+						"Enter + Num 4 - РџСЂРµРґ. С‚РµРєСЃС‚СѓСЂР°, Enter + Num 6 - РЎР»РµРґ. С‚РµРєСЃС‚СѓСЂР°", 
 						"Enter + Num 4 - Last Texture, Enter + Num 6 - Next Texture");
 					} else {
 						SendClientMessageEx(playerid, COLOR_LIME,
-						"Управление пешком", "Controls on-foot:");
+						"РЈРїСЂР°РІР»РµРЅРёРµ РїРµС€РєРѕРј", "Controls on-foot:");
 						SendClientMessageEx(playerid, COLOR_LIME,
-						"Y - Пред. текстура, H - След. текстура", 
+						"Y - РџСЂРµРґ. С‚РµРєСЃС‚СѓСЂР°, H - РЎР»РµРґ. С‚РµРєСЃС‚СѓСЂР°", 
 						"Y - Last Texture, H - Next Texture");
 					}
 					SendClientMessageEx(playerid, COLOR_LIME,
-					"Num 4 - Пред. Страница, Num 6 - След. Страница",
+					"Num 4 - РџСЂРµРґ. РЎС‚СЂР°РЅРёС†Р°, Num 6 - РЎР»РµРґ. РЎС‚СЂР°РЅРёС†Р°",
 					"Num 4 - Last Page, Num 6 - Next Page");
 					SendClientMessageEx(playerid, COLOR_LIME,
-					"/stop - Закончить редактирование",
+					"/stop - Р—Р°РєРѕРЅС‡РёС‚СЊ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ",
 					"/stop - Finish editing");
 					#endif
 				}
@@ -2876,12 +2877,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						ShowPlayerDialog(playerid, DIALOG_TEXTURESEARCH, DIALOG_STYLE_INPUT,
 						"Textures search", 
-						"Поиск текстуры по слову. Введите слово для поиска:\n",
+						"РџРѕРёСЃРє С‚РµРєСЃС‚СѓСЂС‹ РїРѕ СЃР»РѕРІСѓ. Р’РІРµРґРёС‚Рµ СЃР»РѕРІРѕ РґР»СЏ РїРѕРёСЃРєР°:\n",
 						"Select", "Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_TEXTURESEARCH, DIALOG_STYLE_INPUT,
 						"Textures search", 
-						"Поиск текстуры по слову. Enter a search word:\n",
+						"РџРѕРёСЃРє С‚РµРєСЃС‚СѓСЂС‹ РїРѕ СЃР»РѕРІСѓ. Enter a search word:\n",
 						"Select", "Cancel");
 					}
 				}
@@ -2900,22 +2901,28 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 5: 
 				{
 					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtreset");		
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/sindex");		
 					#endif
 				}
-				case 6:
+				case 6: 
 				{
 					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/copy");		
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtreset");		
 					#endif
 				}
 				case 7:
 				{
 					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/paste");		
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/copy");		
 					#endif
 				}
 				case 8:
+				{
+					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/paste");		
+					#endif
+				}
+				case 9:
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/clear");		
@@ -2984,9 +2991,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(GetPVarInt(playerid, "lang") == 0)
 					{
-						ShowPlayerDialog(playerid, DIALOG_CREATEMAPICON, DIALOG_STYLE_INPUT, "Mapicon","{FFFFFF}Посмотреть список доступных mapicon можно на сайте\n"\
+						ShowPlayerDialog(playerid, DIALOG_CREATEMAPICON, DIALOG_STYLE_INPUT, "Mapicon","{FFFFFF}РџРѕСЃРјРѕС‚СЂРµС‚СЊ СЃРїРёСЃРѕРє РґРѕСЃС‚СѓРїРЅС‹С… mapicon РјРѕР¶РЅРѕ РЅР° СЃР°Р№С‚Рµ\n"\
 						"{00BFFF}https://pawnokit.ru/mapicons_id\n"\
-						"{FFFFFF}Введите {00FF00}mapicon ID:\n","Create","Back");
+						"{FFFFFF}Р’РІРµРґРёС‚Рµ {00FF00}mapicon ID:\n","Create","Back");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_CREATEMAPICON, DIALOG_STYLE_INPUT, "Mapicon",
 						"{FFFFFF}Type {00FF00}mapicon ID:\n","Create","Back");
@@ -3068,7 +3075,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					} else {
 						SetPVarInt(playerid, "lang",0);
 						LangSet = 0;
-						SendClientMessage(playerid, COLOR_GREY, "Выбран русский язык");
+						SendClientMessage(playerid, COLOR_GREY, "Р’С‹Р±СЂР°РЅ СЂСѓСЃСЃРєРёР№ СЏР·С‹Рє");
 					}
 					new query[128];
 					format(query,sizeof(query),
@@ -3081,7 +3088,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
 						ShowPlayerDialog(playerid, DIALOG_SKIN, DIALOG_STYLE_INPUT,
-						"Смена скина", "{FFFFFF}Введите id скина", "Ok", "Выход");
+						"РЎРјРµРЅР° СЃРєРёРЅР°", "{FFFFFF}Р’РІРµРґРёС‚Рµ id СЃРєРёРЅР°", "Ok", "Р’С‹С…РѕРґ");
 					} else { 
 						ShowPlayerDialog(playerid, DIALOG_SKIN, DIALOG_STYLE_INPUT, 
 						"Change skin", "{FFFFFF}Enter the skin ID below", "Confirm", "Cancel");
@@ -3150,11 +3157,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(superJump) 
 					{
 						SendClientMessageEx(playerid, -1,
-						"Супер прыжок деактивирован", "Super jump deactivated");
+						"РЎСѓРїРµСЂ РїСЂС‹Р¶РѕРє РґРµР°РєС‚РёРІРёСЂРѕРІР°РЅ", "Super jump deactivated");
 						superJump = false;
 					} else { 
 						SendClientMessageEx(playerid, -1,
-						"Супер прыжок активирован, нажмите клавишу прыжка для просмотра",
+						"РЎСѓРїРµСЂ РїСЂС‹Р¶РѕРє Р°РєС‚РёРІРёСЂРѕРІР°РЅ, РЅР°Р¶РјРёС‚Рµ РєР»Р°РІРёС€Сѓ РїСЂС‹Р¶РєР° РґР»СЏ РїСЂРѕСЃРјРѕС‚СЂР°",
 						"Super jump activated, press jump key to view");
 						superJump = true;
 					}
@@ -3187,7 +3194,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			if(mainMenuKeyCode == 131072)
 			{
 				SendClientMessageEx(playerid, -1,
-				"Не рекомендуется использовать эту клавишу - она задействована под стандартное меню TS",
+				"РќРµ СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЌС‚Сѓ РєР»Р°РІРёС€Сѓ - РѕРЅР° Р·Р°РґРµР№СЃС‚РІРѕРІР°РЅР° РїРѕРґ СЃС‚Р°РЅРґР°СЂС‚РЅРѕРµ РјРµРЅСЋ TS",
 				"Not recommended to use this key - it is used under the standard TS menu");
 			}
 		}
@@ -3244,7 +3251,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					"UPDATE `Settings` SET Value=%d WHERE Option='use3dTextOnObjects'", use3dTextOnObjects);
 					db_query(mtoolsDB,query);
 					#else
-					SendClientMessageEx(playerid, -1, "Эта функция доступна только в TextureStudio",
+					SendClientMessageEx(playerid, -1, "Р­С‚Р° С„СѓРЅРєС†РёСЏ РґРѕСЃС‚СѓРїРЅР° С‚РѕР»СЊРєРѕ РІ TextureStudio",
 					"This feature is only available in TextureStudio");
 					#endif
 				}
@@ -3340,17 +3347,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						ShowPlayerDialog(playerid, DIALOG_OBJECTSMENU, DIALOG_STYLE_TABLIST_HEADERS, 
 						"[CREATE - Objects]",
-						"Действие\tКоманда\n"\
-						"{A9A9A9}Создать объект по номеру\t{00FF00}/newobj\n"\
-						"Список объектов загруженных для редактирования\t{00FF00}/lsel\n"\
-						"{A9A9A9}Избранные объекты\t\n"\
-						"Поиск объектов по слову\t{00FF00}/osearch\n"\
-						"{A9A9A9}Поиск дубликатов объектов\t\n"\
-						"Определить расстояние между двумя объектами\t\n"\
-						"{A9A9A9}Информация о модели объекта\t{00FF00}/minfo\n"\
-						"Показать скрытые объекты\t\n"\
-						"{A9A9A9}Ближайший объект\t{00FF00}/nearest\n",
-						//"[>] Движение объектов\t\n",
+						"Р”РµР№СЃС‚РІРёРµ\tРљРѕРјР°РЅРґР°\n"\
+						"{A9A9A9}РЎРѕР·РґР°С‚СЊ РѕР±СЉРµРєС‚ РїРѕ РЅРѕРјРµСЂСѓ\t{00FF00}/newobj\n"\
+						"РЎРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ Р·Р°РіСЂСѓР¶РµРЅРЅС‹С… РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ\t{00FF00}/lsel\n"\
+						"{A9A9A9}РР·Р±СЂР°РЅРЅС‹Рµ РѕР±СЉРµРєС‚С‹\t\n"\
+						"РџРѕРёСЃРє РѕР±СЉРµРєС‚РѕРІ РїРѕ СЃР»РѕРІСѓ\t{00FF00}/osearch\n"\
+						"{A9A9A9}РџРѕРёСЃРє РґСѓР±Р»РёРєР°С‚РѕРІ РѕР±СЉРµРєС‚РѕРІ\t\n"\
+						"РћРїСЂРµРґРµР»РёС‚СЊ СЂР°СЃСЃС‚РѕСЏРЅРёРµ РјРµР¶РґСѓ РґРІСѓРјСЏ РѕР±СЉРµРєС‚Р°РјРё\t\n"\
+						"{A9A9A9}РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РјРѕРґРµР»Рё РѕР±СЉРµРєС‚Р°\t{00FF00}/minfo\n"\
+						"РџРѕРєР°Р·Р°С‚СЊ СЃРєСЂС‹С‚С‹Рµ РѕР±СЉРµРєС‚С‹\t\n"\
+						"{A9A9A9}Р‘Р»РёР¶Р°Р№С€РёР№ РѕР±СЉРµРєС‚\t{00FF00}/nearest\n",
+						//"[>] Р”РІРёР¶РµРЅРёРµ РѕР±СЉРµРєС‚РѕРІ\t\n",
 						"Select","Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_OBJECTSMENU, DIALOG_STYLE_TABLIST_HEADERS, 
@@ -3381,12 +3388,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
 						ShowPlayerDialog(playerid, DIALOG_CREATEPICKUP, DIALOG_STYLE_LIST, 
-						"Создание pickup",
-						"{FFFFFF}Создать pickup по ID\n"\
-						"{AFDAFC}Создать pickup брони\n"\
-						"{FF0000}Создать pickup пополнения здоровья\n"\
-						"{191970}Создать pickup jetpack\n"\
-						"{A9A9A9}Создать pickup входа в интерьер\n",
+						"РЎРѕР·РґР°РЅРёРµ pickup",
+						"{FFFFFF}РЎРѕР·РґР°С‚СЊ pickup РїРѕ ID\n"\
+						"{AFDAFC}РЎРѕР·РґР°С‚СЊ pickup Р±СЂРѕРЅРё\n"\
+						"{FF0000}РЎРѕР·РґР°С‚СЊ pickup РїРѕРїРѕР»РЅРµРЅРёСЏ Р·РґРѕСЂРѕРІСЊСЏ\n"\
+						"{191970}РЎРѕР·РґР°С‚СЊ pickup jetpack\n"\
+						"{A9A9A9}РЎРѕР·РґР°С‚СЊ pickup РІС…РѕРґР° РІ РёРЅС‚РµСЂСЊРµСЂ\n",
 						"Select","Cancel");
 					} else {
 	
@@ -3453,7 +3460,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						ShowPlayerDialog(playerid, DIALOG_OBJSEARCH, DIALOG_STYLE_INPUT,
 						"Object search", 
-						"Поиск объектов по слову. Введите слово для поиска:\n",
+						"РџРѕРёСЃРє РѕР±СЉРµРєС‚РѕРІ РїРѕ СЃР»РѕРІСѓ. Р’РІРµРґРёС‚Рµ СЃР»РѕРІРѕ РґР»СЏ РїРѕРёСЃРєР°:\n",
 						"Search", "Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_OBJSEARCH, DIALOG_STYLE_INPUT,
@@ -3472,7 +3479,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						objectid, GetDynamicObjectModel(objectid));
 					} else {
 						format(tbtext, sizeof(tbtext),
-						"{FFFFFF}Ближайший объект %i - modelid: %i\nВведите modelid для поиска:",
+						"{FFFFFF}Р‘Р»РёР¶Р°Р№С€РёР№ РѕР±СЉРµРєС‚ %i - modelid: %i\nР’РІРµРґРёС‚Рµ modelid РґР»СЏ РїРѕРёСЃРєР°:",
 						objectid, GetDynamicObjectModel(objectid));
 					}
 					ShowPlayerDialog(playerid, DIALOG_DUPLICATESEARCH, DIALOG_STYLE_INPUT,
@@ -3491,7 +3498,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						ShowPlayerDialog(playerid, DIALOG_MODELSIZEINFO, DIALOG_STYLE_INPUT,
 						"Object model information", 
-						"Введите modelid для поиска:\n",
+						"Р’РІРµРґРёС‚Рµ modelid РґР»СЏ РїРѕРёСЃРєР°:\n",
 						"Search", "Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_MODELSIZEINFO, DIALOG_STYLE_INPUT,
@@ -3513,7 +3520,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						#endif
 					#endif
 					SendClientMessageEx(playerid, -1,
-					"Все скрытые объекты были показаны","All hidden objects have been revealed");
+					"Р’СЃРµ СЃРєСЂС‹С‚С‹Рµ РѕР±СЉРµРєС‚С‹ Р±С‹Р»Рё РїРѕРєР°Р·Р°РЅС‹","All hidden objects have been revealed");
 				}
 				case 8:
 				{
@@ -3523,7 +3530,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						format(tmpstr, sizeof(tmpstr), "Nearest object -  objectid: %i modelid: %i",
 						objectid, GetDynamicObjectModel(objectid));
 					} else {
-						format(tmpstr, sizeof(tmpstr), "Ближайший объект - objectid: %i modelid: %i",
+						format(tmpstr, sizeof(tmpstr), "Р‘Р»РёР¶Р°Р№С€РёР№ РѕР±СЉРµРєС‚ - objectid: %i modelid: %i",
 						objectid, GetDynamicObjectModel(objectid));
 					}
 					SendClientMessage(playerid, -1, tmpstr);
@@ -3599,7 +3606,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new modelid = strval(inputtext);
 			if(!IsValidObjectModel(modelid)) {
 				SendClientMessageEx(playerid,COLOR_GREY,
-				"вы указали несуществующий ID модели!","Wrong objectid!");
+				"РІС‹ СѓРєР°Р·Р°Р»Рё РЅРµСЃСѓС‰РµСЃС‚РІСѓСЋС‰РёР№ ID РјРѕРґРµР»Рё!","Wrong objectid!");
 				return ShowPlayerMenu(playerid, DIALOG_CREATEOBJ);
 			}
 			new param[24];
@@ -3617,7 +3624,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				if(strlen(inputtext) > 64) {
 					return SendClientMessageEx(playerid, COLOR_GREY, 
-					"Неверное значение (Max: 64 symbols)", "Incorrect value (Max: 64 symbols)");
+					"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ (Max: 64 symbols)", "Incorrect value (Max: 64 symbols)");
 				}
 				new index =	CurrentIndex3dText;
 				strcat(Text3dArray[index][Text3Dvalue], inputtext);
@@ -3650,7 +3657,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}	
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY, 
-				"Неверное значение", "Incorrect value");
+				"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ", "Incorrect value");
 			}
 		} 
 		else ShowPlayerMenu(playerid, DIALOG_3DTEXTMENU);
@@ -3667,7 +3674,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}	
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY, 
-				"Неверное значение", "Incorrect value");
+				"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ", "Incorrect value");
 			}
 		} 
 		else ShowPlayerMenu(playerid, DIALOG_3DTEXTMENU);
@@ -3794,12 +3801,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					DestroyDynamicObject(EDIT_OBJECT_ID);
 					#endif
 				}
-				case 6: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/oprop");
-					#endif
-				}
 				/*case 7:
 				{
 					#if defined TEXTURE_STUDIO
@@ -3809,24 +3810,24 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);					
 					#endif
 				}*/
-				case 7:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/pivot");
-					#endif
-				}
-				case 8: ShowPlayerMenu(playerid, DIALOG_TEXTUREMENU);
-				case 9: ShowPlayerMenu(playerid, DIALOG_GROUPEDIT);
-				case 10: 
+				case 6: ShowPlayerMenu(playerid, DIALOG_TEXTUREMENU);
+				case 7: ShowPlayerMenu(playerid, DIALOG_GROUPEDIT);
+				case 8: 
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/undo");
 					#endif
 				}
-				case 11: 
+				case 9: 
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/redo");
+					#endif
+				}
+				case 10: 
+				{
+					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/oprop");
 					#endif
 				}
 			}
@@ -3913,8 +3914,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if (GetPVarInt(playerid, "lang") == 1) {
 						ShowPlayerDialog(playerid, DIALOG_RANGEDEL, DIALOG_STYLE_INPUT, "/rangedel", "{FFFFFF}This action {FF0000}delete all{FFFFFF} in the specified radius. Enter radius:\n","Delete"," < ");
 					} else {
-						ShowPlayerDialog(playerid, DIALOG_RANGEDEL, DIALOG_STYLE_INPUT, "/rangedel", "{FF0000}Удалить все{FFFFFF} объекты в радиусе. Ввдеите радиус:\n",
-						"Удалить"," < ");
+						ShowPlayerDialog(playerid, DIALOG_RANGEDEL, DIALOG_STYLE_INPUT, "/rangedel", "{FF0000}РЈРґР°Р»РёС‚СЊ РІСЃРµ{FFFFFF} РѕР±СЉРµРєС‚С‹ РІ СЂР°РґРёСѓСЃРµ. Р’РІРґРµРёС‚Рµ СЂР°РґРёСѓСЃ:\n",
+						"РЈРґР°Р»РёС‚СЊ"," < ");
 					}
 				}
 				case 3: ShowPlayerDialog(playerid, DIALOG_REMDEFOBJECT, DIALOG_STYLE_INPUT,
@@ -3930,7 +3931,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
 						#endif
 					} else {
-						SendClientMessageEx(playerid, COLOR_GREY, "Не найден последний созданный объект", "Last created object not found");
+						SendClientMessageEx(playerid, COLOR_GREY, "РќРµ РЅР°Р№РґРµРЅ РїРѕСЃР»РµРґРЅРёР№ СЃРѕР·РґР°РЅРЅС‹Р№ РѕР±СЉРµРєС‚", "Last created object not found");
 					}
 					#endif
 				}*/
@@ -3938,7 +3939,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if(EDIT_OBJECT_ID[playerid] == -1){
 						return SendClientMessageEx(playerid, COLOR_GREY, 
-						"Не выбран объект", "No object selected");
+						"РќРµ РІС‹Р±СЂР°РЅ РѕР±СЉРµРєС‚", "No object selected");
 					}
 					#if defined STREAMER_ALL_TAGS
 					Streamer_ToggleItem(playerid, STREAMER_TYPE_OBJECT, EDIT_OBJECT_ID[playerid], 0);
@@ -3956,7 +3957,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SendClientMessage(playerid, -1, "Function unavaiable. Need TextureStudio");
 					#endif
 				}
-				case 6: ShowPlayerDialog(playerid, DIALOG_CLEARTEMPFILES, DIALOG_STYLE_MSGBOX, "", "{FFFFFF}This action {FF0000}delete all{FFFFFF} temporary files. You are sure?\n","Ок","<");
+				case 6: ShowPlayerDialog(playerid, DIALOG_CLEARTEMPFILES, DIALOG_STYLE_MSGBOX, "", "{FFFFFF}This action {FF0000}delete all{FFFFFF} temporary files. You are sure?\n","РћРє","<");
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -4057,6 +4058,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 4:
 				{
 					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/pivot");
+					#endif
+				}
+				case 5:
+				{
+					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/rotreset");
 					#else
 					SetDynamicObjectRot(EDIT_OBJECT_ID[playerid], 0,0,0);
@@ -4077,10 +4084,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new tbtext[300], cam1_st[18], cam2_st[18];
 					
 					if(CamData[playerid][X1] > 0) 
-					cam1_st = "{00FF00}[Active]"; else cam1_st = "{FF0000}[ОFF]";
+					cam1_st = "{00FF00}[Active]"; else cam1_st = "{FF0000}[РћFF]";
 					
 					if(CamData[playerid][X2] > 0)
-					cam2_st = "{00FF00}[Active]"; else cam2_st = "{FF0000}[ОFF]";
+					cam2_st = "{00FF00}[Active]"; else cam2_st = "{FF0000}[РћFF]";
 					
 					format(tbtext, sizeof tbtext,
 					"\t\n"\
@@ -4096,7 +4103,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
 						ShowPlayerDialog(playerid, DIALOG_CAMDELAY, DIALOG_STYLE_INPUT,
-						"[CAM] - Time", "Введите время в миллисекундах до завершения перемещения:", "Select", "Cancel");
+						"[CAM] - Time", "Р’РІРµРґРёС‚Рµ РІСЂРµРјСЏ РІ РјРёР»Р»РёСЃРµРєСѓРЅРґР°С… РґРѕ Р·Р°РІРµСЂС€РµРЅРёСЏ РїРµСЂРµРјРµС‰РµРЅРёСЏ:", "Select", "Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_CAMDELAY, DIALOG_STYLE_INPUT,
 						"[CAM] - Time", "Input the time in milliseconds before the move is complete:", "Select", "Cancel");
@@ -4106,11 +4113,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if (CamData[playerid][X1] == 0) {
 						return SendClientMessageEx(playerid, -1,
-						"Сперва установите начальную позицию","Set the starting position first");
+						"РЎРїРµСЂРІР° СѓСЃС‚Р°РЅРѕРІРёС‚Рµ РЅР°С‡Р°Р»СЊРЅСѓСЋ РїРѕР·РёС†РёСЋ","Set the starting position first");
 					}
 					if (CamData[playerid][X2] == 0) {
 						return SendClientMessageEx(playerid, -1,
-						"Установите конечную позицию","Set end position");
+						"РЈСЃС‚Р°РЅРѕРІРёС‚Рµ РєРѕРЅРµС‡РЅСѓСЋ РїРѕР·РёС†РёСЋ","Set end position");
 					}
 					if (CamData[playerid][CamDelay] < 1000) {
 						CamData[playerid][CamDelay] = 1000;
@@ -4124,11 +4131,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if (CamData[playerid][X1] == 0) {
 						return SendClientMessageEx(playerid, -1,
-						"Сперва установите начальную позицию","Set the starting position first");
+						"РЎРїРµСЂРІР° СѓСЃС‚Р°РЅРѕРІРёС‚Рµ РЅР°С‡Р°Р»СЊРЅСѓСЋ РїРѕР·РёС†РёСЋ","Set the starting position first");
 					}
 					if (CamData[playerid][X2] == 0) {
 						return SendClientMessageEx(playerid, -1,
-						"Установите конечную позицию","Set end position");
+						"РЈСЃС‚Р°РЅРѕРІРёС‚Рµ РєРѕРЅРµС‡РЅСѓСЋ РїРѕР·РёС†РёСЋ","Set end position");
 					}
 					new File: file = fopen("mtools/camdata.txt", io_append);
 					new str[200];
@@ -4139,7 +4146,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					CamDelay);
 					fwrite(file, str);
 					fclose(file);
-					return SendClientMessageEx(playerid, -1, "Всё сохранено в \"camdata.txt\".",
+					return SendClientMessageEx(playerid, -1, "Р’СЃС‘ СЃРѕС…СЂР°РЅРµРЅРѕ РІ \"camdata.txt\".",
 					"Saved to \"camdata.txt\".");
 				}
 			}
@@ -4159,7 +4166,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					CamData[playerid][X1] = x;
 					CamData[playerid][Y1] = y;
 					CamData[playerid][Z1] = z;
-					SendClientMessageEx(playerid, -1, "Первая точка установлена","First point set");
+					SendClientMessageEx(playerid, -1, "РџРµСЂРІР°СЏ С‚РѕС‡РєР° СѓСЃС‚Р°РЅРѕРІР»РµРЅР°","First point set");
 				}
 				case 1:
 				{
@@ -4168,7 +4175,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					CamData[playerid][X2] = x;
 					CamData[playerid][Y2] = y;
 					CamData[playerid][Z2] = z;
-					SendClientMessageEx(playerid, -1, "Вторая точка установлена","Second point set");
+					SendClientMessageEx(playerid, -1, "Р’С‚РѕСЂР°СЏ С‚РѕС‡РєР° СѓСЃС‚Р°РЅРѕРІР»РµРЅР°","Second point set");
 				}
 			}
 		}
@@ -4189,7 +4196,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SetPlayerCameraLookAt(playerid,X,Y,Z);
 					SetPlayerFacingAngle(playerid,Angle-180.0);
 					SendClientMessageEx(playerid, -1,
-					"Введите /retcam для того чтобы вернуть камеру",
+					"Р’РІРµРґРёС‚Рµ /retcam РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ РІРµСЂРЅСѓС‚СЊ РєР°РјРµСЂСѓ",
 					"Enter /retcam to return the camera");
 				}
 				case 1: 
@@ -4210,7 +4217,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GetPlayerFacingAngle(playerid, Angle);
 					}
 					SendClientMessageEx(playerid, -1,
-					"Введите /retcam для того чтобы вернуть камеру",
+					"Р’РІРµРґРёС‚Рµ /retcam РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ РІРµСЂРЅСѓС‚СЊ РєР°РјРµСЂСѓ",
 					"Enter /retcam to return the camera");
 				}
 				case 2:
@@ -4221,7 +4228,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
 						{
 							return SendClientMessageEx(playerid, -1,
-							"Выйдите из режима наблюдения",
+							"Р’С‹Р№РґРёС‚Рµ РёР· СЂРµР¶РёРјР° РЅР°Р±Р»СЋРґРµРЅРёСЏ",
 							"Stop spectating mode before using this function");
 						}
 						if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
@@ -4233,7 +4240,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							AttachCameraToObject(playerid, Vehcam[playerid]);
 						} else {
 							return SendClientMessageEx(playerid, -1,
-							"Вы должны быть в машине", "You must be in the car");
+							"Р’С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РІ РјР°С€РёРЅРµ", "You must be in the car");
 						}
 					}
 					else
@@ -4251,7 +4258,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
 						{
 							return SendClientMessageEx(playerid, -1,
-							"Выйдите из режима наблюдения",
+							"Р’С‹Р№РґРёС‚Рµ РёР· СЂРµР¶РёРјР° РЅР°Р±Р»СЋРґРµРЅРёСЏ",
 							"Stop spectating mode before using this function");
 						}
 						if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
@@ -4263,7 +4270,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							AttachCameraToObject(playerid, Vehcam[playerid]);
 						} else {
 							return SendClientMessageEx(playerid, -1,
-							"Вы должны быть в машине", "You must be in the car");
+							"Р’С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РІ РјР°С€РёРЅРµ", "You must be in the car");
 						}
 					}
 					else
@@ -4306,7 +4313,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							//AttachCameraToObject
 						} else {
 							SendClientMessageEx(playerid, -1,
-							"Вы должны быть в транспорте или заспавнить транспорт через /v",
+							"Р’С‹ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РІ С‚СЂР°РЅСЃРїРѕСЂС‚Рµ РёР»Рё Р·Р°СЃРїР°РІРЅРёС‚СЊ С‚СЂР°РЅСЃРїРѕСЂС‚ С‡РµСЂРµР· /v",
 							"You must be in a transport or spawn a transport via /v");
 						}
 					}
@@ -4424,22 +4431,22 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						format(tbtext, sizeof(tbtext),
 						"View from above (2D Like)\n"\
 						"Hold camera position\n"\
-						"Сamera on the hood of the car\n"\
-						"Сamera on the side of the vehicle\n"\
+						"РЎamera on the hood of the car\n"\
+						"РЎamera on the side of the vehicle\n"\
 						"Camera to the current object\n"\
 						"Camera to the current vehicle\n"\
 						"Get the current position and direction of the camera\n"\
 						"{00FF00}Restore camera\n");
 					} else {
 						format(tbtext, sizeof(tbtext),
-						"Вид сверху (2D стиль)\n"\
-						"Закрепить камеру\n"\
-						"Закрепить камеру на капоте машины\n"\
-						"Закрепить камеру сбоку на транспорт\n"\
-						"Камеру к текущему объекту\n"\
-						"Камеру к текущему транспорту\n"\
-						"Вывести текущую позицию и направление камеры\n"\
-						"{00FF00}Вернуть камеру\n");
+						"Р’РёРґ СЃРІРµСЂС…Сѓ (2D СЃС‚РёР»СЊ)\n"\
+						"Р—Р°РєСЂРµРїРёС‚СЊ РєР°РјРµСЂСѓ\n"\
+						"Р—Р°РєСЂРµРїРёС‚СЊ РєР°РјРµСЂСѓ РЅР° РєР°РїРѕС‚Рµ РјР°С€РёРЅС‹\n"\
+						"Р—Р°РєСЂРµРїРёС‚СЊ РєР°РјРµСЂСѓ СЃР±РѕРєСѓ РЅР° С‚СЂР°РЅСЃРїРѕСЂС‚\n"\
+						"РљР°РјРµСЂСѓ Рє С‚РµРєСѓС‰РµРјСѓ РѕР±СЉРµРєС‚Сѓ\n"\
+						"РљР°РјРµСЂСѓ Рє С‚РµРєСѓС‰РµРјСѓ С‚СЂР°РЅСЃРїРѕСЂС‚Сѓ\n"\
+						"Р’С‹РІРµСЃС‚Рё С‚РµРєСѓС‰СѓСЋ РїРѕР·РёС†РёСЋ Рё РЅР°РїСЂР°РІР»РµРЅРёРµ РєР°РјРµСЂС‹\n"\
+						"{00FF00}Р’РµСЂРЅСѓС‚СЊ РєР°РјРµСЂСѓ\n");
 					}
 					
 					ShowPlayerDialog(playerid, DIALOG_CAMFIX, DIALOG_STYLE_LIST,
@@ -4452,9 +4459,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						ShowPlayerDialog(playerid, DIALOG_CAMSPEED, DIALOG_STYLE_TABLIST_HEADERS,
 						"[CAM] - Speed",
 						"Option\tState\n\
-						установить максимальную скорость в режиме полета\t{00FF00}/fmspeed \n\
-						установить ускорение в режиме полета\t{00FF00}/fmaccel \n\
-						вкл-откл ускорение в режиме полета\t{00FF00}/fmtoggle \n",
+						СѓСЃС‚Р°РЅРѕРІРёС‚СЊ РјР°РєСЃРёРјР°Р»СЊРЅСѓСЋ СЃРєРѕСЂРѕСЃС‚СЊ РІ СЂРµР¶РёРјРµ РїРѕР»РµС‚Р°\t{00FF00}/fmspeed \n\
+						СѓСЃС‚Р°РЅРѕРІРёС‚СЊ СѓСЃРєРѕСЂРµРЅРёРµ РІ СЂРµР¶РёРјРµ РїРѕР»РµС‚Р°\t{00FF00}/fmaccel \n\
+						РІРєР»-РѕС‚РєР» СѓСЃРєРѕСЂРµРЅРёРµ РІ СЂРµР¶РёРјРµ РїРѕР»РµС‚Р°\t{00FF00}/fmtoggle \n",
 						"Select", "Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_CAMSPEED, DIALOG_STYLE_TABLIST_HEADERS,
@@ -4472,7 +4479,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						ShowPlayerDialog(playerid, DIALOG_CAMINTERPOLATE, DIALOG_STYLE_LIST,
 						"[CAM] - Interpolate", 
-						"Установить точку\nСкорость перемещения\nПредпросмотр\nЭкспорт в filterscript",
+						"РЈСЃС‚Р°РЅРѕРІРёС‚СЊ С‚РѕС‡РєСѓ\nРЎРєРѕСЂРѕСЃС‚СЊ РїРµСЂРµРјРµС‰РµРЅРёСЏ\nРџСЂРµРґРїСЂРѕСЃРјРѕС‚СЂ\nР­РєСЃРїРѕСЂС‚ РІ filterscript",
 						"Select", "Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_CAMINTERPOLATE, DIALOG_STYLE_LIST,
@@ -4514,13 +4521,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					} else {
 						GetPlayerPos(playerid, x,y,z);
 						SendClientMessageEx(playerid, -1,
-						"Объект не был выбран, в качестве координат взяты координаты игрока",
+						"РћР±СЉРµРєС‚ РЅРµ Р±С‹Р» РІС‹Р±СЂР°РЅ, РІ РєР°С‡РµСЃС‚РІРµ РєРѕРѕСЂРґРёРЅР°С‚ РІР·СЏС‚С‹ РєРѕРѕСЂРґРёРЅР°С‚С‹ РёРіСЂРѕРєР°",
 						"The object was not selected, set player coordinates as object coords");
 					}
 					ObjectsMoveData[playerid][X1] = x;
 					ObjectsMoveData[playerid][Y1] = y;
 					ObjectsMoveData[playerid][Z1] = z;
-					SendClientMessageEx(playerid, -1, "Стартовая точка установлена","Start point set");
+					SendClientMessageEx(playerid, -1, "РЎС‚Р°СЂС‚РѕРІР°СЏ С‚РѕС‡РєР° СѓСЃС‚Р°РЅРѕРІР»РµРЅР°","Start point set");
 				}
 				case 2:
 				{
@@ -4530,13 +4537,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					} else {
 						GetPlayerPos(playerid, x,y,z);
 						SendClientMessageEx(playerid, -1,
-						"Объект не был выбран, в качестве координат взяты координаты игрока",
+						"РћР±СЉРµРєС‚ РЅРµ Р±С‹Р» РІС‹Р±СЂР°РЅ, РІ РєР°С‡РµСЃС‚РІРµ РєРѕРѕСЂРґРёРЅР°С‚ РІР·СЏС‚С‹ РєРѕРѕСЂРґРёРЅР°С‚С‹ РёРіСЂРѕРєР°",
 						"The object was not selected, set player coordinates as object coords");
 					}
 					ObjectsMoveData[playerid][X2] = x;
 					ObjectsMoveData[playerid][Y2] = y;
 					ObjectsMoveData[playerid][Z2] = z;
-					SendClientMessageEx(playerid, -1, "Финальная точка установлена","End point set");
+					SendClientMessageEx(playerid, -1, "Р¤РёРЅР°Р»СЊРЅР°СЏ С‚РѕС‡РєР° СѓСЃС‚Р°РЅРѕРІР»РµРЅР°","End point set");
 				}
 				case 3:
 				{
@@ -4551,18 +4558,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						ObjectsMoveData[playerid][movobject] = EDIT_OBJECT_ID[playerid];
 					} else {
 						return SendClientMessageEx(playerid, -1,
-						"Объект не был выбран!","The object was not selected!");
+						"РћР±СЉРµРєС‚ РЅРµ Р±С‹Р» РІС‹Р±СЂР°РЅ!","The object was not selected!");
 					}
 					if(ObjectsMoveData[playerid][MoveSpeed] <= 0){
 						ObjectsMoveData[playerid][MoveSpeed] = 20000;
 					}
 					if(ObjectsMoveData[playerid][X1] == 0){
 						return SendClientMessageEx(playerid, -1,
-						"Начальная позиция не установлена","Set start point!");
+						"РќР°С‡Р°Р»СЊРЅР°СЏ РїРѕР·РёС†РёСЏ РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅР°","Set start point!");
 					}
 					/*if(ObjectsMoveData[playerid][X2] == 0){
 						return SendClientMessageEx(playerid, -1,
-						"Финальная позиция не установлена","Set end point!");
+						"Р¤РёРЅР°Р»СЊРЅР°СЏ РїРѕР·РёС†РёСЏ РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅР°","Set end point!");
 					}*/
 					new Float: rx, Float: ry, Float: rz;
 					GetDynamicObjectRot(ObjectsMoveData[playerid][movobject], rx, ry, rz);
@@ -4609,7 +4616,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					//DestroyDynamicObject(explode_object);	
 					CreateExplosion(x, y, z, 12, 7);
 					SendClientMessageEx(playerid, COLOR_RED,
-					"В аду нет света и воды. Welcome to hell!",
+					"Р’ Р°РґСѓ РЅРµС‚ СЃРІРµС‚Р° Рё РІРѕРґС‹. Welcome to hell!",
 					"No light, no water. no mercy. Welcome to hell!");
 				}
 				case 1:
@@ -4621,20 +4628,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					superJump = true;
 					GameTextForPlayer(playerid, "~g~Enter the Matrix", 1000, 5);
 					SendClientMessageEx(playerid, COLOR_LIME,
-					"В этом режиме изменена гравитация и включен супер прыжок",
+					"Р’ СЌС‚РѕРј СЂРµР¶РёРјРµ РёР·РјРµРЅРµРЅР° РіСЂР°РІРёС‚Р°С†РёСЏ Рё РІРєР»СЋС‡РµРЅ СЃСѓРїРµСЂ РїСЂС‹Р¶РѕРє",
 					"In this mode, the gravity is changed and the super jump is enabled");
 				}
 				case 2:
 				{
 					SetGravity(0.013);
 					SendClientMessageEx(playerid, COLOR_LIME,
-					"В этом режиме изменена физика на более реалистичную",
+					"Р’ СЌС‚РѕРј СЂРµР¶РёРјРµ РёР·РјРµРЅРµРЅР° С„РёР·РёРєР° РЅР° Р±РѕР»РµРµ СЂРµР°Р»РёСЃС‚РёС‡РЅСѓСЋ",
 					"In this mode, physics has been changed to more realistic");
 				}
 				case 3:
 				{
 					SendClientMessageEx(playerid, COLOR_LIME,
-					"В этом режиме полностью отключена гравитация",
+					"Р’ СЌС‚РѕРј СЂРµР¶РёРјРµ РїРѕР»РЅРѕСЃС‚СЊСЋ РѕС‚РєР»СЋС‡РµРЅР° РіСЂР°РІРёС‚Р°С†РёСЏ",
 					"In this mode, gravity is disabled.");
 					SetGravity(0.000);
 					SetPlayerWeather(playerid, 21);
@@ -4643,7 +4650,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 4:
 				{
 					SendClientMessageEx(playerid, COLOR_LIME,
-					"Включен режим слоумо",
+					"Р’РєР»СЋС‡РµРЅ СЂРµР¶РёРј СЃР»РѕСѓРјРѕ",
 					"Slow motion mode enabled");
 					SetGravity(0.001); 
 				}
@@ -4654,7 +4661,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SetPlayerTime(playerid, 12, 0);
 					superJump = false;
 					SendClientMessageEx(playerid, COLOR_LIME,
-					"Физика и окружение восстановлены на стандартные",
+					"Р¤РёР·РёРєР° Рё РѕРєСЂСѓР¶РµРЅРёРµ РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅС‹ РЅР° СЃС‚Р°РЅРґР°СЂС‚РЅС‹Рµ",
 					"Physics and environment restored to standard");
 				}
 			}
@@ -4668,12 +4675,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			if (isnull(inputtext) || !isNumeric(inputtext))
 			{
 				return SendClientMessageEx(playerid, COLOR_GREY,
-				"Неверное значение", "Incorrect value");
+				"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ", "Incorrect value");
 			}
 			if (strval(inputtext) < 1000)
 			{
 				SendClientMessageEx(playerid, COLOR_GREY, 
-				"Введите значение не меньше 1000мс (1сек)",
+				"Р’РІРµРґРёС‚Рµ Р·РЅР°С‡РµРЅРёРµ РЅРµ РјРµРЅСЊС€Рµ 1000РјСЃ (1СЃРµРє)",
 				"Enter a value not less than 1000ms (1sec)");
 			} else {
 				CamData[playerid][CamDelay] = strval(inputtext);
@@ -4694,7 +4701,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				#endif
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY,
-				"Неверное значение", "Incorrect value");
+				"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ", "Incorrect value");
 			}
 		}
 	}
@@ -4711,7 +4718,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				#endif
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY,
-				"Неверное значение", "Incorrect value");
+				"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ", "Incorrect value");
 			}
 		}
 	}
@@ -4728,7 +4735,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				#endif
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY,
-				"Неверное значение", "Incorrect value");
+				"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ", "Incorrect value");
 			}
 		}
 	}
@@ -4748,11 +4755,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					"OK", "Cancel");
 				} else {
 					SendClientMessageEx(playerid, COLOR_GREY,
-					"Не найден объект с таким id", "No object with this id found");
+					"РќРµ РЅР°Р№РґРµРЅ РѕР±СЉРµРєС‚ СЃ С‚Р°РєРёРј id", "No object with this id found");
 				}
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY,
-				"Неверное значение", "Incorrect value");
+				"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ", "Incorrect value");
 			}
 		}
 	}
@@ -4781,11 +4788,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					DeletePVar(playerid, "d_objectid");
 				} else {
 					SendClientMessageEx(playerid, COLOR_GREY,
-					"Не найден объект с таким id", "No object with this id found");
+					"РќРµ РЅР°Р№РґРµРЅ РѕР±СЉРµРєС‚ СЃ С‚Р°РєРёРј id", "No object with this id found");
 				}
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY,
-				"Неверное значение", "Incorrect value");
+				"РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ", "Incorrect value");
 			}
 		}
 	}
@@ -4819,7 +4826,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             new skinid = strval(inputtext);
             if(skinid < 0 || skinid > 301 || skinid == 74)
             {
-                SendClientMessageEx(playerid, COLOR_GREY, "Ошибка: Выберите скин в диапазоне 0-301", "Error: Choose a skin ID between 0 and 301.");
+                SendClientMessageEx(playerid, COLOR_GREY, "РћС€РёР±РєР°: Р’С‹Р±РµСЂРёС‚Рµ СЃРєРёРЅ РІ РґРёР°РїР°Р·РѕРЅРµ 0-301", "Error: Choose a skin ID between 0 and 301.");
             }
             else
             {
@@ -4831,7 +4838,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					format(string, sizeof(string), "New skin id: %i, old skin id: %i",
 					skinid, oldskinid);
 				} else {
-					format(string, sizeof(string), "№ нового скина: %i, № предыдущего скина: %i",
+					format(string, sizeof(string), "в„– РЅРѕРІРѕРіРѕ СЃРєРёРЅР°: %i, в„– РїСЂРµРґС‹РґСѓС‰РµРіРѕ СЃРєРёРЅР°: %i",
 					skinid, oldskinid);
 				}
 				SendClientMessage(playerid, COLOR_LIME, string);
@@ -4846,7 +4853,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if (strval(inputtext) > 255 || strval(inputtext) < 1)
 			{
-				SendClientMessageEx(playerid, COLOR_GREY, "Неверный № погоды, доступные значения [1-255]", "Incorrect weather ID, available values [1-255]");
+				SendClientMessageEx(playerid, COLOR_GREY, "РќРµРІРµСЂРЅС‹Р№ в„– РїРѕРіРѕРґС‹, РґРѕСЃС‚СѓРїРЅС‹Рµ Р·РЅР°С‡РµРЅРёСЏ [1-255]", "Incorrect weather ID, available values [1-255]");
 			} else {
 				SetPlayerWeather(playerid, strval(inputtext)); 
 				SetPVarInt(playerid,"Weather",strval(inputtext));
@@ -4873,7 +4880,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if (strval(inputtext) > 23 || strval(inputtext) < 0)
 			{
-				SendClientMessageEx(playerid, COLOR_GREY, "Доступное время 0-23 часов", "Incorrect [hour], available values [0-23]");
+				SendClientMessageEx(playerid, COLOR_GREY, "Р”РѕСЃС‚СѓРїРЅРѕРµ РІСЂРµРјСЏ 0-23 С‡Р°СЃРѕРІ", "Incorrect [hour], available values [0-23]");
 			} else {
 				SetPlayerTime(playerid,strval(inputtext),0); 
 				SetPVarInt(playerid,"Hour",strval(inputtext)); 
@@ -4888,7 +4895,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				SetGravity(floatstr(inputtext)); 
 			} else {
-				SendClientMessageEx(playerid, COLOR_GREY, "Неверное значение", "Incorrect value");
+				SendClientMessageEx(playerid, COLOR_GREY, "РќРµРІРµСЂРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ", "Incorrect value");
 			}
 		}
 	}
@@ -4939,7 +4946,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if (GetPVarInt(playerid, "lang") == 0) {
 						ShowPlayerDialog(playerid, DIALOG_CREATE3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text","{FFFFFF}Введите текст\n",
+						"3D Text","{FFFFFF}Р’РІРµРґРёС‚Рµ С‚РµРєСЃС‚\n",
 						"Create","Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_CREATE3DTEXT, DIALOG_STYLE_INPUT,
@@ -4951,7 +4958,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if (GetPVarInt(playerid, "lang") == 0) {
 						ShowPlayerDialog(playerid, DIALOG_INDEX3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Index","{FFFFFF}Введите index для редактирования\n",
+						"3D Text - Index","{FFFFFF}Р’РІРµРґРёС‚Рµ index РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ\n",
 						"Select","Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_INDEX3DTEXT, DIALOG_STYLE_INPUT,
@@ -4963,7 +4970,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if (GetPVarInt(playerid, "lang") == 0) {
 						ShowPlayerDialog(playerid, DIALOG_UPDATE3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Edit text","{FFFFFF}Введите новый текст\n",
+						"3D Text - Edit text","{FFFFFF}Р’РІРµРґРёС‚Рµ РЅРѕРІС‹Р№ С‚РµРєСЃС‚\n",
 						"Select","Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_UPDATE3DTEXT, DIALOG_STYLE_INPUT,
@@ -4975,7 +4982,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if (GetPVarInt(playerid, "lang") == 0) {
 						ShowPlayerDialog(playerid, DIALOG_COLOR3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Color","{FFFFFF}Введите новый цвет в формате (0xAFAFAFAA)\n",
+						"3D Text - Color","{FFFFFF}Р’РІРµРґРёС‚Рµ РЅРѕРІС‹Р№ С†РІРµС‚ РІ С„РѕСЂРјР°С‚Рµ (0xAFAFAFAA)\n",
 						"Select","Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_COLOR3DTEXT, DIALOG_STYLE_INPUT,
@@ -4987,7 +4994,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if (GetPVarInt(playerid, "lang") == 0) {
 						ShowPlayerDialog(playerid, DIALOG_DISTANCE3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Color","{FFFFFF}Введите дистанцию\n",
+						"3D Text - Color","{FFFFFF}Р’РІРµРґРёС‚Рµ РґРёСЃС‚Р°РЅС†РёСЋ\n",
 						"Select","Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_DISTANCE3DTEXT, DIALOG_STYLE_INPUT,
@@ -5068,7 +5075,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					if (GetPVarInt(playerid, "lang") == 0) {
 						ShowPlayerDialog(playerid, DIALOG_ACTORCREATE, DIALOG_STYLE_INPUT,
-						"Create actor", "{FFFFFF}Введите ид скина актера","OK"," < ");
+						"Create actor", "{FFFFFF}Р’РІРµРґРёС‚Рµ РёРґ СЃРєРёРЅР° Р°РєС‚РµСЂР°","OK"," < ");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_ACTORCREATE, DIALOG_STYLE_INPUT,
 						"Create actor", "{FFFFFF}Enter the actor's skin id","OK"," < ");
@@ -5079,7 +5086,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if (GetPVarInt(playerid, "lang") == 0) 
 					{
 						ShowPlayerDialog(playerid, DIALOG_ACTORINDEX, DIALOG_STYLE_INPUT,
-						"ACTORS manager", "Выберите индекс актера (0-10):", "OK"," < ");
+						"ACTORS manager", "Р’С‹Р±РµСЂРёС‚Рµ РёРЅРґРµРєСЃ Р°РєС‚РµСЂР° (0-10):", "OK"," < ");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_ACTORINDEX, DIALOG_STYLE_INPUT,
 						"ACTORS manager", "Select actor index (0-10):", "OK"," < ");
@@ -5091,7 +5098,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						ShowPlayerDialog(playerid, DIALOG_ACTORANIMLIB, DIALOG_STYLE_INPUT,
 						"Animlib",
-						"{FFFFFF}Введите название библиотеки анимаций (animlib[]) например PED",
+						"{FFFFFF}Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ Р±РёР±Р»РёРѕС‚РµРєРё Р°РЅРёРјР°С†РёР№ (animlib[]) РЅР°РїСЂРёРјРµСЂ PED",
 						"OK"," < ");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_ACTORANIMLIB, DIALOG_STYLE_INPUT,
@@ -5147,13 +5154,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 7: 
 				{
 					ShowPlayerDialog(playerid, DIALOG_ACTORSMASSMENU, DIALOG_STYLE_LIST,
-					"Создать массовку",
-					"{FFFFFF}Создать массовку\n"\
-					"Кол-во актеров\n"\
-					"Назначить анимации\n"\
-					"Расположение массовки\n"\
-					"Тематическая постановка\n"\
-					"{FF0000}Распустить массовку\n",
+					"РЎРѕР·РґР°С‚СЊ РјР°СЃСЃРѕРІРєСѓ",
+					"{FFFFFF}РЎРѕР·РґР°С‚СЊ РјР°СЃСЃРѕРІРєСѓ\n"\
+					"РљРѕР»-РІРѕ Р°РєС‚РµСЂРѕРІ\n"\
+					"РќР°Р·РЅР°С‡РёС‚СЊ Р°РЅРёРјР°С†РёРё\n"\
+					"Р Р°СЃРїРѕР»РѕР¶РµРЅРёРµ РјР°СЃСЃРѕРІРєРё\n"\
+					"РўРµРјР°С‚РёС‡РµСЃРєР°СЏ РїРѕСЃС‚Р°РЅРѕРІРєР°\n"\
+					"{FF0000}Р Р°СЃРїСѓСЃС‚РёС‚СЊ РјР°СЃСЃРѕРІРєСѓ\n",
 					"OK","Cancel");
 				}
 			}
@@ -5169,7 +5176,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(strval(inputtext) > 0 && strval(inputtext) <= 10){
 					indexActor = strval(inputtext);
 				} 
-				else SendClientMessageEx(playerid, -1, "Некорректное значение","Incorrect value");
+				else SendClientMessageEx(playerid, -1, "РќРµРєРѕСЂСЂРµРєС‚РЅРѕРµ Р·РЅР°С‡РµРЅРёРµ","Incorrect value");
 			}
 		}
 	}
@@ -5195,7 +5202,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SetActorVirtualWorld(Actors[indexActor], GetPlayerVirtualWorld(playerid));
 					#endif
 				}
-				else SendClientMessageEx(playerid, -1, "Нужно ввести ид скина от 0 до 305","Need to enter the skin id (0 to 305)");
+				else SendClientMessageEx(playerid, -1, "РќСѓР¶РЅРѕ РІРІРµСЃС‚Рё РёРґ СЃРєРёРЅР° РѕС‚ 0 РґРѕ 305","Need to enter the skin id (0 to 305)");
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_ACTORS);
@@ -5204,10 +5211,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			if(isnull(inputtext)) return SendClientMessage(playerid, -1, "Вы оставили поле ввода пустым");
+			if(isnull(inputtext)) return SendClientMessage(playerid, -1, "Р’С‹ РѕСЃС‚Р°РІРёР»Рё РїРѕР»Рµ РІРІРѕРґР° РїСѓСЃС‚С‹Рј");
 			format(animactordatalib, sizeof animactordatalib, "%s", inputtext);
 			ShowPlayerDialog(playerid, DIALOG_ACTORANIMNAME, DIALOG_STYLE_INPUT, "Animlib",
-			"{FFFFFF}Полный список анимаций на сайте {00BFFF}http://wiki.pro-pawn.ru/wiki/Анимации\n {FFFFFF}Введите название анимации. (animname[]) например IDLE_tired\n","Ok"," X ");
+			"{FFFFFF}РџРѕР»РЅС‹Р№ СЃРїРёСЃРѕРє Р°РЅРёРјР°С†РёР№ РЅР° СЃР°Р№С‚Рµ {00BFFF}http://wiki.pro-pawn.ru/wiki/РђРЅРёРјР°С†РёРё\n {FFFFFF}Р’РІРµРґРёС‚Рµ РЅР°Р·РІР°РЅРёРµ Р°РЅРёРјР°С†РёРё. (animname[]) РЅР°РїСЂРёРјРµСЂ IDLE_tired\n","Ok"," X ");
 		}
 		else ShowPlayerMenu(playerid, DIALOG_ACTORS);
 	}
@@ -5215,7 +5222,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			if(isnull(inputtext)) return SendClientMessage(playerid, -1, "Вы оставили поле ввода пустым");
+			if(isnull(inputtext)) return SendClientMessage(playerid, -1, "Р’С‹ РѕСЃС‚Р°РІРёР»Рё РїРѕР»Рµ РІРІРѕРґР° РїСѓСЃС‚С‹Рј");
 			format(animactordataname, sizeof animactordataname, "%s", inputtext);
 			#if defined _new_streamer_included
 			ApplyDynamicActorAnimation(Actors[indexActor],animactordatalib,animactordataname, 4.1, 1, 0, 0, 0, 0);
@@ -5261,7 +5268,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 1: SetPVarInt(playerid, "MassActors",10);
 				//case 4: ShowPlayerDialog(playerid, DIALOG_ACTORMASSANIM, DIALOG_STYLE_LIST,
-				//"Выбрать массовку", "Забастовка\nSWAT\nТанцовщицы","Выбрать","Отмена");
+				//"Р’С‹Р±СЂР°С‚СЊ РјР°СЃСЃРѕРІРєСѓ", "Р—Р°Р±Р°СЃС‚РѕРІРєР°\nSWAT\nРўР°РЅС†РѕРІС‰РёС†С‹","Р’С‹Р±СЂР°С‚СЊ","РћС‚РјРµРЅР°");
 				case 5:
 				{
 					for (new x = 0; x < sizeof(massactor); x++) {
@@ -5452,32 +5459,32 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1:
 				{
 					VaeData[playerid][EditStatus] = vaeFloatX;
-					SendClientMessage(playerid, -1, "Редактирование оси X.");
+					SendClientMessage(playerid, -1, "Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РѕСЃРё X.");
 				}
 				case 2:
 				{
 					VaeData[playerid][EditStatus] = vaeFloatY;
-					SendClientMessage(playerid, -1, "Редактирование оси Y.");
+					SendClientMessage(playerid, -1, "Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РѕСЃРё Y.");
 				}
 				case 3:
 				{
 					VaeData[playerid][EditStatus] = vaeFloatZ;
-					SendClientMessage(playerid, -1, "Редактирование оси Z.");
+					SendClientMessage(playerid, -1, "Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РѕСЃРё Z.");
 				}
 				case 4:
 				{
 					VaeData[playerid][EditStatus] = vaeFloatRX;
-					SendClientMessage(playerid, -1, "Редактирование оси RX.");
+					SendClientMessage(playerid, -1, "Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РѕСЃРё RX.");
 				}
 				case 5:
 				{
 					VaeData[playerid][EditStatus] = vaeFloatRY;
-					SendClientMessage(playerid, -1, "Редактирование оси RY.");
+					SendClientMessage(playerid, -1, "Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РѕСЃРё RY.");
 				}
 				case 6:
 				{
 					VaeData[playerid][EditStatus] = vaeFloatRZ;
-					SendClientMessage(playerid, -1, "Редактирование оси RZ.");
+					SendClientMessage(playerid, -1, "Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РѕСЃРё RZ.");
 				}
 				case 7:
 				{
@@ -5485,11 +5492,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						TogglePlayerControllable(playerid, true);
 						SetPVarInt(playerid,"freezed",0);
-						SendClientMessageEx(playerid, -1, "Вы размороженны","You are unfreezed");
+						SendClientMessageEx(playerid, -1, "Р’С‹ СЂР°Р·РјРѕСЂРѕР¶РµРЅРЅС‹","You are unfreezed");
 					} else {
 						TogglePlayerControllable(playerid, false);
 						SetPVarInt(playerid,"freezed",1);
-						SendClientMessageEx(playerid, -1, "Вы замороженны","You are freezed");
+						SendClientMessageEx(playerid, -1, "Р’С‹ Р·Р°РјРѕСЂРѕР¶РµРЅРЅС‹","You are freezed");
 					}
 				}
 				case 8:
@@ -5498,7 +5505,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					TogglePlayerControllable(playerid, true);
 					SetPVarInt(playerid,"freezed",0);
 					DeletePVar(playerid, "VaeEdit");
-					SendClientMessage(playerid, -1, "Редактирование закончено.");
+					SendClientMessage(playerid, -1, "Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Р·Р°РєРѕРЅС‡РµРЅРѕ.");
 				}
 				case 9:
 				{
@@ -5507,7 +5514,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					format(str, 200, "\r\nAttachObjectToVehicle(objectid, vehicleid, %f, %f, %f, %f, %f, %f); //Object Model: %d | %s", VaeData[playerid][OffSetX], VaeData[playerid][OffSetY], VaeData[playerid][OffSetZ], VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ], VaeData[playerid][objmodel]);
 					fwrite(file, str);
 					fclose(file);
-					return SendClientMessageEx(playerid, -1, "Всё сохранено в \"vaeditions.txt\".", "Saved to \"vaeditions.txt\".");
+					return SendClientMessageEx(playerid, -1, "Р’СЃС‘ СЃРѕС…СЂР°РЅРµРЅРѕ РІ \"vaeditions.txt\".", "Saved to \"vaeditions.txt\".");
 				}
 			}
 		}
@@ -5519,17 +5526,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if(!isnull(inputtext) && strval(inputtext) != INVALID_OBJECT_ID)
 			{
-				if(!IsPlayerInAnyVehicle(playerid)) return SendClientMessageEx(playerid, -1, "Вы не в машине.","You are not in the car.");
+				if(!IsPlayerInAnyVehicle(playerid)) return SendClientMessageEx(playerid, -1, "Р’С‹ РЅРµ РІ РјР°С€РёРЅРµ.","You are not in the car.");
 				if(VaeData[playerid][timer] != -1) KillTimer(VaeData[playerid][timer]);
 				if(IsValidObject(VaeData[playerid][obj])) DestroyObject(VaeData[playerid][obj]);
 				
 				if(VaeData[playerid][obj] == -1)
 				{
 					SendClientMessageEx(playerid, -1, 
-					"Используйте клавиши {FF0000}ВЛЕВО-ВПРАВО{FFFFFF} для перемещения аттача",
+					"РСЃРїРѕР»СЊР·СѓР№С‚Рµ РєР»Р°РІРёС€Рё {FF0000}Р’Р›Р•Р’Рћ-Р’РџР РђР’Рћ{FFFFFF} РґР»СЏ РїРµСЂРµРјРµС‰РµРЅРёСЏ Р°С‚С‚Р°С‡Р°",
 					"Use keys {FF0000}LEFT - RIGHT{FFFFFF} to move attach");
 					SendClientMessageEx(playerid, -1, 
-					"Удерживайте {FF0000}F / ENTER{FFFFFF} для того чтобы показать меню редактирования",
+					"РЈРґРµСЂР¶РёРІР°Р№С‚Рµ {FF0000}F / ENTER{FFFFFF} РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ РїРѕРєР°Р·Р°С‚СЊ РјРµРЅСЋ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ",
 					"Hold {FF0000}F / ENTER{FFFFFF} to show the edit menu");
 				}
 			
@@ -5567,7 +5574,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			if(listitem == 2)
 			{
 				SendClientMessageEx(playerid, -1,
-				"текст исчезнет после смерти", "the text will disappear after death");
+				"С‚РµРєСЃС‚ РёСЃС‡РµР·РЅРµС‚ РїРѕСЃР»Рµ СЃРјРµСЂС‚Рё", "the text will disappear after death");
 			}
 			SetSVarInt("gametextstyle", listitem);
 			ShowPlayerDialog(playerid, DIALOG_GAMETEXTTEST, DIALOG_STYLE_INPUT,
@@ -5799,16 +5806,16 @@ public ShowPlayerMenu(playerid, dialogid)
 				"{A9A9A9}[>] Information\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"[>] Редактировать\n"\
-				"{A9A9A9}[>] Создать\n"\
-				"[>] Удалить\n"\
-				"{A9A9A9}[>] Текстуры\n"\
-				"[>] Управление картой\n"\
-				"{A9A9A9}[>] Транспорт\n"\
-				"[>] Режим съемки\n"\
-				"{A9A9A9}[>] Разное\n"\
-				"[>] Настройки\n"\
-				"{A9A9A9}[>] Информация\n");
+				"[>] Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ\n"\
+				"{A9A9A9}[>] РЎРѕР·РґР°С‚СЊ\n"\
+				"[>] РЈРґР°Р»РёС‚СЊ\n"\
+				"{A9A9A9}[>] РўРµРєСЃС‚СѓСЂС‹\n"\
+				"[>] РЈРїСЂР°РІР»РµРЅРёРµ РєР°СЂС‚РѕР№\n"\
+				"{A9A9A9}[>] РўСЂР°РЅСЃРїРѕСЂС‚\n"\
+				"[>] Р РµР¶РёРј СЃСЉРµРјРєРё\n"\
+				"{A9A9A9}[>] Р Р°Р·РЅРѕРµ\n"\
+				"[>] РќР°СЃС‚СЂРѕР№РєРё\n"\
+				"{A9A9A9}[>] РРЅС„РѕСЂРјР°С†РёСЏ\n");
 			}
 			ShowPlayerDialog(playerid, DIALOG_MAIN, DIALOG_STYLE_LIST,
 			"{FF0000}M{FFFFFF}TOOLS",tbtext,">>>","");
@@ -5819,12 +5826,12 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Команды mtools\n"\
-				"Команды TextureStudio\n"\
-				"Управление и горячие клавиши\n"\
-				"Цветовая палитра\n"\
+				"РљРѕРјР°РЅРґС‹ mtools\n"\
+				"РљРѕРјР°РЅРґС‹ TextureStudio\n"\
+				"РЈРїСЂР°РІР»РµРЅРёРµ Рё РіРѕСЂСЏС‡РёРµ РєР»Р°РІРёС€Рё\n"\
+				"Р¦РІРµС‚РѕРІР°СЏ РїР°Р»РёС‚СЂР°\n"\
 				"Credits\n"\
-				"О mtools\n");
+				"Рћ mtools\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Commands mtools\n"\
@@ -5840,22 +5847,22 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_ETC:
 		{
-			// todo "Проверить карту на наличие дубликатов объектов\t\n"
+			// todo "РџСЂРѕРІРµСЂРёС‚СЊ РєР°СЂС‚Сѓ РЅР° РЅР°Р»РёС‡РёРµ РґСѓР±Р»РёРєР°С‚РѕРІ РѕР±СЉРµРєС‚РѕРІ\t\n"
 			new tbtext[550];
 			
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
 				" \t \n"\
-				"[>] Сохранить координаты\t\n"\
-				"Прыгнуть вперед\t{00FF00}/jump\n"\
+				"[>] РЎРѕС…СЂР°РЅРёС‚СЊ РєРѕРѕСЂРґРёРЅР°С‚С‹\t\n"\
+				"РџСЂС‹РіРЅСѓС‚СЊ РІРїРµСЂРµРґ\t{00FF00}/jump\n"\
 				"Surfly mode\t{00FF00}/surfly\n"\
-				"Взять джетпак\t{FFFF00}/jetpack\n"\
-				"Телепортироваться в стандартный интерьер\t{FFFF00}/gotoint\n"\
-				"Телепортироваться в город\t{FFFF00}/tplist\n"\
-				"Обновить все динамические элементы\t\n"\
-				"Протестировать ID звука из игры\t\n"\
-				"Вывести Gametext\t\n");
+				"Р’Р·СЏС‚СЊ РґР¶РµС‚РїР°Рє\t{FFFF00}/jetpack\n"\
+				"РўРµР»РµРїРѕСЂС‚РёСЂРѕРІР°С‚СЊСЃСЏ РІ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РёРЅС‚РµСЂСЊРµСЂ\t{FFFF00}/gotoint\n"\
+				"РўРµР»РµРїРѕСЂС‚РёСЂРѕРІР°С‚СЊСЃСЏ РІ РіРѕСЂРѕРґ\t{FFFF00}/tplist\n"\
+				"РћР±РЅРѕРІРёС‚СЊ РІСЃРµ РґРёРЅР°РјРёС‡РµСЃРєРёРµ СЌР»РµРјРµРЅС‚С‹\t\n"\
+				"РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°С‚СЊ ID Р·РІСѓРєР° РёР· РёРіСЂС‹\t\n"\
+				"Р’С‹РІРµСЃС‚Рё Gametext\t\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				" \t \n"\
@@ -5880,13 +5887,13 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"{A9A9A9}[>] Объект\n"\
-				"[>] 3D текст\n"\
-				"{A9A9A9}[>] Текст\n"\
+				"{A9A9A9}[>] РћР±СЉРµРєС‚\n"\
+				"[>] 3D С‚РµРєСЃС‚\n"\
+				"{A9A9A9}[>] РўРµРєСЃС‚\n"\
 				"[>] Pickup\n"\
-				"{A9A9A9}[>] Attach к игроку\n"\
-				"[>] Attach на транспорт\n"\
-				"{A9A9A9}[>] Актера\n");
+				"{A9A9A9}[>] Attach Рє РёРіСЂРѕРєСѓ\n"\
+				"[>] Attach РЅР° С‚СЂР°РЅСЃРїРѕСЂС‚\n"\
+				"{A9A9A9}[>] РђРєС‚РµСЂР°\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"{A9A9A9}[>] Object\n"\
@@ -5917,19 +5924,18 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Действие\tКоманда\n"\
-				"Выбрать объект\t{00FF00}/csel\n"\
-				"Переместить объект\t{00FF00}/editobject\n"\
-				"Повернуть объект\t{00FF00}/rot\n"\
-				"Выбрать объект стоящий рядом\t{00FF00}/scsel\n"\
-				"Копировать объект\t{00FF00}/clone\n"\
-				"Удалить объект\t{00FF00}/dobject\n"\
-				"Информация о текущем объектe\t{00FF00}/oprop\n"\
-				"Установить опорную точку\t{00FF00}/pivot\n"\
-				"[>] Ретекстур\t\n"\
-				"[>] Редактирование группы\t\n"\
-				"{00FF00}<<<{FFFFFF} Отмена последнего действия\t{00FF00}/undo\n"\
-				"{00FF00}>>>{FFFFFF} Возврат предыдущего действия\t{00FF00}/redo\n");
+				"Р”РµР№СЃС‚РІРёРµ\tРљРѕРјР°РЅРґР°\n"\
+				"Р’С‹Р±СЂР°С‚СЊ РѕР±СЉРµРєС‚\t{00FF00}/csel\n"\
+				"РџРµСЂРµРјРµСЃС‚РёС‚СЊ РѕР±СЉРµРєС‚\t{00FF00}/editobject\n"\
+				"РџРѕРІРµСЂРЅСѓС‚СЊ РѕР±СЉРµРєС‚\t{00FF00}/rot\n"\
+				"Р’С‹Р±СЂР°С‚СЊ РѕР±СЉРµРєС‚ СЃС‚РѕСЏС‰РёР№ СЂСЏРґРѕРј\t{00FF00}/scsel\n"\
+				"РљРѕРїРёСЂРѕРІР°С‚СЊ РѕР±СЉРµРєС‚\t{00FF00}/clone\n"\
+				"РЈРґР°Р»РёС‚СЊ РѕР±СЉРµРєС‚\t{FF0000}/dobject\n"\
+				"[>] Р РµС‚РµРєСЃС‚СѓСЂ\t\n"\
+				"[>] Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ РіСЂСѓРїРїС‹\t\n"\
+				"{00FF00}<<<{FFFFFF} РћС‚РјРµРЅР° РїРѕСЃР»РµРґРЅРµРіРѕ РґРµР№СЃС‚РІРёСЏ\t{00FF00}/undo\n"\
+				"{00FF00}>>>{FFFFFF} Р’РѕР·РІСЂР°С‚ РїСЂРµРґС‹РґСѓС‰РµРіРѕ РґРµР№СЃС‚РІРёСЏ\t{00FF00}/redo\n"\
+				"РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚РµРєСѓС‰РµРј РѕР±СЉРµРєС‚e\t{00FF00}/oprop\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Description\tCommand\n"\
@@ -5938,13 +5944,12 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Rotate object\t{00FF00}/rot\n"\ 
 				"Select a nearby object\t{00FF00}/scsel\n"\
 				"Copy object\t{00FF00}/clone\n"\
-				"Delete object\t{00FF00}/dobject\n"\
-				"Information about the current object\t{00FF00}/oprop\n"\
-				"Set anchor point\t{00FF00}/pivot\n"\
+				"Delete object\t{FF0000}/dobject\n"\
 				"[>] Textures edit\t\n"\
 				"[>] Groups edit\t\n"\
 				"{00FF00}<<<{FFFFFF} Undo the last action\t{00FF00}/undo\n"\
-				"{00FF00}>>>{FFFFFF} Reverting the previous action\t{00FF00}/redo\n");
+				"{00FF00}>>>{FFFFFF} Reverting the previous action\t{00FF00}/redo\n"\
+				"Information about the current object\t{00FF00}/oprop\n");
 			}
 			
 			ShowPlayerDialog(playerid, DIALOG_EDITMENU, DIALOG_STYLE_TABLIST_HEADERS, 
@@ -5957,14 +5962,14 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Действие\tКоманда\n"\
-				"Добавление/удаление объекта из группы\t{00FF00}/gsel\n"\
-				"Установить идентификатор группы\t{00FF00}/setgroup\n"\
-				"Сгруппировать все объекты\t{00FF00}/selectgroup\n"\
-				"Копировать объекты которые находятся в группе\t{00FF00}/gclone\n"\
-				"Удалить все объекты из группы\t{00FF00}/gclear\n"\
-				"Удалить объекты которые находятся в группе\t{00FF00}/gdelete\n"\
-				"Создание objectmetry фигуры\t{00FF00}/obmedit\n");
+				"Р”РµР№СЃС‚РІРёРµ\tРљРѕРјР°РЅРґР°\n"\
+				"Р”РѕР±Р°РІР»РµРЅРёРµ/СѓРґР°Р»РµРЅРёРµ РѕР±СЉРµРєС‚Р° РёР· РіСЂСѓРїРїС‹\t{00FF00}/gsel\n"\
+				"РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂ РіСЂСѓРїРїС‹\t{00FF00}/setgroup\n"\
+				"РЎРіСЂСѓРїРїРёСЂРѕРІР°С‚СЊ РІСЃРµ РѕР±СЉРµРєС‚С‹\t{00FF00}/selectgroup\n"\
+				"РљРѕРїРёСЂРѕРІР°С‚СЊ РѕР±СЉРµРєС‚С‹ РєРѕС‚РѕСЂС‹Рµ РЅР°С…РѕРґСЏС‚СЃСЏ РІ РіСЂСѓРїРїРµ\t{00FF00}/gclone\n"\
+				"РЈРґР°Р»РёС‚СЊ РІСЃРµ РѕР±СЉРµРєС‚С‹ РёР· РіСЂСѓРїРїС‹\t{00FF00}/gclear\n"\
+				"РЈРґР°Р»РёС‚СЊ РѕР±СЉРµРєС‚С‹ РєРѕС‚РѕСЂС‹Рµ РЅР°С…РѕРґСЏС‚СЃСЏ РІ РіСЂСѓРїРїРµ\t{00FF00}/gdelete\n"\
+				"РЎРѕР·РґР°РЅРёРµ objectmetry С„РёРіСѓСЂС‹\t{00FF00}/obmedit\n");
 				
 			} else {
 				format(tbtext, sizeof(tbtext),
@@ -5988,14 +5993,14 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Действие\tКоманда\n"\
-				"Удалить текущий объект\t{FF0000}/dobject\n"\
-				"Удалить ближайший объект\t{FF0000}/dcsel\n"\
-				"Удалить объекты в радиусе\t{FF0000}/rangedel\n"\
-				"Удалить стандартный объект\t{FF0000}/remobject\n"\
-				"Скрыть объект\t\n"\
-				"<<< Вернуть удаленный объект\t{FFFF00}/undo\n"\
-				"Удалить временные файлы mtools\n");
+				"Р”РµР№СЃС‚РІРёРµ\tРљРѕРјР°РЅРґР°\n"\
+				"РЈРґР°Р»РёС‚СЊ С‚РµРєСѓС‰РёР№ РѕР±СЉРµРєС‚\t{FF0000}/dobject\n"\
+				"РЈРґР°Р»РёС‚СЊ Р±Р»РёР¶Р°Р№С€РёР№ РѕР±СЉРµРєС‚\t{FF0000}/dcsel\n"\
+				"РЈРґР°Р»РёС‚СЊ РѕР±СЉРµРєС‚С‹ РІ СЂР°РґРёСѓСЃРµ\t{FF0000}/rangedel\n"\
+				"РЈРґР°Р»РёС‚СЊ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Р№ РѕР±СЉРµРєС‚\t{FF0000}/remobject\n"\
+				"РЎРєСЂС‹С‚СЊ РѕР±СЉРµРєС‚\t\n"\
+				"<<< Р’РµСЂРЅСѓС‚СЊ СѓРґР°Р»РµРЅРЅС‹Р№ РѕР±СЉРµРєС‚\t{FFFF00}/undo\n"\
+				"РЈРґР°Р»РёС‚СЊ РІСЂРµРјРµРЅРЅС‹Рµ С„Р°Р№Р»С‹ mtools\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Description\tCommand\n"\
@@ -6017,16 +6022,17 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),	
-				"Действие\tКоманда\n"\
-				"Менеджер текстур\t{00FF00}/mtextures\n"\
-				"Сохраненные текстуры\t{00FF00}/ttextures\n"\
-				"Найти текстуру по части имени\t{00FF00}/tsearch\n"\
-				"Редактор текстур\t{00FF00}/stexture\n"\
-				"Добавить текст на объект\t{00FF00}/text\n"\
-				"Сброс материала и цвета объекта\t{00FF00}/mtreset\n"\
-				"Копировать свойства объекта (текстура/цвет/текст) в буфер\t{00FF00}/copy\n"\
-				"Вставить свойства на выбранный объект из буфера\t{00FF00}/paste\n"\
-				"Очистить свойства объекта из буфера\t{00FF00}/clear\n");
+				"Р”РµР№СЃС‚РІРёРµ\tРљРѕРјР°РЅРґР°\n"\
+				"РњРµРЅРµРґР¶РµСЂ С‚РµРєСЃС‚СѓСЂ\t{00FF00}/mtextures\n"\
+				"РЎРѕС…СЂР°РЅРµРЅРЅС‹Рµ С‚РµРєСЃС‚СѓСЂС‹\t{00FF00}/ttextures\n"\
+				"РќР°Р№С‚Рё С‚РµРєСЃС‚СѓСЂСѓ РїРѕ С‡Р°СЃС‚Рё РёРјРµРЅРё\t{00FF00}/tsearch\n"\
+				"Р РµРґР°РєС‚РѕСЂ С‚РµРєСЃС‚СѓСЂ\t{00FF00}/stexture\n"\
+				"Р”РѕР±Р°РІРёС‚СЊ С‚РµРєСЃС‚ РЅР° РѕР±СЉРµРєС‚\t{00FF00}/text\n"\
+				"РџРѕРєР°Р·Р°С‚СЊ РёРЅРґРµРєСЃС‹\t{00FF00}/sindex\n"\
+				"РЎР±СЂРѕСЃ РјР°С‚РµСЂРёР°Р»Р° Рё С†РІРµС‚Р° РѕР±СЉРµРєС‚Р°\t{00FF00}/mtreset\n"\
+				"РљРѕРїРёСЂРѕРІР°С‚СЊ СЃРІРѕР№СЃС‚РІР° РѕР±СЉРµРєС‚Р° (С‚РµРєСЃС‚СѓСЂР°/С†РІРµС‚/С‚РµРєСЃС‚) РІ Р±СѓС„РµСЂ\t{00FF00}/copy\n"\
+				"Р’СЃС‚Р°РІРёС‚СЊ СЃРІРѕР№СЃС‚РІР° РЅР° РІС‹Р±СЂР°РЅРЅС‹Р№ РѕР±СЉРµРєС‚ РёР· Р±СѓС„РµСЂР°\t{00FF00}/paste\n"\
+				"РћС‡РёСЃС‚РёС‚СЊ СЃРІРѕР№СЃС‚РІР° РѕР±СЉРµРєС‚Р° РёР· Р±СѓС„РµСЂР°\t{00FF00}/clear\n");
 			} else {
 				format(tbtext, sizeof(tbtext),	
 				"Description\tCommand\n"\
@@ -6035,6 +6041,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Find texture by part of name\t{00FF00}/tsearch\n"\
 				"Texture editor\t{00FF00}/stexture\n"\
 				"Add text to object\t{00FF00}/text\n"\
+				"Show index\t{00FF00}/sindex\n"\
 				"Reset object material and color\t{00FF00}/mtreset\n"\
 				"Copy object properties (texture/color/text) to buffer\t{00FF00}/copy\n"\
 				"Paste properties on the selected object from the buffer\t{00FF00}/paste\n"\
@@ -6048,14 +6055,14 @@ public ShowPlayerMenu(playerid, dialogid)
 		{
 			new header[64];
 			if (GetPVarInt(playerid, "lang") == 0){
-				format(header, sizeof(header), "Создать объект. Последний объект: %d",
+				format(header, sizeof(header), "РЎРѕР·РґР°С‚СЊ РѕР±СЉРµРєС‚. РџРѕСЃР»РµРґРЅРёР№ РѕР±СЉРµРєС‚: %d",
 				EDIT_OBJECT_MODELID[playerid]);
 				ShowPlayerDialog(playerid,DIALOG_CREATEOBJ,DIALOG_STYLE_INPUT, header,
-				"{FFFFFF}Введите ID модели объекта для того чтобы его создать\n"\
-				"Объект появится перед вами, далее вы будете изменять его\n\n"\
+				"{FFFFFF}Р’РІРµРґРёС‚Рµ ID РјРѕРґРµР»Рё РѕР±СЉРµРєС‚Р° РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ РµРіРѕ СЃРѕР·РґР°С‚СЊ\n"\
+				"РћР±СЉРµРєС‚ РїРѕСЏРІРёС‚СЃСЏ РїРµСЂРµРґ РІР°РјРё, РґР°Р»РµРµ РІС‹ Р±СѓРґРµС‚Рµ РёР·РјРµРЅСЏС‚СЊ РµРіРѕ\n\n"\
 				"{FFD700}615-18300 [GTASA], 18632-19521 [SAMP], 11754-11880 [UGMP]\n"\
-				"{FFFFFF}Список объектов по категориям можно посмотреть:\n"\
-				"на сайте {00BFFF}https://dev.prineside.com/ru",
+				"{FFFFFF}РЎРїРёСЃРѕРє РѕР±СЉРµРєС‚РѕРІ РїРѕ РєР°С‚РµРіРѕСЂРёСЏРј РјРѕР¶РЅРѕ РїРѕСЃРјРѕС‚СЂРµС‚СЊ:\n"\
+				"РЅР° СЃР°Р№С‚Рµ {00BFFF}https://dev.prineside.com/ru",
 				"Create","Close");
 			} else {
 				format(header, sizeof(header), "Create object. Last object modelid: %d",
@@ -6102,14 +6109,14 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"{FFFFFF}Создать актера и указать скин\n"\
-				"Сменить индекс\n"\
-				"Назначить анимацию\n"\
-				"Сделать актера бессмертным\n"\
-				"Переместить актера\n"\
-				"Повернуть актера лицом к игроку\n"\
-				"{FF0000}Удалить актера\n");
-				//"{FFFFFF}[>] Создать массовку\n");
+				"{FFFFFF}РЎРѕР·РґР°С‚СЊ Р°РєС‚РµСЂР° Рё СѓРєР°Р·Р°С‚СЊ СЃРєРёРЅ\n"\
+				"РЎРјРµРЅРёС‚СЊ РёРЅРґРµРєСЃ\n"\
+				"РќР°Р·РЅР°С‡РёС‚СЊ Р°РЅРёРјР°С†РёСЋ\n"\
+				"РЎРґРµР»Р°С‚СЊ Р°РєС‚РµСЂР° Р±РµСЃСЃРјРµСЂС‚РЅС‹Рј\n"\
+				"РџРµСЂРµРјРµСЃС‚РёС‚СЊ Р°РєС‚РµСЂР°\n"\
+				"РџРѕРІРµСЂРЅСѓС‚СЊ Р°РєС‚РµСЂР° Р»РёС†РѕРј Рє РёРіСЂРѕРєСѓ\n"\
+				"{FF0000}РЈРґР°Р»РёС‚СЊ Р°РєС‚РµСЂР°\n");
+				//"{FFFFFF}[>] РЎРѕР·РґР°С‚СЊ РјР°СЃСЃРѕРІРєСѓ\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"{FFFFFF}Create actor and set skin\n"\
@@ -6131,15 +6138,15 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{	
 				format(tbtext, sizeof(tbtext),
-				"Действие\tКоманда\n"\
-				"Создать 3DText\t\n"\
-				"Индекс\t%i\n"\
-				"Изменить текст\t%s\n"\
-				"Изменить цвет\t\n"\
-				"Изменить дистанцию\t%.1f\n"\
-				"Изменить позицию\t\n"\
-				"{FF0000}Удалить 3Dtext\t\n"\
-				"Экспортировать в filterscript\t\n",
+				"Р”РµР№СЃС‚РІРёРµ\tРљРѕРјР°РЅРґР°\n"\
+				"РЎРѕР·РґР°С‚СЊ 3DText\t\n"\
+				"РРЅРґРµРєСЃ\t%i\n"\
+				"РР·РјРµРЅРёС‚СЊ С‚РµРєСЃС‚\t%s\n"\
+				"РР·РјРµРЅРёС‚СЊ С†РІРµС‚\t\n"\
+				"РР·РјРµРЅРёС‚СЊ РґРёСЃС‚Р°РЅС†РёСЋ\t%.1f\n"\
+				"РР·РјРµРЅРёС‚СЊ РїРѕР·РёС†РёСЋ\t\n"\
+				"{FF0000}РЈРґР°Р»РёС‚СЊ 3Dtext\t\n"\
+				"Р­РєСЃРїРѕСЂС‚РёСЂРѕРІР°С‚СЊ РІ filterscript\t\n",
 				CurrentIndex3dText, 
 				Text3dArray[CurrentIndex3dText][Text3Dvalue],
 				Text3dArray[CurrentIndex3dText][Text3Dcolor],
@@ -6171,17 +6178,17 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Действие\tКоманда\n"\
-				"Тестовый автомобиль\t{00FF00}/v\n"\
-				"Создать новую машину\t{00FF00}/avnewcar\n"\
-				"Выбрать машину для редактирования\t{00FF00}/avsel\n"\
-				"Копировать машину\t{00FF00}/avclonecar\n"\
-				"Удалить машину\t{00FF00}/avdeletecar\n"\
-				"Установить точку спавна\t{00FF00}/avsetspawn\n"\
-				"Экспорт выбранной машины\t{00FF00}/avexport\n"\
-				"[>] Тюнинг\t\n"\
-				"[>] Специальные возможности\t\n"\
-				"[>] Настройки\t\n");
+				"Р”РµР№СЃС‚РІРёРµ\tРљРѕРјР°РЅРґР°\n"\
+				"РўРµСЃС‚РѕРІС‹Р№ Р°РІС‚РѕРјРѕР±РёР»СЊ\t{00FF00}/v\n"\
+				"РЎРѕР·РґР°С‚СЊ РЅРѕРІСѓСЋ РјР°С€РёРЅСѓ\t{00FF00}/avnewcar\n"\
+				"Р’С‹Р±СЂР°С‚СЊ РјР°С€РёРЅСѓ РґР»СЏ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёСЏ\t{00FF00}/avsel\n"\
+				"РљРѕРїРёСЂРѕРІР°С‚СЊ РјР°С€РёРЅСѓ\t{00FF00}/avclonecar\n"\
+				"РЈРґР°Р»РёС‚СЊ РјР°С€РёРЅСѓ\t{00FF00}/avdeletecar\n"\
+				"РЈСЃС‚Р°РЅРѕРІРёС‚СЊ С‚РѕС‡РєСѓ СЃРїР°РІРЅР°\t{00FF00}/avsetspawn\n"\
+				"Р­РєСЃРїРѕСЂС‚ РІС‹Р±СЂР°РЅРЅРѕР№ РјР°С€РёРЅС‹\t{00FF00}/avexport\n"\
+				"[>] РўСЋРЅРёРЅРі\t\n"\
+				"[>] РЎРїРµС†РёР°Р»СЊРЅС‹Рµ РІРѕР·РјРѕР¶РЅРѕСЃС‚Рё\t\n"\
+				"[>] РќР°СЃС‚СЂРѕР№РєРё\t\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Action\tCommand\n"\
@@ -6207,18 +6214,18 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),	
-				"Действие\tКоманда\n"\
-				"Загрузить карту\t{00FF00}/loadmap\n"\
-				"Создать карту\t{00FF00}/newmap\n"\
-				"Переименовать карту\t{00FF00}/renamemap\n"\
-				"Задать точку спавна\t{00FF00}/setspawn\n"\
-				"Импортировать объекты из файла\t{00FF00}/importmap\n"\
-				"Экспортировать карту\t{00FF00}/export\n"\
-				"Экспортировать весь транспорт\t{00FF00}/avexportall\n"\
-				"Показать стандартные объекты на карте\t{00FF00}/gtaobjects\n"\
-				"Добавить mapicon на карту\t\n"\
-				"Лимиты\t\n"\
-				"{FF0000}Удалить карту\t{FF0000}/deletemap\n");
+				"Р”РµР№СЃС‚РІРёРµ\tРљРѕРјР°РЅРґР°\n"\
+				"Р—Р°РіСЂСѓР·РёС‚СЊ РєР°СЂС‚Сѓ\t{00FF00}/loadmap\n"\
+				"РЎРѕР·РґР°С‚СЊ РєР°СЂС‚Сѓ\t{00FF00}/newmap\n"\
+				"РџРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ РєР°СЂС‚Сѓ\t{00FF00}/renamemap\n"\
+				"Р—Р°РґР°С‚СЊ С‚РѕС‡РєСѓ СЃРїР°РІРЅР°\t{00FF00}/setspawn\n"\
+				"РРјРїРѕСЂС‚РёСЂРѕРІР°С‚СЊ РѕР±СЉРµРєС‚С‹ РёР· С„Р°Р№Р»Р°\t{00FF00}/importmap\n"\
+				"Р­РєСЃРїРѕСЂС‚РёСЂРѕРІР°С‚СЊ РєР°СЂС‚Сѓ\t{00FF00}/export\n"\
+				"Р­РєСЃРїРѕСЂС‚РёСЂРѕРІР°С‚СЊ РІРµСЃСЊ С‚СЂР°РЅСЃРїРѕСЂС‚\t{00FF00}/avexportall\n"\
+				"РџРѕРєР°Р·Р°С‚СЊ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Рµ РѕР±СЉРµРєС‚С‹ РЅР° РєР°СЂС‚Рµ\t{00FF00}/gtaobjects\n"\
+				"Р”РѕР±Р°РІРёС‚СЊ mapicon РЅР° РєР°СЂС‚Сѓ\t\n"\
+				"Р›РёРјРёС‚С‹\t\n"\
+				"{FF0000}РЈРґР°Р»РёС‚СЊ РєР°СЂС‚Сѓ\t{FF0000}/deletemap\n");
 			} else {
 				format(tbtext, sizeof(tbtext),	
 				"Action\tCommand\n"\
@@ -6280,15 +6287,15 @@ public ShowPlayerMenu(playerid, dialogid)
 				Firstperson_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
-				"Полет камерой\t{FFFF00}/flymode\n"\
-				"Вид от первого лица\t%s\n"\
-				"Взять фотоаппарат\t{FFFF00}/camera\n"\
-				"Спрятать все текстдравы\t{FFFF00}/hud\n"\
-				"[>] Позиция камеры\t\n"\
-				"[>] Скорость перемещения камеры\t\n"\
-				"[>] Интерполяция камеры\t\n"\
-				"[>] Окружение и эффекты\t\n",
+				"РћРїС†РёСЏ\tРЎС‚Р°С‚СѓСЃ\n"\
+				"РџРѕР»РµС‚ РєР°РјРµСЂРѕР№\t{FFFF00}/flymode\n"\
+				"Р’РёРґ РѕС‚ РїРµСЂРІРѕРіРѕ Р»РёС†Р°\t%s\n"\
+				"Р’Р·СЏС‚СЊ С„РѕС‚РѕР°РїРїР°СЂР°С‚\t{FFFF00}/camera\n"\
+				"РЎРїСЂСЏС‚Р°С‚СЊ РІСЃРµ С‚РµРєСЃС‚РґСЂР°РІС‹\t{FFFF00}/hud\n"\
+				"[>] РџРѕР·РёС†РёСЏ РєР°РјРµСЂС‹\t\n"\
+				"[>] РЎРєРѕСЂРѕСЃС‚СЊ РїРµСЂРµРјРµС‰РµРЅРёСЏ РєР°РјРµСЂС‹\t\n"\
+				"[>] РРЅС‚РµСЂРїРѕР»СЏС†РёСЏ РєР°РјРµСЂС‹\t\n"\
+				"[>] РћРєСЂСѓР¶РµРЅРёРµ Рё СЌС„С„РµРєС‚С‹\t\n",
 				Firstperson_st);
 			}
 			
@@ -6321,15 +6328,15 @@ public ShowPlayerMenu(playerid, dialogid)
 				GetPVarInt(playerid,"Hour"), GetGravity());
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
-				"[>] Интерфейс\t\n"\
-				"{A9A9A9}[>] Горячие клавиши\t\n"\
-				"[>] Настройки транспорта\t\n"\
-				"Язык\t%s\n"\
-				"Сменить скин\t{00FF00}%i\n"\
-				"Установить погоду\t{00FF00}%i\n"\
-				"Установить время\t{00FF00}%i\n"\
-				"Установить гравитацию\t{00FF00}%.3f\n",
+				"РћРїС†РёСЏ\tРЎС‚Р°С‚СѓСЃ\n"\
+				"[>] РРЅС‚РµСЂС„РµР№СЃ\t\n"\
+				"{A9A9A9}[>] Р“РѕСЂСЏС‡РёРµ РєР»Р°РІРёС€Рё\t\n"\
+				"[>] РќР°СЃС‚СЂРѕР№РєРё С‚СЂР°РЅСЃРїРѕСЂС‚Р°\t\n"\
+				"РЇР·С‹Рє\t%s\n"\
+				"РЎРјРµРЅРёС‚СЊ СЃРєРёРЅ\t{00FF00}%i\n"\
+				"РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕРіРѕРґСѓ\t{00FF00}%i\n"\
+				"РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РІСЂРµРјСЏ\t{00FF00}%i\n"\
+				"РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РіСЂР°РІРёС‚Р°С†РёСЋ\t{00FF00}%.3f\n",
 				Lang_st, GetPlayerSkin(playerid), GetPVarInt(playerid,"Weather"),
 				GetPVarInt(playerid,"Hour"), GetGravity());
 			}
@@ -6366,10 +6373,10 @@ public ShowPlayerMenu(playerid, dialogid)
 				bindFkeyToFlymode_st, mainMenuKeyCode_st, SuperJump_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
-				"Режим полета на <F>\t%s\n"\
-				"Вызов главного меню на клавишу\t%s\n"\
-				"Cупер прыжок\t%s\n",
+				"РћРїС†РёСЏ\tРЎС‚Р°С‚СѓСЃ\n"\
+				"Р РµР¶РёРј РїРѕР»РµС‚Р° РЅР° <F>\t%s\n"\
+				"Р’С‹Р·РѕРІ РіР»Р°РІРЅРѕРіРѕ РјРµРЅСЋ РЅР° РєР»Р°РІРёС€Сѓ\t%s\n"\
+				"CСѓРїРµСЂ РїСЂС‹Р¶РѕРє\t%s\n",
 				bindFkeyToFlymode_st, mainMenuKeyCode_st, SuperJump_st);
 			}
 			
@@ -6415,16 +6422,16 @@ public ShowPlayerMenu(playerid, dialogid)
 				fpsBarTD_st, autoLoadMap_st, showEditMenu_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
-				"TD подсчета объектов в области стрима\t%s\n"\
-				"Информация о текущей позиции\t/position\n"\
-				"Настройки 3d текста на объектах\t/edittext3d\n"\
-				"Показывать 3d текст на объектах\t/objtext3d\n"\
-				"Точка по центру экрана в полете\t%s\n"\
-				"Информация о объектах и транспорте в режиме полета\t%s\n"\
-				"Показывать FPS над радаром\t%s\n"\
-				"Показывать окно загрузки карты при входе\t%s\n"\
-				"Показывать EditMenu при редактировании объекта\t%s\n",
+				"РћРїС†РёСЏ\tРЎС‚Р°С‚СѓСЃ\n"\
+				"TD РїРѕРґСЃС‡РµС‚Р° РѕР±СЉРµРєС‚РѕРІ РІ РѕР±Р»Р°СЃС‚Рё СЃС‚СЂРёРјР°\t%s\n"\
+				"РРЅС„РѕСЂРјР°С†РёСЏ Рѕ С‚РµРєСѓС‰РµР№ РїРѕР·РёС†РёРё\t/position\n"\
+				"РќР°СЃС‚СЂРѕР№РєРё 3d С‚РµРєСЃС‚Р° РЅР° РѕР±СЉРµРєС‚Р°С…\t/edittext3d\n"\
+				"РџРѕРєР°Р·С‹РІР°С‚СЊ 3d С‚РµРєСЃС‚ РЅР° РѕР±СЉРµРєС‚Р°С…\t/objtext3d\n"\
+				"РўРѕС‡РєР° РїРѕ С†РµРЅС‚СЂСѓ СЌРєСЂР°РЅР° РІ РїРѕР»РµС‚Рµ\t%s\n"\
+				"РРЅС„РѕСЂРјР°С†РёСЏ Рѕ РѕР±СЉРµРєС‚Р°С… Рё С‚СЂР°РЅСЃРїРѕСЂС‚Рµ РІ СЂРµР¶РёРјРµ РїРѕР»РµС‚Р°\t%s\n"\
+				"РџРѕРєР°Р·С‹РІР°С‚СЊ FPS РЅР°Рґ СЂР°РґР°СЂРѕРј\t%s\n"\
+				"РџРѕРєР°Р·С‹РІР°С‚СЊ РѕРєРЅРѕ Р·Р°РіСЂСѓР·РєРё РєР°СЂС‚С‹ РїСЂРё РІС…РѕРґРµ\t%s\n"\
+				"РџРѕРєР°Р·С‹РІР°С‚СЊ EditMenu РїСЂРё СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРё РѕР±СЉРµРєС‚Р°\t%s\n",
 				StreamedObjectsTD_st,AIMTD_st,TargetInfo_st,
 				fpsBarTD_st, autoLoadMap_st, showEditMenu_st);
 			}
@@ -6463,14 +6470,14 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
+				"РћРїС†РёСЏ\tРЎС‚Р°С‚СѓСЃ\n"\
 				"Speed Boost\t%s\n"\
-				"Автопополение Nos\t%s\n"\
-				"Автопочинка\t%s\n"\
-				"Автотюнинг (Клавиша 2)\t%s\n"\
-				"Поставить транспорт на колеса (Клавиша H)\t%s\n"\
-				"Коллизия транспорта\t%s\n"\
-				"Удалять транспорт игрока при выходе из машины\t%s\n",
+				"РђРІС‚РѕРїРѕРїРѕР»РµРЅРёРµ Nos\t%s\n"\
+				"РђРІС‚РѕРїРѕС‡РёРЅРєР°\t%s\n"\
+				"РђРІС‚РѕС‚СЋРЅРёРЅРі (РљР»Р°РІРёС€Р° 2)\t%s\n"\
+				"РџРѕСЃС‚Р°РІРёС‚СЊ С‚СЂР°РЅСЃРїРѕСЂС‚ РЅР° РєРѕР»РµСЃР° (РљР»Р°РІРёС€Р° H)\t%s\n"\
+				"РљРѕР»Р»РёР·РёСЏ С‚СЂР°РЅСЃРїРѕСЂС‚Р°\t%s\n"\
+				"РЈРґР°Р»СЏС‚СЊ С‚СЂР°РЅСЃРїРѕСЂС‚ РёРіСЂРѕРєР° РїСЂРё РІС‹С…РѕРґРµ РёР· РјР°С€РёРЅС‹\t%s\n",
 				useBoost_st, useNOS_st, useAutoFixveh_st, useAutoTune_st,
 				useFlip_st, vecol_st, autoremveh_st);
 			} else {
@@ -6502,6 +6509,7 @@ public ShowPlayerMenu(playerid, dialogid)
 			{3f70d6}/Rx \t %.2f\n\
 			{e0364e}/Ry \t %.2f\n\
 			{26b85d}/Rz \t %.2f\n\
+			Set anchor point\t{00FF00}/pivot\n\
 			Reset object rotation\t{FF0000}/rotreset\n", RotX, RotY, RotZ);
 			
 			ShowPlayerDialog(playerid, DIALOG_ROTATION, DIALOG_STYLE_TABLIST_HEADERS,
@@ -6544,17 +6552,17 @@ public ShowPlayerMenu(playerid, dialogid)
 				VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ]);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
-				"Изменить модель\t{00FF00}/vaemodel\n"\
-				"Регулировка оси X\t%.2f\n"\
-				"Регулировка оси Y\t%.2f\n"\
-				"Регулировка оси Z\t%.2f\n"\
-				"Регулировка оси RX\t%.2f\n"\
-				"Регулировка оси RY\t%.2f\n"\
-				"Регулировка оси RZ\t%.2f\n"\
-				"Заморозить-Разморозить\t{00FF00}/freeze\n"\
-				"Закончить редактирование\t{00FF00}/vaestop\n"\
-				"Сохранить\t{00FF00}/vaesave\n",
+				"РћРїС†РёСЏ\tРЎС‚Р°С‚СѓСЃ\n"\
+				"РР·РјРµРЅРёС‚СЊ РјРѕРґРµР»СЊ\t{00FF00}/vaemodel\n"\
+				"Р РµРіСѓР»РёСЂРѕРІРєР° РѕСЃРё X\t%.2f\n"\
+				"Р РµРіСѓР»РёСЂРѕРІРєР° РѕСЃРё Y\t%.2f\n"\
+				"Р РµРіСѓР»РёСЂРѕРІРєР° РѕСЃРё Z\t%.2f\n"\
+				"Р РµРіСѓР»РёСЂРѕРІРєР° РѕСЃРё RX\t%.2f\n"\
+				"Р РµРіСѓР»РёСЂРѕРІРєР° РѕСЃРё RY\t%.2f\n"\
+				"Р РµРіСѓР»РёСЂРѕРІРєР° РѕСЃРё RZ\t%.2f\n"\
+				"Р—Р°РјРѕСЂРѕР·РёС‚СЊ-Р Р°Р·РјРѕСЂРѕР·РёС‚СЊ\t{00FF00}/freeze\n"\
+				"Р—Р°РєРѕРЅС‡РёС‚СЊ СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ\t{00FF00}/vaestop\n"\
+				"РЎРѕС…СЂР°РЅРёС‚СЊ\t{00FF00}/vaesave\n",
 				VaeData[playerid][OffSetX], VaeData[playerid][OffSetY], VaeData[playerid][OffSetZ],
 				VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ]);
 			}
@@ -6606,7 +6614,7 @@ MSelectCreate:FavObjects(playerid)
 MSelectResponse:FavObjects(playerid, MSelectType:response, itemid, modelid)
 {
 	if(MSelectType:response == 1 && modelid != -1) CreateDynamicObjectByModelid(playerid,modelid);
-	//if(MSelectType:response == 2) ShowPlayerDialog (playerid, DIALOG_OBJLIST, DIALOG_STYLE_LIST, "Создание объекта",ObjlistMenu, " > ","Назад");
+	//if(MSelectType:response == 2) ShowPlayerDialog (playerid, DIALOG_OBJLIST, DIALOG_STYLE_LIST, "РЎРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚Р°",ObjlistMenu, " > ","РќР°Р·Р°Рґ");
 	return 1;
 }
 
@@ -6794,7 +6802,7 @@ stock mCreatePickup(pickupid, playerid)
 	format(nwPickup, sizeof nwPickup, "CreateDynamicPickup(%i, 2, %.2f, %.2f, %.2f, %i, %i, -1, 250, -1, 0);\r\n", pickupid, X, Y, Z, GetPlayerVirtualWorld(playerid),GetPlayerInterior(playerid));
 	fwrite(pos3, nwPickup);
 	fclose(pos3);
-	SendClientMessage(playerid, -1, "Pickup был сохранен в папке {FFD700}scriptfiles > mtools > Pickups.txt");
+	SendClientMessage(playerid, -1, "Pickup Р±С‹Р» СЃРѕС…СЂР°РЅРµРЅ РІ РїР°РїРєРµ {FFD700}scriptfiles > mtools > Pickups.txt");
 }
 
 stock CreateDynamicObjectByModelid(playerid, modelid)
@@ -6820,7 +6828,7 @@ stock CreateDynamicObjectByModelid(playerid, modelid)
 	}
 	if(reverse)	SetDynamicObjectRot(id, 0, 0, 180);
 	*/
-	//if(id > DEF_MAX_OBJECTS) return SendClientMessageToAll(COLOR_WHITE,"Ошибка при создании объекта, лимит объектов исчерпан!");
+	//if(id > DEF_MAX_OBJECTS) return SendClientMessageToAll(COLOR_WHITE,"РћС€РёР±РєР° РїСЂРё СЃРѕР·РґР°РЅРёРё РѕР±СЉРµРєС‚Р°, Р»РёРјРёС‚ РѕР±СЉРµРєС‚РѕРІ РёСЃС‡РµСЂРїР°РЅ!");
 	
 	//EDIT_OBJECT_ID[playerid] = id;
 	//LAST_OBJECT_ID[playerid] = id;
@@ -6838,7 +6846,7 @@ stock RemoveTempMapEditorFiles(playerid)
 	fremove("mtools/Pickup.txt");
 	fremove("mtools/Attachments.txt");
 	fremove("mtools/Vaeditions.txt");
-	SendClientMessageEx(playerid, -1, "Временные файлы из {FFD700}scriptfiles/mtools{FFFFFF} очищены",
+	SendClientMessageEx(playerid, -1, "Р’СЂРµРјРµРЅРЅС‹Рµ С„Р°Р№Р»С‹ РёР· {FFD700}scriptfiles/mtools{FFFFFF} РѕС‡РёС‰РµРЅС‹",
 	"Temporary files from {FFD700}scriptfiles/mtools{FFFFFF} have been cleared");
 }
 
@@ -6852,14 +6860,14 @@ stock GetPlayerCoords(playerid)
 	GetPlayerPos(playerid, x, y, z);
 	GetPlayerFacingAngle(playerid, a);
 	if (GetPVarInt(playerid, "lang") == 0) {
-		format(coordinfo,sizeof(coordinfo),"Координаты: %f,%f,%f,%f", x, y, z, a);
+		format(coordinfo,sizeof(coordinfo),"РљРѕРѕСЂРґРёРЅР°С‚С‹: %f,%f,%f,%f", x, y, z, a);
 	} else {
 		format(coordinfo,sizeof(coordinfo),"OnFoot position: %f,%f,%f,%f", x, y, z, a);
 	}
 	SendClientMessage(playerid,-1,coordinfo);
 	
 	if (GetPVarInt(playerid, "lang") == 0) {
-		format(coordinfo,sizeof(coordinfo),"Интерьер: %i, Виртуальный мир %i",
+		format(coordinfo,sizeof(coordinfo),"РРЅС‚РµСЂСЊРµСЂ: %i, Р’РёСЂС‚СѓР°Р»СЊРЅС‹Р№ РјРёСЂ %i",
 		currentinterior, currentworld);
 	} else {
 		format(coordinfo,sizeof(coordinfo),"Interior: %i, VirtualWorld %i",
@@ -6876,7 +6884,7 @@ stock GetPlayerCoords(playerid)
 		new vehpostext[96];
 		if (GetPVarInt(playerid, "lang") == 0) {
 			format(vehpostext, sizeof(vehpostext),
-			"Текущая позиция данного транспорта: %f, %f, %f", vehx, vehy, vehz);
+			"РўРµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ РґР°РЅРЅРѕРіРѕ С‚СЂР°РЅСЃРїРѕСЂС‚Р°: %f, %f, %f", vehx, vehy, vehz);
 		} else {
 			format(vehpostext, sizeof(vehpostext),
 			"The current position of this vehicle: %f, %f, %f", vehx, vehy, vehz);
@@ -6899,14 +6907,14 @@ stock SaveCoords(playerid, wmode = 0)
 		if(GetPVarFloat(playerid, "BoundsMaxX") == 0){
 			SetPVarFloat(playerid, "BoundsMaxX", X);
 			SetPVarFloat(playerid, "BoundsMaxY", Y);
-			return SendClientMessage(playerid, -1, "Первая пара координат сохранена, переместитесь в противоположный угол");
+			return SendClientMessage(playerid, -1, "РџРµСЂРІР°СЏ РїР°СЂР° РєРѕРѕСЂРґРёРЅР°С‚ СЃРѕС…СЂР°РЅРµРЅР°, РїРµСЂРµРјРµСЃС‚РёС‚РµСЃСЊ РІ РїСЂРѕС‚РёРІРѕРїРѕР»РѕР¶РЅС‹Р№ СѓРіРѕР»");
 		}
 		if(GetPVarFloat(playerid, "BoundsMinX") == 0){
 			SetPVarFloat(playerid, "BoundsMinX", X);
 			SetPVarFloat(playerid, "BoundsMinY", Y);
 			format(nwCoords, sizeof nwCoords, "SetPlayerWorldBounds(playerid, %f, %f, %f, %f);\r\n",
 			GetPVarFloat(playerid, "BoundsMaxX"), GetPVarFloat(playerid, "BoundsMinX"),GetPVarFloat(playerid, "BoundsMaxY"), GetPVarFloat(playerid, "BoundsMinY"));
-			SendClientMessage(playerid, -1, "Вторая пара координат сохранена.");
+			SendClientMessage(playerid, -1, "Р’С‚РѕСЂР°СЏ РїР°СЂР° РєРѕРѕСЂРґРёРЅР°С‚ СЃРѕС…СЂР°РЅРµРЅР°.");
 			DeletePVar(playerid, "BoundsMaxX");
 			DeletePVar(playerid, "BoundsMinX");
 			DeletePVar(playerid, "BoundsMaxY");
@@ -6921,7 +6929,7 @@ stock SaveCoords(playerid, wmode = 0)
 	else format(nwCoords, sizeof nwCoords, "%f, %f, %f\r\n", X, Y, Z);
 	fwrite(coord, nwCoords);
 	fclose(coord);
-	SendClientMessage(playerid, -1, "Координаты были сохранены в папке {FFD700}scriptfiles > mtools > Coords.txt");
+	SendClientMessage(playerid, -1, "РљРѕРѕСЂРґРёРЅР°С‚С‹ Р±С‹Р»Рё СЃРѕС…СЂР°РЅРµРЅС‹ РІ РїР°РїРєРµ {FFD700}scriptfiles > mtools > Coords.txt");
 	return 1;
 }
 
@@ -7210,19 +7218,19 @@ public SurflyMode(playerid)
 		ApplyAnimation(playerid,"PARACHUTE","PARA_steerR",6.1,1,1,1,1,0,1);
 		Surfly(playerid);
 		SendClientMessageEx(playerid, -1,
-		"Вы перешли в режим полета (surfly). Управление:",
+		"Р’С‹ РїРµСЂРµС€Р»Рё РІ СЂРµР¶РёРј РїРѕР»РµС‚Р° (surfly). РЈРїСЂР°РІР»РµРЅРёРµ:",
 		"You have entered surfly mode. Controls:");
 		SendClientMessageEx(playerid, -1,
-		"{FF0000}Левая кнопка мыши (LMB){FFFFFF} - увеличить высоту",
+		"{FF0000}Р›РµРІР°СЏ РєРЅРѕРїРєР° РјС‹С€Рё (LMB){FFFFFF} - СѓРІРµР»РёС‡РёС‚СЊ РІС‹СЃРѕС‚Сѓ",
 		"{FF0000}Left Mouse Button (LMB){FFFFFF} - increase height");
 		SendClientMessageEx(playerid, -1,
-		"{FF0000}Правая кнопка мыши (RMB){FFFFFF} - уменьшить высоту",
+		"{FF0000}РџСЂР°РІР°СЏ РєРЅРѕРїРєР° РјС‹С€Рё (RMB){FFFFFF} - СѓРјРµРЅСЊС€РёС‚СЊ РІС‹СЃРѕС‚Сѓ",
 		"{FF0000}Right Mouse Button (RMB){FFFFFF} - reduce height");
 		SendClientMessageEx(playerid, -1,
-		"{FF0000}Клавиша бега (KEY_SPRINT){FFFFFF} - ускорение",
+		"{FF0000}РљР»Р°РІРёС€Р° Р±РµРіР° (KEY_SPRINT){FFFFFF} - СѓСЃРєРѕСЂРµРЅРёРµ",
 		"{FF0000}Sprint key (KEY_SPRINT){FFFFFF} - accelerate");
 		SendClientMessageEx(playerid, -1,
-		"{FF0000}F / ЕNТЕR{FFFFFF} - выйти из режима полета",
+		"{FF0000}F / Р•NРўР•R{FFFFFF} - РІС‹Р№С‚Рё РёР· СЂРµР¶РёРјР° РїРѕР»РµС‚Р°",
 		"{FF0000}F / ENTER{FFFFFF} - exit flight mode");
 		/*GameTextForPlayer(playerid,
 		"~r~~k~~PED_FIREWEAPON~~w~- increase height~n~\
@@ -7238,7 +7246,7 @@ public FirstPersonMode(playerid)
 	if(GetPVarInt(playerid, "Firstperson") == 0)
 	{
 		SendClientMessageEx(playerid, -1,
-		"При движении в транспорте может неккоректно отображать окружение!",
+		"РџСЂРё РґРІРёР¶РµРЅРёРё РІ С‚СЂР°РЅСЃРїРѕСЂС‚Рµ РјРѕР¶РµС‚ РЅРµРєРєРѕСЂРµРєС‚РЅРѕ РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ РѕРєСЂСѓР¶РµРЅРёРµ!",
 		"When driving in transport, the environment may be displayed incorrectly!");
 		firstperson[playerid] = CreateObject(19300, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
 		AttachObjectToPlayer(firstperson[playerid],playerid, 0.0, 0.12, 0.7, 0.0, 0.0, 0.0);
@@ -7246,7 +7254,7 @@ public FirstPersonMode(playerid)
 		SetPVarInt(playerid, "Firstperson",1);
 	} else {
 		SendClientMessageEx(playerid, -1,
-		"Вы отключили вид от 1-го лица", "You have disabled 1st person view");
+		"Р’С‹ РѕС‚РєР»СЋС‡РёР»Рё РІРёРґ РѕС‚ 1-РіРѕ Р»РёС†Р°", "You have disabled 1st person view");
 		SetCameraBehindPlayer(playerid);
 		DestroyObject(firstperson[playerid]);
 		SetPVarInt(playerid, "Firstperson",0);
@@ -7293,21 +7301,26 @@ public SendTexdrawMessage(playerid, hidedelay, text[])
 stock Jump(playerid)
 {
 	// Jump forward
+	new 
+		Float:facing_angle,
+		Float:adj = 4,
+		Float:x, Float:y, Float:z
+	;
 	if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK) useJetpack = true;
-	new Float:facing_angle;
-	new Float:adj = 4;
 	GetPlayerFacingAngle(playerid, facing_angle);
 	new LookAt = GetDirectionInWhichPlayerLooks(playerid, facing_angle);
-	new Float:x, Float:y, Float:z;
 	GetPlayerPos(playerid, x,y,z);
-	if (LookAt == 0) SetPlayerPos(playerid,x,y+adj,z+1);
-	if (LookAt == 1) SetPlayerPos(playerid,x-adj,y+adj,z+1);
-	if (LookAt == 2) SetPlayerPos(playerid,x-adj,y,z+1);
-	if (LookAt == 3) SetPlayerPos(playerid,x-adj,y-adj,z+1);
-	if (LookAt == 4) SetPlayerPos(playerid,x,y-adj,z+1);
-	if (LookAt == 5) SetPlayerPos(playerid,x+adj,y-adj,z+1);
-	if (LookAt == 6) SetPlayerPos(playerid,x+adj,y,z+1);
-	if (LookAt == 7) SetPlayerPos(playerid,x+adj,y+adj,z+1);
+	switch(LookAt) 
+	{
+		case 0: SetPlayerPos(playerid,x,y+adj,z+1);
+		case 1: SetPlayerPos(playerid,x-adj,y+adj,z+1);
+		case 2: SetPlayerPos(playerid,x-adj,y,z+1);
+		case 3: SetPlayerPos(playerid,x-adj,y-adj,z+1);
+		case 4: SetPlayerPos(playerid,x,y-adj,z+1);
+		case 5: SetPlayerPos(playerid,x+adj,y-adj,z+1);
+		case 6: SetPlayerPos(playerid,x+adj,y,z+1);
+		case 7: SetPlayerPos(playerid,x+adj,y+adj,z+1);
+	}
 	if(useJetpack) SetPlayerSpecialAction(playerid, SPECIAL_ACTION_USEJETPACK);
 }
 
@@ -7354,22 +7367,22 @@ ShowMainAttachEditMenu(playerid)
 	if (GetPVarInt(playerid, "lang") == 0)
 	{
 		format(string, sizeof(string),
-		"Опция\tСтатус\n\
-		Индекс \t(%d)\n\
-		Объект \t(%d)\n\
-		Кость \t(%d)\n\
-		X-позиция \t(%.4f)\n\
-		Y-позиция \t(%.4f)\n\
-		Z-позиция \t(%.4f)\n\
-		X-вращение \t(%.4f)\n\
-		Y-вращение \t(%.4f)\n\
-		Z-вращение \t(%.4f)\n\
-		X-масштаб \t(%.4f)\n\
-		Y-масштаб \t(%.4f)\n\
-		Z-масштаб \t(%.4f)\n\
-		Редактировать\t\n\
-		{FF0000}Очистить{FFFFFF} этот индекс\t\n\
-		Сохранить",
+		"РћРїС†РёСЏ\tРЎС‚Р°С‚СѓСЃ\n\
+		РРЅРґРµРєСЃ \t(%d)\n\
+		РћР±СЉРµРєС‚ \t(%d)\n\
+		РљРѕСЃС‚СЊ \t(%d)\n\
+		X-РїРѕР·РёС†РёСЏ \t(%.4f)\n\
+		Y-РїРѕР·РёС†РёСЏ \t(%.4f)\n\
+		Z-РїРѕР·РёС†РёСЏ \t(%.4f)\n\
+		X-РІСЂР°С‰РµРЅРёРµ \t(%.4f)\n\
+		Y-РІСЂР°С‰РµРЅРёРµ \t(%.4f)\n\
+		Z-РІСЂР°С‰РµРЅРёРµ \t(%.4f)\n\
+		X-РјР°СЃС€С‚Р°Р± \t(%.4f)\n\
+		Y-РјР°СЃС€С‚Р°Р± \t(%.4f)\n\
+		Z-РјР°СЃС€С‚Р°Р± \t(%.4f)\n\
+		Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ\t\n\
+		{FF0000}РћС‡РёСЃС‚РёС‚СЊ{FFFFFF} СЌС‚РѕС‚ РёРЅРґРµРєСЃ\t\n\
+		РЎРѕС…СЂР°РЅРёС‚СЊ",
 		gCurrentAttachIndex[playerid],
 		gIndexModel[playerid][gCurrentAttachIndex[playerid]],
 		gIndexBone[playerid][gCurrentAttachIndex[playerid]],
@@ -7429,8 +7442,8 @@ ShowIndexList(playerid)
 		{
 			if (GetPVarInt(playerid, "lang") == 0)
 			{
-				if(gIndexUsed[playerid][i]) format(string, sizeof(string), "%sСлот %d (%s - %d)\n", string, i, AttachmentBones[gIndexBone[playerid][i]], gIndexModel[playerid][i]);
-				else format(string, sizeof(string), "%sСлот %d (Внешний)\n", string, i);
+				if(gIndexUsed[playerid][i]) format(string, sizeof(string), "%sРЎР»РѕС‚ %d (%s - %d)\n", string, i, AttachmentBones[gIndexBone[playerid][i]], gIndexModel[playerid][i]);
+				else format(string, sizeof(string), "%sРЎР»РѕС‚ %d (Р’РЅРµС€РЅРёР№)\n", string, i);
 			} else {
 				if(gIndexUsed[playerid][i]) format(string, sizeof(string), "%sSlot %d (%s - %d)\n", string, i, AttachmentBonesEN[gIndexBone[playerid][i]], gIndexModel[playerid][i]);
 				else format(string, sizeof(string), "%s Slot %d (External)\n", string, i);
@@ -7444,7 +7457,7 @@ ShowIndexList(playerid)
 
 ShowModelInput(playerid)
 {
-	ShowPlayerDialog(playerid, DIALOG_ATPMODEL_SELECT, DIALOG_STYLE_INPUT, "Attachments editor / Object", "Введите объект для прикрепления", "OK", "Cancel");
+	ShowPlayerDialog(playerid, DIALOG_ATPMODEL_SELECT, DIALOG_STYLE_INPUT, "Attachments editor / Object", "Р’РІРµРґРёС‚Рµ РѕР±СЉРµРєС‚ РґР»СЏ РїСЂРёРєСЂРµРїР»РµРЅРёСЏ", "OK", "Cancel");
 }
 
 ShowBoneList(playerid)
@@ -7466,7 +7479,7 @@ ShowBoneList(playerid)
 EditAttachCoord(playerid, coord)
 {
 	gCurrentAxisEdit[playerid] = coord;
-	ShowPlayerDialog(playerid, DIALOG_ATPCOORD_INPUT, DIALOG_STYLE_INPUT, "Attachments editor / Scale", "Введите float-точку для смещения:", "OK", "Cancel");
+	ShowPlayerDialog(playerid, DIALOG_ATPCOORD_INPUT, DIALOG_STYLE_INPUT, "Attachments editor / Scale", "Р’РІРµРґРёС‚Рµ float-С‚РѕС‡РєСѓ РґР»СЏ СЃРјРµС‰РµРЅРёСЏ:", "OK", "Cancel");
 }
 
 EditAttachment(playerid)
@@ -7653,7 +7666,7 @@ public MtoolsHudToggle(playerid)
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/logo");
 		#endif
 		SendClientMessageEx(playerid, -1, 
-		"Все текстдравы и худ игрока были временно скрыты",
+		"Р’СЃРµ С‚РµРєСЃС‚РґСЂР°РІС‹ Рё С…СѓРґ РёРіСЂРѕРєР° Р±С‹Р»Рё РІСЂРµРјРµРЅРЅРѕ СЃРєСЂС‹С‚С‹",
 		"All textdraws and player hud have been temporarily hidden");
 		return 0;
 	} else {
@@ -7668,7 +7681,7 @@ public MtoolsHudToggle(playerid)
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/logo");
 		#endif
 		SendClientMessageEx(playerid, -1, 
-		"Все текстдравы и худ игрока были восстановлены",
+		"Р’СЃРµ С‚РµРєСЃС‚РґСЂР°РІС‹ Рё С…СѓРґ РёРіСЂРѕРєР° Р±С‹Р»Рё РІРѕСЃСЃС‚Р°РЅРѕРІР»РµРЅС‹",
 		"All text and player skin have been restored");
 		return 1;
 	}
