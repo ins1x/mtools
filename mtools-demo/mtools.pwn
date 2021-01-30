@@ -30,8 +30,8 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
 // VERSION
-#define VERSION              	"0.3.12"
-#define BUILD_DATE             	"29.01.2020"
+#define VERSION              	"0.3.13"
+#define BUILD_DATE             	"30.01.2020"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -124,6 +124,7 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_GAMETEXTSTYLE		6089
 #define DIALOG_ROTSET				6090
 #define DIALOG_COLORSTIP			6091
+#define DIALOG_PREFABMENU			6092
 
 #define COLOR_SERVER_GREY		0x87bae7FF
 #define COLOR_GREY 				0xAFAFAFAA
@@ -1169,6 +1170,18 @@ public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y
 	return 1;
 }
 #endif
+
+public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
+{
+	// the studio texture already has this function, 
+	// and is only needed in case you run mtools without TStudio
+	if (IsPlayerAdmin(playerid)) 
+	{
+		SetPlayerPos(playerid, fX, fY, fZ+1.0);
+		//format(inmess, sizeof(inmess), "~w~x=%.2f y=%.2f z=%.2f", fX,fY,fZ);
+    }
+    return 1;
+}
 
 /*
 public OnPlayerSelectObject(playerid, type, objectid, modelid, Float:fX, Float:fY, Float:fZ)
@@ -2868,10 +2881,28 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1: 
 				{
 					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/stexture");		
+					#endif
+				}
+				case 2: 
+				{
+					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/text");		
+					#endif
+				}
+				case 3: 
+				{
+					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/sindex");		
+					#endif
+				}
+				case 4: 
+				{
+					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/ttextures");		
 					#endif
 				}
-				case 2:
+				case 5:
 				{
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
@@ -2885,24 +2916,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"Поиск текстуры по слову. Enter a search word:\n",
 						"Select", "Cancel");
 					}
-				}
-				case 3: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/stexture");		
-					#endif
-				}
-				case 4: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/text");		
-					#endif
-				}
-				case 5: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/sindex");		
-					#endif
 				}
 				case 6: 
 				{
@@ -2989,6 +3002,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 8:
 				{
+					ShowPlayerMenu(playerid, DIALOG_PREFABMENU);
+				}
+				case 9:
+				{
 					if(GetPVarInt(playerid, "lang") == 0)
 					{
 						ShowPlayerDialog(playerid, DIALOG_CREATEMAPICON, DIALOG_STYLE_INPUT, "Mapicon","{FFFFFF}Посмотреть список доступных mapicon можно на сайте\n"\
@@ -2999,7 +3016,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"{FFFFFF}Type {00FF00}mapicon ID:\n","Create","Back");
 					}
 				}
-				case 9:
+				case 10:
 				{
 					new tbtext[300], CountActors;
 					
@@ -3039,7 +3056,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowPlayerDialog(playerid, DIALOG_LIMITS, DIALOG_STYLE_TABLIST_HEADERS, "Limits",
 					tbtext,"OK","");
 				}
-				case 10:
+				case 11:
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/deletemap");		
@@ -3048,6 +3065,33 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
+	}
+	if(dialogid == DIALOG_PREFABMENU)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0:
+				{
+					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gprefab");		
+					#endif
+				}
+				case 1:
+				{
+					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/prefabsetz");		
+					#endif
+				}
+				case 2:
+				{
+					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/prefab");		
+					#endif
+				}
+			}
+		}
 	}
 	if(dialogid == DIALOG_MAPINFO)
 	{
@@ -4039,7 +4083,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0: AutoRotateObject(EDIT_OBJECT_ID[playerid]);
+				case 0: AutoRotateObject(playerid, EDIT_OBJECT_ID[playerid]);
 				case 1: 
 				{
 					SetPVarInt(playerid, "RotAxis",1);
@@ -4064,10 +4108,38 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 5:
 				{
 					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/togpivot");
+					#endif
+				}
+				case 6:
+				{
+					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/rotreset");
 					#else
 					SetDynamicObjectRot(EDIT_OBJECT_ID[playerid], 0,0,0);
 					#endif
+				}
+				case 7:
+				{
+					SendClientMessageEx(playerid, COLOR_LIME,
+					"/editobject - Режим редактирования объекта",
+					"/editobject - Edit object mode");
+					
+					SendClientMessageEx(playerid, COLOR_LIME,
+					"/ox - /oy - /oz - Стандартные команды перемещения",
+					"/ox - /oy - /oz - Standard movement commands");
+					
+					SendClientMessageEx(playerid, COLOR_LIME,
+					"/rx - ry - /rz - Стандартные команды поворота",
+					"/rx - ry - /rz - Standard rotation commands");
+					
+					SendClientMessageEx(playerid, COLOR_LIME,
+					"/dox - /doy - /doz - Дельта перемещение",
+					"/dox - /doy - /doz - Delta move map");
+					
+					SendClientMessageEx(playerid, COLOR_LIME,
+					"/drx - /dry - /drz - повернуть карту вокруг центра карты",
+					"/drx - /dry - /drz - Rotate map around map center");
 				}
 			}
 		}
@@ -6024,12 +6096,12 @@ public ShowPlayerMenu(playerid, dialogid)
 				format(tbtext, sizeof(tbtext),	
 				"Действие\tКоманда\n"\
 				"Менеджер текстур\t{00FF00}/mtextures\n"\
-				"Сохраненные текстуры\t{00FF00}/ttextures\n"\
-				"Найти текстуру по части имени\t{00FF00}/tsearch\n"\
 				"Редактор текстур\t{00FF00}/stexture\n"\
 				"Добавить текст на объект\t{00FF00}/text\n"\
 				"Показать индексы\t{00FF00}/sindex\n"\
-				"Сброс материала и цвета объекта\t{00FF00}/mtreset\n"\
+				"Сохраненные текстуры\t{00FF00}/ttextures\n"\
+				"Найти текстуру по части имени\t{00FF00}/tsearch\n"\
+				"{FF0000}Сброс материала и цвета объекта\t{FF0000}/mtreset\n"\
 				"Копировать свойства объекта (текстура/цвет/текст) в буфер\t{00FF00}/copy\n"\
 				"Вставить свойства на выбранный объект из буфера\t{00FF00}/paste\n"\
 				"Очистить свойства объекта из буфера\t{00FF00}/clear\n");
@@ -6037,12 +6109,12 @@ public ShowPlayerMenu(playerid, dialogid)
 				format(tbtext, sizeof(tbtext),	
 				"Description\tCommand\n"\
 				"Texture manager\t{00FF00}/mtextures\n"\
-				"Saved textures\t{00FF00}/ttextures\n"\
-				"Find texture by part of name\t{00FF00}/tsearch\n"\
 				"Texture editor\t{00FF00}/stexture\n"\
 				"Add text to object\t{00FF00}/text\n"\
 				"Show index\t{00FF00}/sindex\n"\
-				"Reset object material and color\t{00FF00}/mtreset\n"\
+				"Saved textures\t{00FF00}/ttextures\n"\
+				"Find texture by part of name\t{00FF00}/tsearch\n"\
+				"{FF0000}Reset object material and color\t{FF0000}/mtreset\n"\
 				"Copy object properties (texture/color/text) to buffer\t{00FF00}/copy\n"\
 				"Paste properties on the selected object from the buffer\t{00FF00}/paste\n"\
 				"Clear object properties from buffer \t{00FF00}/clear\n");
@@ -6223,6 +6295,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Экспортировать карту\t{00FF00}/export\n"\
 				"Экспортировать весь транспорт\t{00FF00}/avexportall\n"\
 				"Показать стандартные объекты на карте\t{00FF00}/gtaobjects\n"\
+				"Управление prefab\t{00FF00}/prefab\n"\
 				"Добавить mapicon на карту\t\n"\
 				"Лимиты\t\n"\
 				"{FF0000}Удалить карту\t{FF0000}/deletemap\n");
@@ -6237,6 +6310,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Export map\t{00FF00}/export\n"\
 				"Export all vehicles\t{00FF00}/avexportall\n"\
 				"Show default objects on map\t{00FF00}/gtaobjects\n"\
+				"Manage prefab\t{00FF00}/prefab\n"\
 				"Add mapicon\t\n"\
 				"Limits\t\n"\
 				"{FF0000}Delete map\t{FF0000}/deletemap\n");
@@ -6244,6 +6318,28 @@ public ShowPlayerMenu(playerid, dialogid)
 			
 			ShowPlayerDialog(playerid, DIALOG_MAPMENU, DIALOG_STYLE_TABLIST_HEADERS,
 			"[MAP]",tbtext, "OK","Cancel");
+		}
+		case DIALOG_PREFABMENU:
+		{
+			new tbtext[250];
+	
+			if(GetPVarInt(playerid, "lang") == 0)
+			{		
+				format(tbtext, sizeof(tbtext),	
+				"Действие\tКоманда\n"\
+				"Экспорт группы объектов в загружаемый файл префаба \t{00FF00}/gprefab\n"\
+				"Установить смещение загрузки файла префаба \t{00FF00}/prefabsetz\n"\
+				"Показать все префабы \t{00FF00}/prefab\n");
+			} else {
+				format(tbtext, sizeof(tbtext),	
+				"Action\tCommand\n"\
+				"Export a group of objects to a loadable prefab file\t{00FF00}/gprefab\n"\
+				"Set the load offset of a prefab file\t{00FF00}/prefabsetz\n"\
+				"Show all prefabs\t{00FF00}/prefab\n");
+			}
+			
+			ShowPlayerDialog(playerid, DIALOG_PREFABMENU, DIALOG_STYLE_TABLIST_HEADERS,
+			"[PREFAB]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_MAPINFO:
 		{
@@ -6499,7 +6595,7 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_ROTATION:
 		{
-			new tbtext[200];
+			new tbtext[300];
 			new Float:RotX,Float:RotY,Float:RotZ;
 			GetDynamicObjectRot(EDIT_OBJECT_ID[playerid], RotX, RotY, RotZ);
 			
@@ -6510,7 +6606,9 @@ public ShowPlayerMenu(playerid, dialogid)
 			{e0364e}/Ry \t %.2f\n\
 			{26b85d}/Rz \t %.2f\n\
 			Set anchor point\t{00FF00}/pivot\n\
-			Reset object rotation\t{FF0000}/rotreset\n", RotX, RotY, RotZ);
+			Turn on/off pivot rotation\t{00FF00}/togpivot\n\
+			Reset object rotation\t{FF0000}/rotreset\n\
+			Basic movement commands\n", RotX, RotY, RotZ);
 			
 			ShowPlayerDialog(playerid, DIALOG_ROTATION, DIALOG_STYLE_TABLIST_HEADERS,
 			"[EDIT - Rotate]",tbtext, "OK","Cancel");
@@ -6713,15 +6811,24 @@ stock RotateAngle(Float: RotAngle)
 	else return a;
 }
 
-stock AutoRotateObject(objectid)
+stock AutoRotateObject(playerid, objectid)
 {
 	// Automatically selects an object rotation x/y/z angle multiple of 45
-	new Float:RotX, Float:RotY, Float:RotZ;
+	new Float:RotX, Float:RotY, Float:RotZ, param[24];
 	GetDynamicObjectRot(objectid, RotX, RotY, RotZ);
 	RotX = RotateAngle(RotX);
 	RotY = RotateAngle(RotY);
 	RotZ = RotateAngle(RotZ);
+	#if defined TEXTURE_STUDIO
+	format(param, sizeof(param), "/ox %f", RotX);
+	CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
+	format(param, sizeof(param), "/oy %f", RotY);
+	CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
+	format(param, sizeof(param), "/oz %f", RotZ);
+	CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
+	#else
 	SetDynamicObjectRot(objectid, RotX, RotY, RotZ);
+	#endif
 }
 
 stock GetClosestDynamicObject(playerid)
