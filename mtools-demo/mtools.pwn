@@ -30,8 +30,8 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
 // VERSION
-#define VERSION              	"0.3.13"
-#define BUILD_DATE             	"30.01.2020"
+#define VERSION              	"0.3.14"
+#define BUILD_DATE             	"31.01.2020"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -271,6 +271,7 @@ new LangSet = 0;
 new EDIT_OBJECT_ID[MAX_PLAYERS];
 new EDIT_OBJECT_MODELID[MAX_PLAYERS];
 new LAST_OBJECT_ID[MAX_PLAYERS];
+new EDIT_VEHICLE_ID[MAX_PLAYERS];
 new PlayerVehicle[MAX_PLAYERS];
 new bool:OnFly[MAX_PLAYERS];
 new firstperson[MAX_PLAYERS];
@@ -649,7 +650,8 @@ public OnPlayerConnect(playerid)
 	EnablePlayerCameraTarget(playerid, true);
 	// Texdraws 
 	// objects rate info
-	Objrate[playerid] = CreatePlayerTextDraw(playerid, 34, 310, "_");
+	//Objrate[playerid] = CreatePlayerTextDraw(playerid, 34, 310, "_");
+	Objrate[playerid] = CreatePlayerTextDraw(playerid, 34, 435, "_");
 	PlayerTextDrawLetterSize(playerid, Objrate[playerid], 0.20, 1.2);
 	PlayerTextDrawAlignment(playerid, Objrate[playerid], 1);
 	//PlayerTextDrawColor(playerid, Objrate[playerid], 0xDFA906AA);
@@ -660,7 +662,8 @@ public OnPlayerConnect(playerid)
 	PlayerTextDrawFont(playerid, Objrate[playerid], 2);
 	PlayerTextDrawSetProportional(playerid, Objrate[playerid], 1);
 	
-	FPSBAR[playerid] = CreatePlayerTextDraw(playerid, 34, 325, "_");
+	//FPSBAR[playerid] = CreatePlayerTextDraw(playerid, 34, 325, "_");
+	FPSBAR[playerid] = CreatePlayerTextDraw(playerid, 34, 425, "_");
 	PlayerTextDrawLetterSize(playerid, FPSBAR[playerid], 0.20, 1.2);
 	PlayerTextDrawAlignment(playerid, FPSBAR[playerid], 1);
 	//PlayerTextDrawColor(playerid, FPSBAR[playerid], 0xDFA906AA);
@@ -714,12 +717,13 @@ public OnPlayerConnect(playerid)
 
 	SetPlayerTime(playerid,12,0); 
 	SetPVarInt(playerid,"Hour",12); 
-	SetPlayerWeather(playerid,0); 
-	SetPVarInt(playerid,"Weather",0);
+	SetPlayerWeather(playerid,2); 
+	SetPVarInt(playerid,"Weather",2);
 	
 	VaeData[playerid][timer] = -1;
 	VaeData[playerid][obj] =  -1;
 	EDIT_OBJECT_ID[playerid] = -1;
+	EDIT_VEHICLE_ID[playerid] = -1;
 	
 	OnFly[playerid] = false;
 	//hide logo
@@ -889,6 +893,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			}
 			#endif
 		} else {
+			/*
 			if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
 			{
 				#if defined TEXTURE_STUDIO
@@ -897,6 +902,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				}
 				#endif
 			}
+			*/
 			if(OnFly[playerid])// disable surfly
 			{
 				new Float:x,Float:y,Float:z;
@@ -1848,6 +1854,15 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_USEJETPACK);
 		return true;
 	}
+	if (!strcmp(cmdtext, "/deletecar", true))
+	{
+		if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+		{
+			new vehicleid = GetPlayerVehicleID(playerid);
+			DestroyVehicle(vehicleid);
+		}
+		return 1;
+	}
 	// Debug commands
 	if(!strcmp(cmdtext, "/testf", true))
     {
@@ -2031,20 +2046,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
 						format(tbtext, sizeof(tbtext),
-						"{FF0000}m{FFFFFF}tools — это filterscript который дополняет Texture Studio и предоставляет\n"\
-						"классический интерфейс на диалогах с основными функциями редактора карт\n\n"\
-						"Многим не хватало некоторых базовых функций в Texture Studio\n"\
-						"их список пополнялся, и пришла идея слияния мелких дополнений в один\n"\
-						"filterscript - так и появился mtools\n\n"\
-						"Домашняя страница mtools: {4682b4}vk.com/1nsanemapping{FFFFFF}\n"\
-						"Нашли баг? Сообщите о находке!\n");
+						"{FF0000}m{FFFFFF}tools — это filterscript который дополняет \n\
+						Texture Studio и предоставляет классический интерфейс на диалогах \n\
+						с основными функциями редактора карт\n\n\
+						Домашняя страница mtools: {4682b4}vk.com/1nsanemapping{FFFFFF}\n\
+						Нашли баг? Сообщите о находке!\n");
 					} else {
 						format(tbtext, sizeof(tbtext),
 						"{FF0000}m{FFFFFF}tools is a filterscript that complements Texture Studio and provides\n"\
 						"a classic dialog interface with basic map editor functions\n\n"\
-						"Many were missing some basic functionality in Texture Studio\n"\
-						"their list was replenished, and the idea of ??merging into one filterscript\n"\
-						"came up - and this is how mtools\n\n"\
 						"mtools homepage: {4682b4}vk.com/1nsanemapping{FFFFFF}\n"\
 						"Have you found a bug? Please report it!\n");
 					}
@@ -2180,19 +2190,29 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0: 
 				{
 					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/tcar");
+					if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+					{
+						new param[24];
+						EDIT_VEHICLE_ID[playerid] = GetPlayerVehicleID(playerid);
+						format(param, sizeof(param), "/avsel %i", EDIT_VEHICLE_ID[playerid]);
+						CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
+					}
+					#else
+					if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)	{
+						EDIT_VEHICLE_ID[playerid] = GetPlayerVehicleID(playerid);
+					}
 					#endif
 				}
 				case 1: 
 				{
 					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avnewcar");
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/tcar");
 					#endif
 				}
 				case 2: 
 				{
 					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avsel");
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avnewcar");
 					#endif
 				}
 				case 3: 
@@ -2219,7 +2239,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avexport");
 					#endif
 				}
-				case 7: 
+				case 7: RespawnAllVehicles();
+				case 8: 
 				{
 					new tbtext[450];
 					if(GetPVarInt(playerid, "lang") == 0)
@@ -2248,7 +2269,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowPlayerDialog(playerid, DIALOG_VEHMOD, DIALOG_STYLE_TABLIST_HEADERS,
 					"[VEHICLE - TUNING]",tbtext, "OK","Cancel");
 				}
-				case 8: 
+				case 9: 
 				{
 					new tbtext[350];
 					if(GetPVarInt(playerid, "lang") == 0)
@@ -2273,7 +2294,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowPlayerDialog(playerid, DIALOG_VEHSPEC, DIALOG_STYLE_LIST,
 					"[VEHICLE - Spec]",tbtext, "OK","Cancel");
 				}
-				case 9:	ShowPlayerMenu(playerid, DIALOG_VEHSETTINGS);
+				case 10: ShowPlayerMenu(playerid, DIALOG_VEHSETTINGS);
 			}
 		} else {
 			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -6246,38 +6267,49 @@ public ShowPlayerMenu(playerid, dialogid)
 		case DIALOG_VEHICLE:
 		{
 			new tbtext[450];
+			new header[64];
+			
+			if(EDIT_VEHICLE_ID[playerid] > -1)
+			{
+				format(header, sizeof header, "[VEHICLE] vehicleid:%i model:%i",
+				EDIT_VEHICLE_ID[playerid], GetVehicleModel(EDIT_VEHICLE_ID[playerid]));
+			} else {
+				format(header, sizeof header, "[VEHICLE]");
+			}
 			
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
 				"Действие\tКоманда\n"\
+				"Выбрать машину для редактирования\t{00FF00}/avsel\n"\
 				"Тестовый автомобиль\t{00FF00}/v\n"\
 				"Создать новую машину\t{00FF00}/avnewcar\n"\
-				"Выбрать машину для редактирования\t{00FF00}/avsel\n"\
 				"Копировать машину\t{00FF00}/avclonecar\n"\
 				"Удалить машину\t{00FF00}/avdeletecar\n"\
 				"Установить точку спавна\t{00FF00}/avsetspawn\n"\
 				"Экспорт выбранной машины\t{00FF00}/avexport\n"\
+				"Зареспавнить весь транспорт\t\n"\
 				"[>] Тюнинг\t\n"\
 				"[>] Специальные возможности\t\n"\
 				"[>] Настройки\t\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Action\tCommand\n"\
+				"Select vehicle\t{00FF00}/avsel\n"\
 				"Test vehicle\t{00FF00}/v\n"\
 				"Create new vehicle\t{00FF00}/avnewcar\n"\
-				"Select vehicle\t{00FF00}/avsel\n"\
 				"Clone vehicle\t{00FF00}/avclonecar\n"\
 				"Delete vehicle\t{00FF00}/avdeletecar\n"\
 				"Set spawn place\t{00FF00}/avsetspawn\n"\
 				"Export selected vehicle\t{00FF00}/avexport\n"\
+				"Respawn all vehicles\t\n"\
 				"[>] Tuning\t\n"\
 				"[>] Special abilities\t\n"\
 				"[>] Settings\t\n");
 			}
-			
+
 			ShowPlayerDialog(playerid, DIALOG_VEHICLE, DIALOG_STYLE_TABLIST_HEADERS,
-			"[VEHICLE]",tbtext, "OK","Cancel");
+			header, tbtext, "OK","Cancel");
 		}
 		case DIALOG_MAPMENU:
 		{
@@ -6511,7 +6543,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Show 3d text on objects\t/objtext3d\n"\
 				"Point in the center of the screen in flight\t%s\n"\
 				"Information about objects and vehicles in flymode\t%s\n"\
-				"Show FPS over the radar\t%s\n"\
+				"Show FPS under the radar\t%s\n"\
 				"Show map loading window at login\t%s\n"\
 				"Show EditMenu when editing object\t%s\n",
 				StreamedObjectsTD_st,AIMTD_st,TargetInfo_st,
@@ -6525,7 +6557,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Показывать 3d текст на объектах\t/objtext3d\n"\
 				"Точка по центру экрана в полете\t%s\n"\
 				"Информация о объектах и транспорте в режиме полета\t%s\n"\
-				"Показывать FPS над радаром\t%s\n"\
+				"Показывать FPS под радаром\t%s\n"\
 				"Показывать окно загрузки карты при входе\t%s\n"\
 				"Показывать EditMenu при редактировании объекта\t%s\n",
 				StreamedObjectsTD_st,AIMTD_st,TargetInfo_st,
@@ -7757,6 +7789,15 @@ stock IsValidObjectModel(modelid)
 	#endif
 	else return 0;
 }
+
+stock RespawnAllVehicles()
+{
+    for (new i = GetVehiclePoolSize()+1; --i != 0;)
+    SetVehicleToRespawn(i);
+	SendClientMessageToAllEx(COLOR_GREY,
+	"Весь транспорт был возвращен на точку появления",
+	"All vehicles have been returned to the spawn point");
+}  
 
 public MtoolsHudToggle(playerid)
 {
