@@ -2,7 +2,7 @@
 
 ![logo](/img/logo_mtools.png)
 
-**MTOOLS** is a filterscript that complements Texture Studio and provides a classic dialog interface.
+**MTOOLS** is a filterscript that complements Texture Studio and provides a classic dialog interface.  
 Mtools gives mappers more features to be more productive.
 
 >The main menu is called by default on ALT (Can be changed in the settings)\
@@ -22,7 +22,7 @@ Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 ## Requirements
 * [SA:MP 0.3.7 R2 server](https://www.sa-mp.com/download.php) or highter (DL not requred)
 * [Incognito Streamer plugin v2.7 - 2.9.4](https://github.com/samp-incognito/samp-streamer-plugin/releases)
-* **mtools** works correctly with Texture Studio 2.0 and above
+* **mtools** works correctly with  *[Texture Studio 2.0](https://vk.com/tip_mapper?w=page-89889560_49251374)* and above
 
 ## **[Wiki](https://github.com/ins1x/mtools/wiki)**
 * [English](https://github.com/ins1x/mtools/wiki)
