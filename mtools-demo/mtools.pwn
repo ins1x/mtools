@@ -29,9 +29,8 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 
 */
 
-// VERSION
-#define VERSION              	"0.3.14"
-#define BUILD_DATE             	"31.01.2020"
+#define VERSION              	"0.3.15"
+#define BUILD_DATE             	"3.02.2020"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -125,6 +124,9 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_ROTSET				6090
 #define DIALOG_COLORSTIP			6091
 #define DIALOG_PREFABMENU			6092
+#define DIALOG_LIGHTING				6093
+#define DIALOG_SETINTERIOR			6094
+#define DIALOG_SETWORLD				6095
 
 #define COLOR_SERVER_GREY		0x87bae7FF
 #define COLOR_GREY 				0xAFAFAFAA
@@ -163,7 +165,6 @@ IsPlayerSpawned(playerid)
 }
 #endif
 
-//#include <mselect>
 #include "/modules/streamer.inc"
 //#include <streamer>
 #include <filemanager>
@@ -265,6 +266,7 @@ new showEditMenu = true;
 new askDelete = true;
 new savePlayerPos = true;
 new hideMtoolsMenu = false;
+new useFastMove = false;
 
 new mainMenuKeyCode = 1024; // ALT key
 new LangSet = 0;
@@ -853,12 +855,24 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	{
 		if(PRESSED(KEY_FIRE) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 		{
-			const Float:velocity = 1.8;
+			const Float:velocity = 1.5;
 			new Float:angle;
 			GetVehicleZAngle(GetPlayerVehicleID(playerid), angle);
 			new Float:vx = velocity * -floatcos(angle - 90.0, degrees);
 			new Float:vy = velocity * -floatsin(angle - 90.0, degrees);
 			SetVehicleVelocity(GetPlayerVehicleID(playerid), vx, vy, 0.0);
+		}
+	}
+	if(useFastMove)
+	{
+		if(HOLDING(KEY_SPRINT) && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
+		{
+			new Float:player_velocity = 5.0;
+			new Float:angle;
+			GetPlayerFacingAngle(playerid, angle);
+			new Float:vx = player_velocity * -floatcos(angle - 90.0, degrees);
+			new Float:vy = player_velocity * -floatsin(angle - 90.0, degrees);
+			SetPlayerVelocity(playerid, vx, vy, 0.1);
 		}
 	}
 	// autofix to LMB
@@ -1387,7 +1401,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		else SendClientMessage(playerid, -1, "Set drunk level. Use: /drunk [0-50000]");
 		return 1;
 	}
-	if(!strcmp(cmdtext,"/stopedit", true) || !strcmp(cmdtext,"/stop", true))
+	if(!strcmp(cmdtext,"/stop", true))
     {
 		if(GetPVarInt(playerid, "Editmode") != 5) { 
 			SetPVarInt(playerid, "Editmode", 5);
@@ -1655,7 +1669,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		#endif
 		return 1;
 	}
-	if(!strcmp(cmdtext, "/newobj", true) || !strcmp(cmdtext, "/oadd", true))
+	if(!strcmp(cmdtext, "/oadd", true))
 	{
 		ShowPlayerMenu(playerid,DIALOG_CREATEOBJ);
 		return 1;
@@ -3188,6 +3202,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					"Set gravity","Enter new gravity value. Default server value [0.008].",
 					"OK", "Cancel");
 				}
+				case 8: 
+				{
+					ShowPlayerDialog(playerid, DIALOG_SETINTERIOR, DIALOG_STYLE_INPUT, 
+					"Set interior",	"Enter interior ID", "Ok", "Cancel");
+				}
+				case 9: 
+				{
+					ShowPlayerDialog(playerid, DIALOG_SETWORLD, DIALOG_STYLE_INPUT, 
+					"Set virtual world","Enter virtual world ID", "OK", "Cancel");
+				}
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -3234,6 +3258,21 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					format(query,sizeof(query),
 					"UPDATE `Settings` SET Value=%d WHERE Option='superJump'", superJump);
 					db_query(mtoolsDB,query);
+					ShowPlayerMenu(playerid, DIALOG_KEYBINDS);
+				}
+				case 3:
+				{
+					if(useFastMove)
+					{
+						SendClientMessageEx(playerid, -1,
+						"Быстрое перемещение отключено", "Fast move disabled");
+						useFastMove= false;
+					} else { 
+						SendClientMessageEx(playerid, -1,
+						"Быстрое перемещение активированно, нажмите клавишу бега для просмотра",
+						"Fast move activated, hold sprint key to fast move");
+						useFastMove = true;
+					}
 					ShowPlayerMenu(playerid, DIALOG_KEYBINDS);
 				}
 			}
@@ -3413,30 +3452,30 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						ShowPlayerDialog(playerid, DIALOG_OBJECTSMENU, DIALOG_STYLE_TABLIST_HEADERS, 
 						"[CREATE - Objects]",
 						"Действие\tКоманда\n"\
-						"{A9A9A9}Создать объект по номеру\t{00FF00}/newobj\n"\
+						"Создать объект по номеру\t{00FF00}/oadd\n"\
 						"Список объектов загруженных для редактирования\t{00FF00}/lsel\n"\
-						"{A9A9A9}Избранные объекты\t\n"\
+						"Избранные объекты\t\n"\
 						"Поиск объектов по слову\t{00FF00}/osearch\n"\
-						"{A9A9A9}Поиск дубликатов объектов\t\n"\
+						"Поиск дубликатов объектов\t\n"\
 						"Определить расстояние между двумя объектами\t\n"\
-						"{A9A9A9}Информация о модели объекта\t{00FF00}/minfo\n"\
+						"Информация о модели объекта\t{00FF00}/minfo\n"\
 						"Показать скрытые объекты\t\n"\
-						"{A9A9A9}Ближайший объект\t{00FF00}/nearest\n",
+						"Ближайший объект\t{00FF00}/nearest\n",
 						//"[>] Движение объектов\t\n",
 						"Select","Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_OBJECTSMENU, DIALOG_STYLE_TABLIST_HEADERS, 
 						"[CREATE - Objects]",
 						"Description\tCommand\n"\
-						"{A9A9A9}Create object by number\t{00FF00}/newobj\n"\
+						"Create object by number\t{00FF00}/oadd\n"\
 						"List of objects loaded for editing\t{00FF00}/lsel\n"\
-						"{A9A9A9}Favorite objects\n"\
+						"Favorite objects\t\n"\
 						"Search objects\t{00FF00}/osearch\n"\
-						"{A9A9A9}Finding duplicate objects\t\n"\
+						"Finding duplicate objects\t\n"\
 						"Determine the distance between two objects\t\n"\
-						"{A9A9A9}Object model information\t{00FF00}/minfo\n"\
+						"Object model information\t{00FF00}/minfo\n"\
 						"Show hidden objects\t\n"\
-						"{A9A9A9}Nearest object info\t{00FF00}/nearest\n",
+						"Nearest object info\t{00FF00}/nearest\n",
 						//"[>] Object movement\t\n",
 						"Select","Cancel");
 					}
@@ -4992,6 +5031,30 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 	}
+	if (dialogid == DIALOG_SETINTERIOR) 
+	{
+		if(response)
+		{
+			if (!isnull(inputtext))
+			{
+				SetPlayerInterior(playerid, strval(inputtext));
+			} else {
+				SendClientMessageEx(playerid, COLOR_GREY, "Неверное значение", "Incorrect value");
+			}
+		}
+	}
+	if (dialogid == DIALOG_SETWORLD) 
+	{
+		if(response)
+		{
+			if (!isnull(inputtext))
+			{
+				SetPlayerVirtualWorld(playerid, strval(inputtext)); 
+			} else {
+				SendClientMessageEx(playerid, COLOR_GREY, "Неверное значение", "Incorrect value");
+			}
+		}
+	}
 	if (dialogid == DIALOG_CLEARTEMPFILES)
 	{
 		if(response) RemoveTempMapEditorFiles(playerid);
@@ -6451,9 +6514,12 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Change skin\t{00FF00}%i\n"\
 				"Set Weather\t{00FF00}%i\n"\
 				"Set Time\t{00FF00}%i\n"\
-				"Set Gravity\t{00FF00}%.3f\n",
+				"Set Gravity\t{00FF00}%.3f\n"\
+				"Set Interior\t{00FF00}%i\n"\
+				"Set World\t{00FF00}%i\n",
 				Lang_st, GetPlayerSkin(playerid), GetPVarInt(playerid,"Weather"),
-				GetPVarInt(playerid,"Hour"), GetGravity());
+				GetPVarInt(playerid,"Hour"), GetGravity(),
+				 GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Опция\tСтатус\n"\
@@ -6464,9 +6530,12 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Сменить скин\t{00FF00}%i\n"\
 				"Установить погоду\t{00FF00}%i\n"\
 				"Установить время\t{00FF00}%i\n"\
-				"Установить гравитацию\t{00FF00}%.3f\n",
+				"Установить гравитацию\t{00FF00}%.3f\n"\
+				"Установить интерьер\t{00FF00}%i\n"\
+				"Установить виртуальный мир\t{00FF00}%i\n",
 				Lang_st, GetPlayerSkin(playerid), GetPVarInt(playerid,"Weather"),
-				GetPVarInt(playerid,"Hour"), GetGravity());
+				GetPVarInt(playerid,"Hour"), GetGravity(),
+				GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
 			}
 			ShowPlayerDialog(playerid, DIALOG_SETTINGS, DIALOG_STYLE_TABLIST_HEADERS,
 			"[SETTINGS]",tbtext, "Select","Cancel");
@@ -6475,12 +6544,14 @@ public ShowPlayerMenu(playerid, dialogid)
 		{
 			new tbtext[500];
 			new 
-				SuperJump_st[16], 
+				SuperJump_st[16], FastMove_st[16],
 				bindFkeyToFlymode_st[16], mainMenuKeyCode_st[16]
 			;
 			
 			if(superJump) 
 			SuperJump_st = "{00FF00}[ON]"; else SuperJump_st = "{FF0000}[OFF]";
+			if(useFastMove) 
+			FastMove_st = "{00FF00}[ON]"; else FastMove_st = "{FF0000}[OFF]";
 			if(bindFkeyToFlymode)
 			bindFkeyToFlymode_st = "{00FF00}[ON]"; else bindFkeyToFlymode_st = "{FF0000}[OFF]";
 			switch(mainMenuKeyCode)
@@ -6494,18 +6565,20 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 1)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Option\tState\n"\
-				"Flymode mode at <F>\t%s\n"\
-				"Main menu hotkey\t%s\n"\
-				"SuperJump\t%s\n",
-				bindFkeyToFlymode_st, mainMenuKeyCode_st, SuperJump_st);
+				"Option\tState\n\
+				Flymode mode at <F>\t%s\n\
+				Main menu hotkey\t%s\n\
+				SuperJump\t%s\n\
+				Fast move\t%s\n",
+				bindFkeyToFlymode_st, mainMenuKeyCode_st, SuperJump_st, FastMove_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
-				"Режим полета на <F>\t%s\n"\
-				"Вызов главного меню на клавишу\t%s\n"\
-				"Cупер прыжок\t%s\n",
-				bindFkeyToFlymode_st, mainMenuKeyCode_st, SuperJump_st);
+				"Опция\tСтатус\n\
+				Режим полета на <F>\t%s\n\
+				Вызов главного меню на клавишу\t%s\n\
+				Cупер прыжок\t%s\n\
+				Быстрое перемещение\t%s\n",
+				bindFkeyToFlymode_st, mainMenuKeyCode_st, SuperJump_st, FastMove_st);
 			}
 			
 			ShowPlayerDialog(playerid, DIALOG_KEYBINDS, DIALOG_STYLE_TABLIST_HEADERS,
