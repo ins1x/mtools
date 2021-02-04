@@ -1,3 +1,9 @@
 # Auto detect text files and perform LF normalization
-*.pwn text working-tree-encoding=Windows-1251
+# *.pwn text working-tree-encoding=Windows-1251
 * text=auto
+[*.pwn]
+text working-tree-encoding=Windows-1251
+charset = utf-8
+indent_style = tab
+indent_size = 4
+trim_trailing_whitespace = true
