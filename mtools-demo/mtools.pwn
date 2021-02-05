@@ -13,8 +13,6 @@ Requirements:
 - Incognito Streamer plugin v 2.7+ (Last 2.9.4 supported)
 - mtools works correctly with Texture Studio 2.0 and above
 
-> only some basic functions are available for UG-MP
-
 Installation:
 - Install latest version Texture Studio
 - Copy the mtools.amx file to the filterscripts folder
@@ -28,8 +26,8 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.16"
-#define BUILD_DATE             	"4.02.2020"
+#define VERSION              	"0.3.17"
+#define BUILD_DATE             	"5.02.2020"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -132,6 +130,14 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_OBJECTSCAT			6100
 #define DIALOG_LST_LIGHTING			6101
 #define DIALOG_LST_NATURE			6102
+#define DIALOG_LST_WALLS			6103
+#define DIALOG_LST_TRASH			6104
+#define DIALOG_LST_SAMPOBJ			6105
+#define DIALOG_LST_STREETS			6106
+#define DIALOG_LST_INTERIORS		6107
+#define DIALOG_LST_HOUSECOMP		6108
+#define DIALOG_LST_LANDSCAPE		6109
+#define DIALOG_LST_BANNERS			6110
 
 #define COLOR_SERVER_GREY		0x87bae7FF
 #define COLOR_GREY 				0xAFAFAFAA
@@ -1172,13 +1178,14 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	new string[64];
 	format(string, sizeof(string), "id: %i", EDIT_OBJECT_ID[playerid]);
 	SendClientMessage(playerid, -1, string);*/
-	
+
 	if(showEditMenu)
 	{
 		if(response == EDIT_RESPONSE_FINAL || response == EDIT_RESPONSE_CANCEL)
 		{
 			CancelEdit(playerid);
 			ShowPlayerMenu(playerid,DIALOG_EDITMENU);
+			SetPVarInt(playerid, "Editmode",0);
 		}
 	}
 	return 1;
@@ -3725,6 +3732,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			CreateDynamicObjectByModelid(playerid, array_FavObjects[listitem]);
 		}
 	}
+
+	#if defined TEXTURE_STUDIO
 	if(dialogid == DIALOG_OBJECTSCAT)
 	{
 		if(response)
@@ -3745,19 +3754,153 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					"Favorites",tbtext,"Create","Close");
 				}
 				case 1:
-				{					
-					ShowPlayerDialog(playerid, DIALOG_LST_LIGHTING, DIALOG_STYLE_LIST,
-					"Lighting", "PointLight\nPinSpotLight\nNeon\nBollardLight\nAll\n",
-					"OK","Close");
+				{
+					if (GetPVarInt(playerid, "lang") == 0) {
+						ShowPlayerDialog(playerid, DIALOG_LST_SAMPOBJ, DIALOG_STYLE_LIST,
+						"SA-MP","Трубы\nСферы\nКлетки\nРампы\nДжампы\nДороги",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_SAMPOBJ, DIALOG_STYLE_LIST,
+						"SA-MP","Tubes\nSpheres\nCages\nRamps\nJumps\nRoads",
+						"OK","Close");
+					}
 				}
 				case 2:
+				{	
+					if (GetPVarInt(playerid, "lang") == 0) {
+						ShowPlayerDialog(playerid, DIALOG_LST_LIGHTING, DIALOG_STYLE_LIST,
+						"Освещение","Точка освещения\nПрожектор\nНеон\nСтолб со светом\nВсе\n",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_LIGHTING, DIALOG_STYLE_LIST,
+						"Lighting", "PointLight\nPinSpotLight\nNeon\nBollardLight\nAll\n",
+						"OK","Close");
+					}			
+				}
+				case 3:
 				{					
-					ShowPlayerDialog(playerid, DIALOG_LST_NATURE, DIALOG_STYLE_LIST,
-					"Lighting", "Trees\nGrass\nStones\n",
-					"OK","Close");
+					if (GetPVarInt(playerid, "lang") == 0) {
+						ShowPlayerDialog(playerid, DIALOG_LST_NATURE, DIALOG_STYLE_LIST,
+						"Природа", "Деревья\nТрава\nДеревья\nКамни\n",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_NATURE, DIALOG_STYLE_LIST,
+						"Nature", "Trees\nGrass\nPlants\nStones",
+						"OK","Close");
+					}
+				}
+				case 4:
+				{		
+					if (GetPVarInt(playerid, "lang") == 0) {			
+						ShowPlayerDialog(playerid, DIALOG_LST_WALLS, DIALOG_STYLE_LIST,
+						"Стены", "Бетонные блоки\nСтолбы\nCтены\n",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_WALLS, DIALOG_STYLE_LIST,
+						"Walls", "Concrete blocks\nPillars\nWalls\n",
+						"OK","Close");
+					}
+				}
+				case 5:
+				{		
+					if (GetPVarInt(playerid, "lang") == 0) {			
+						ShowPlayerDialog(playerid, DIALOG_LST_HOUSECOMP, DIALOG_STYLE_LIST,
+						"Компоненты дома", "Двери\nСтекла\nСтупеньки\n",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_HOUSECOMP, DIALOG_STYLE_LIST,
+						"House components", "Doors\nGlass\nStairs\n",
+						"OK","Close");
+					}
+				}
+				case 6:
+				{
+					if (GetPVarInt(playerid, "lang") == 0) {
+						ShowPlayerDialog(playerid, DIALOG_LST_INTERIORS, DIALOG_STYLE_LIST,
+						"Интерьер", "Кровати\nСтолы\nСтулья\nКухни\nКартины\nЛампы",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_INTERIORS, DIALOG_STYLE_LIST,
+						"Interior", "Beds\nTables\nChairs\nKitchens\nFrames\nLamps",
+						"OK","Close");
+					}
+				}
+				case 7:
+				{
+					if (GetPVarInt(playerid, "lang") == 0) {
+						ShowPlayerDialog(playerid, DIALOG_LST_STREETS, DIALOG_STYLE_LIST,
+						"Уличные объекты", "[>] Вывески\nУличное освещение\nСкамейки",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_STREETS, DIALOG_STYLE_LIST,
+						"Street", "[>] Boards\nStreet light\nBenchs",
+						"OK","Close");
+					}
+
+				}
+				case 8:
+				{
+					if (GetPVarInt(playerid, "lang") == 0) {
+						ShowPlayerDialog(playerid, DIALOG_LST_LANDSCAPE, DIALOG_STYLE_LIST,
+						"Ландшафт", 
+						"Острова и поверхности\n\
+						Земляные участки\n\
+						Каменные участки",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_LANDSCAPE, DIALOG_STYLE_LIST,
+						"Landscape", 
+						"Islands and surfaces\n\
+						Ground plots\n\
+						Stone plots",
+						"OK","Close");
+					}
+				}
+				case 9:
+				{
+					if (GetPVarInt(playerid, "lang") == 0) {
+						ShowPlayerDialog(playerid, DIALOG_LST_TRASH, DIALOG_STYLE_LIST,
+						"Мусор", "Коробки\nМусор\n",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_TRASH, DIALOG_STYLE_LIST,
+						"Trash", "Boxes\nRubbish\n",
+						"OK","Close");
+					}
+				}
+				case 10:
+				{
+					if (GetPVarInt(playerid, "lang") == 0)
+					{
+						ShowPlayerDialog(playerid, DIALOG_OBJSEARCH, DIALOG_STYLE_INPUT,
+						"Object search", 
+						"Поиск объектов по слову. Введите слово для поиска:\n",
+						"Search", "Cancel");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_OBJSEARCH, DIALOG_STYLE_INPUT,
+						"Object search", 
+						"Search for objects by word. Enter a search word:\n",
+						"Search", "Cancel");
+					}
 				}
 			}
 		}
+	}
+	if(dialogid == DIALOG_LST_SAMPOBJ)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch tube");
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch sphere");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch cage");
+				case 3:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch ramp");
+				case 4:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch jump");
+				case 5:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch MRoad");
+			}
+		}
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
 	}
 	if(dialogid == DIALOG_LST_LIGHTING)
 	{
@@ -3765,40 +3908,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch PointLight");
-					#endif
-				}
-				case 1:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch PinSpotLight");
-					#endif
-				}
-				case 2:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch Neon");
-					#endif
-				}
-				case 3:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch BollardLight");
-					#endif
-				}
-				case 4:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch light");
-					#endif
-				}	
+				case 0:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch PointLight");
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch PinSpotLight");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch Neon");
+				case 3:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch BollardLight");
+				case 4:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch light");
 			}
-		} else {
-			ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
 		}
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
 	}
 	if(dialogid == DIALOG_LST_NATURE)
 	{
@@ -3806,29 +3923,121 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch tree");
-					#endif
-				}
-				case 1:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch grass");
-					#endif
-				}
-				case 2:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch stone");
-					#endif
-				}	
+				case 0:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch tree");
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch grass");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch plant");
+				case 3:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch rock");
 			}
-		} else {
-			ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
-		}
+		} 
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
 	}
+	if(dialogid == DIALOG_LST_WALLS)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch Concrete");
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch pillar");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch wall");
+			}
+		}
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
+	}
+	if(dialogid == DIALOG_LST_TRASH)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch box");
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch rubbish");
+			}
+		}
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
+	}
+	if(dialogid == DIALOG_LST_STREETS)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0: 
+				{
+					if (GetPVarInt(playerid, "lang") == 0) {
+						ShowPlayerDialog(playerid, DIALOG_LST_BANNERS, DIALOG_STYLE_LIST,
+						"Уличные объекты", "Вывески\nЗнаки\nБилборды\nБаннеры",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_BANNERS, DIALOG_STYLE_LIST,
+						"Street", "Boards\nSigns\nBillboards\nBanners",
+						"OK","Close");
+					}
+				}
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch lamp");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch bench");
+			}
+		} 
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
+	}
+	if(dialogid == DIALOG_LST_BANNERS)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch boards");
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch sign");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch bill");
+				case 3: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch banner");
+			}
+		} 
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
+	}
+	if(dialogid == DIALOG_LST_LANDSCAPE)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch island");
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch grnd");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch stone");
+			}
+		} 
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
+	}
+	if(dialogid == DIALOG_LST_INTERIORS)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch bed");
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch table");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch chair");
+				case 3:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch kitch");
+				case 4:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch frame");
+				case 5:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch MLIGHT");
+			}
+		}
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
+	}
+	if(dialogid == DIALOG_LST_HOUSECOMP)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch door");
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch glass");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch stairs");
+			}
+		} 
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
+	}
+	#endif
+
 	if(dialogid == DIALOG_CREATEOBJ)
 	{
 		if(response)
@@ -4165,6 +4374,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					#if defined TEXTURE_STUDIO
 						SendClientMessage(playerid, COLOR_GREY, "not available for demo version");
 					#else
+					
 					if (GetPVarInt(playerid, "lang") == 1) {
 						ShowPlayerDialog(playerid, DIALOG_RANGEDEL, DIALOG_STYLE_INPUT, "/rangedel",
 						"{FFFFFF}This action {FF0000}delete all{FFFFFF} in the specified radius. Enter radius:\n",
@@ -6223,13 +6433,29 @@ public ShowPlayerMenu(playerid, dialogid)
 			{		
 				format(tbtext, sizeof(tbtext),
 				"Избранные\n\
+				[>] SA-MP объекты\n\
 				[>] Освещение\n\
-				[>] Природа");
+				[>] Природа\n\
+				[>] Стены\n\
+				[>] Компоненты дома\n\
+				[>] Интерьер\n\
+				[>] Уличные\n\
+				[>] Ландшафт\n\
+				[>] Мусор\n\
+				Поиск объектов");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Favorites\n\
+				[>] SA-MP objects\n\
 				[>] Lighting\n\
-				[>] Nature");
+				[>] Nature\n\
+				[>] Walls\n\
+				[>] House components\n\
+				[>] Interior\n\
+				[>] Street\n\
+				[>] Landscape\n\
+				[>] Trash\n\
+				Search objects");
 			}
 			ShowPlayerDialog(playerid, DIALOG_OBJECTSCAT, DIALOG_STYLE_LIST, 
 			"[OBJECTS - CATEGORY]",tbtext,"OK","Cancel");
