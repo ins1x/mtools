@@ -26,8 +26,8 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.17"
-#define BUILD_DATE             	"5.02.2020"
+#define VERSION              	"0.3.18"
+#define BUILD_DATE             	"8.02.2021"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -121,12 +121,13 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_ROTSET				6090
 #define DIALOG_COLORSTIP			6091
 #define DIALOG_PREFABMENU			6092
-//#define DIALOG_		6093
+//#define DIALOG_				6093
 #define DIALOG_SETINTERIOR			6094
 #define DIALOG_SETWORLD				6095
 //#define DIALOG_		6096
 #define DIALOG_TEXTUREBUFFER		6097
 #define DIALOG_OBJECTSSEARCH		6098
+#define DIALOG_MTAFAVORITES			6099
 #define DIALOG_OBJECTSCAT			6100
 #define DIALOG_LST_LIGHTING			6101
 #define DIALOG_LST_NATURE			6102
@@ -138,6 +139,18 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_LST_HOUSECOMP		6108
 #define DIALOG_LST_LANDSCAPE		6109
 #define DIALOG_LST_BANNERS			6110
+#define DIALOG_LST_ROADS			6111
+#define DIALOG_WEAPONS				6120
+#define DIALOG_WEAPONS_MELEE		6121
+#define DIALOG_WEAPONS_PISTOLS		6122
+#define DIALOG_WEAPONS_SHOTGUNS		6123
+#define DIALOG_WEAPONS_SUBMACHINE	6124
+#define DIALOG_WEAPONS_RIFLES		6125
+#define DIALOG_WEAPONS_ASSAULT		6126
+#define DIALOG_WEAPONS_HEAVY		6127
+#define DIALOG_WEAPONS_GRENADES		6128
+#define DIALOG_WEAPONS_HANDHELD		6129
+//#define DIALOG_WEAPONS_RESERVE	6130
 
 #define COLOR_SERVER_GREY		0x87bae7FF
 #define COLOR_GREY 				0xAFAFAFAA
@@ -158,6 +171,8 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 	#define foreach(%1,%2) for (new %2 = 0; %2 < MAX_PLAYERS; %2++) if (IsPlayerConnected(%2))
 	#define __SSCANF_FOREACH__
 #endif
+
+// Add YSF func later
 //#include <YSF> //https://github.com/IllidanS4/YSF/wiki
 
 #if !defined _YSF_included
@@ -465,6 +480,8 @@ new massactor[10];
 //new Actors[11] = {0, 0, ...};
 new Actors[10];
 
+new weapon[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+
 new array_FavObjects[28] = {
 	1215,1290,1570,1223,3534,3525,3461,3877,
 	3524,3472,3437,19588,18728,1361,8623,2811,
@@ -602,8 +619,7 @@ public OnFilterScriptInit()
 {
 	// Load database
 	LoadMtoolsDb();
-	// Init 0,5 sec timer 
-	SetTimer("OnScriptUpdate",500,true);
+
 	// Check rcon mode
 	if(fexist("mtools/rcon.txt")) {
 		mtoolsRcon = true;
@@ -611,6 +627,7 @@ public OnFilterScriptInit()
 	if(fexist("mtools/debug.txt")) {
 		DEBUG = true;
 	}
+
 	// vae init
 	for(new i = 0; i < MAX_PLAYERS; ++i)
 	{
@@ -627,17 +644,9 @@ public OnFilterScriptInit()
 	{
 		printf("Recommended server version is 0.3.7, current %s", server_version);
 	}
-	return 1;
-}
 
-public OnPlayerConnect(playerid)
-{
-	//PlayerPlaySound(playerid, 1132, 0.0, 0.0, 0.0);// camera shot
-	//SendClientMessage(playerid, COLOR_GREY, 
-	//"Visit mtools developers page: https://vk.com/1nsanemapping");
-	
-	#if defined _new_streamer_included
 	// Streamer config
+	#if defined _new_streamer_included
 	#undef STREAMER_OBJECT_SD
 	#define STREAMER_OBJECT_SD 550.0
 	#undef STREAMER_OBJECT_DD
@@ -653,6 +662,19 @@ public OnPlayerConnect(playerid)
 			#endif
 		#endif	
 	#endif
+
+	// Set 0,5 sec update timer 
+	SetTimer("OnScriptUpdate",500,true);
+
+	return 1;
+}
+
+public OnPlayerConnect(playerid)
+{
+	//PlayerPlaySound(playerid, 1132, 0.0, 0.0, 0.0);// camera shot
+	//SendClientMessage(playerid, COLOR_GREY, 
+	//"Visit mtools developers page: https://vk.com/1nsanemapping");
+	
 	//print("Streamer config:");
 	/*(new tmpstr[64];
 	format(tmpstr, sizeof(tmpstr), "STREAMER_OBJECT_SD: %.1f | STREAMER_OBJECT_DD: %.1f",
@@ -744,14 +766,14 @@ public OnPlayerConnect(playerid)
 	PlayerTextDrawShow(playerid, Logo[playerid]);
 	
 	// vars init
-	SetPVarInt(playerid,"lang",LangSet);
-	SetPVarInt(playerid,"hud",1);
-	SetPVarInt(playerid,"freezed",0);
-	SetPVarInt(playerid,"specbar",-1);
-	SetPVarInt(playerid,"Firstperson",0);
-	SetPVarInt(playerid,"LightsStatus",0);
-	SetPVarInt(playerid, "drunk", 0);
-	SetPVarInt(playerid, "DashCam", 0);
+	SetPVarInt(playerid,"lang",LangSet); // Lang 0 - RU Lang 1 - EN
+	SetPVarInt(playerid,"hud",1); // toggle all internal textdraws 
+	SetPVarInt(playerid,"freezed",0); //used in VAE
+	SetPVarInt(playerid,"specbar",-1);  //toggle debug(spec) bar
+	SetPVarInt(playerid,"Firstperson",0); // toggle first person mod
+	SetPVarInt(playerid,"LightsStatus",0); // vehicle lights
+	SetPVarInt(playerid, "drunk", 0); // need for frs counter
+	SetPVarInt(playerid, "DashCam", 0); // toggle police cam
 	PlayerTextDrawShow(playerid, Objrate[playerid]);
 	PlayerTextDrawShow(playerid, FPSBAR[playerid]);
 
@@ -795,12 +817,22 @@ public OnPlayerSpawn(playerid)
 	{
 		SetPlayerSkin(playerid, 160);
 	}
+	// Restore last position
 	if(savePlayerPos)
 	{
 		if(LastPlayerPos[playerid][LastPosX] != 0.0)
 		{
 			SetPlayerPos(playerid, LastPlayerPos[playerid][LastPosX], LastPlayerPos[playerid][LastPosY], LastPlayerPos[playerid][LastPosZ]);
 			SetActorFacingAngle(playerid, LastPlayerPos[playerid][LastPosA]);
+		}
+	}
+	// Give selected Weapons 
+	ResetPlayerWeapons(playerid);
+	for(new i = sizeof(weapon) -1; i > -1; i--)
+	{
+		if (weapon[i] > 0)
+		{
+			GivePlayerWeapon(playerid, weapon[i], 9998);
 		}
 	}
 	return 1;
@@ -1310,6 +1342,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		ShowPlayerMenu(playerid, DIALOG_CMDS);
 		return true;
 	}
+	if(!strcmp(cmdtext,"/w", true) || !strcmp(cmdtext,"/weapons", true))
+    {
+		ShowPlayerMenu(playerid, DIALOG_WEAPONS);
+        return 1;
+    }
 	if(!strcmp(cmdtext,"/veh", true) || !strcmp(cmdtext,"/vehicle", true) || !strcmp(cmdtext,"/av", true))
     {
 		ShowPlayerMenu(playerid, DIALOG_VEHICLE);
@@ -2223,6 +2260,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					"{FFFFFF}Game Text 6\n",
 					"OK","Cancel");
 				}
+				case 9: ShowPlayerMenu(playerid, DIALOG_WEAPONS);
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -3731,6 +3769,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{	
 			CreateDynamicObjectByModelid(playerid, array_FavObjects[listitem]);
 		}
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
 	}
 
 	#if defined TEXTURE_STUDIO
@@ -3859,6 +3898,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 9:
 				{
 					if (GetPVarInt(playerid, "lang") == 0) {
+						ShowPlayerDialog(playerid, DIALOG_LST_ROADS, DIALOG_STYLE_LIST,
+						"Дороги", "MTA\nДороги\nМосты",
+						"OK","Close");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_LST_ROADS, DIALOG_STYLE_LIST,
+						"Roads", "MTA\nRoads\nBridges",
+						"OK","Close");
+					}
+				}
+				case 10:
+				{
+					if (GetPVarInt(playerid, "lang") == 0) {
 						ShowPlayerDialog(playerid, DIALOG_LST_TRASH, DIALOG_STYLE_LIST,
 						"Мусор", "Коробки\nМусор\n",
 						"OK","Close");
@@ -3868,7 +3919,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"OK","Close");
 					}
 				}
-				case 10:
+				case 11:
 				{
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
@@ -4007,6 +4058,24 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		} 
 		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
 	}
+	if(dialogid == DIALOG_LST_ROADS)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0:
+				{
+					ShowPlayerDialog(playerid, DIALOG_MTAFAVORITES, DIALOG_STYLE_LIST,
+					"Roads", "18450\n3458\n",
+					"OK","Close");
+				}
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch road");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/osearch bridge");
+			}
+		} 
+		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
+	}
 	if(dialogid == DIALOG_LST_INTERIORS)
 	{
 		if(response)
@@ -4035,6 +4104,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		} 
 		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
+	}
+	if(dialogid == DIALOG_MTAFAVORITES)
+	{
+		if(response)
+		{
+			//TODO Add preview TD later
+		}
 	}
 	#endif
 
@@ -5897,6 +5973,168 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		}
 		ShowMainAttachEditMenu(playerid);
 	}
+	if(dialogid == DIALOG_WEAPONS)
+	{	
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0: 
+				{
+					ShowPlayerDialog(playerid, DIALOG_WEAPONS_MELEE, DIALOG_STYLE_LIST,
+					"Melee",
+					"Brass knuckles\nGolf club\nNite stick\nKnife\n\
+					Baseball bat\nShovel\nPool cue\nKatana\nChainsaw\n\
+					Purple dildo\nShort dildo\nLong vibrator\n\
+					Long vibrator\nFlowers\nCane",
+					"Select", "Cancel");
+				}
+				case 1: 
+				{
+					ShowPlayerDialog(playerid, DIALOG_WEAPONS_PISTOLS, DIALOG_STYLE_LIST,
+					"Pistols", "9mm Pistol\nSilenced pistol\nDesert eagle",
+					"Select", "Cancel");
+				}
+				case 2:
+				{
+					ShowPlayerDialog(playerid, DIALOG_WEAPONS_SHOTGUNS, DIALOG_STYLE_LIST,
+					"Shotguns", "Shotgun\nSawn-off shotgun\nCombat shotgun",
+					"Select", "Cancel");
+				}
+				case 3:
+				{
+					ShowPlayerDialog(playerid, DIALOG_WEAPONS_SUBMACHINE, DIALOG_STYLE_LIST,
+					"Sub-machine guns", "Micro Uzi\nMP5\nTEC9",
+					"Select", "Cancel");
+				}
+				case 4:
+				{
+					ShowPlayerDialog(playerid, DIALOG_WEAPONS_ASSAULT, DIALOG_STYLE_LIST,
+					"Assault", "AK47\nM4",
+					"Select", "Cancel");
+				}
+				case 5:
+				{
+					ShowPlayerDialog(playerid, DIALOG_WEAPONS_RIFLES, DIALOG_STYLE_LIST,
+					"Rifles", "Country rifle\nSniper rifle",
+					"Select", "Cancel");
+				}
+				case 6:
+				{
+					ShowPlayerDialog(playerid, DIALOG_WEAPONS_HEAVY, DIALOG_STYLE_LIST,
+					"Heavy weapons","Rocket Launcher\nHS-Rocket Launcher\nFlame thrower\nMinigun",
+					"Select", "Cancel");
+				}
+				case 7: 
+				{
+					ShowPlayerDialog(playerid, DIALOG_WEAPONS_GRENADES, DIALOG_STYLE_LIST,
+					"Grenades", "Grenades\nTear Gas\nMolotov cocktail",
+					"Select", "Cancel");
+				}
+				case 8: 
+				{
+					ShowPlayerDialog(playerid, DIALOG_WEAPONS_HANDHELD, DIALOG_STYLE_LIST,
+					"Hand held", "Spray can\nFire extinguisher\nCamera",
+					"Select", "Cancel");
+				}
+				case 9:
+				{
+					new i;
+					for(i = 0; i < sizeof(weapon); i++)
+					{
+						weapon[i] = 0;
+					}
+					
+					i = 0; //drop counter
+					for(i = 0; i < MAX_PLAYERS; i++)
+					{
+						ResetPlayerWeapons(i);
+					}
+				}
+			}
+		}
+	}
+	if(dialogid == DIALOG_WEAPONS_MELEE)
+	{
+		if(response)
+		{
+			new weapons[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+			GiveWeaponsToAllPlayers(1, weapons[listitem], 9999);
+		}
+		else ShowPlayerMenu(playerid, DIALOG_WEAPONS);
+	}
+	if(dialogid == DIALOG_WEAPONS_PISTOLS)
+	{
+		if(response)
+		{
+			new weapons[] = {22,23,24};
+			GiveWeaponsToAllPlayers(2, weapons[listitem], 9999);
+		}
+		else ShowPlayerMenu(playerid, DIALOG_WEAPONS);
+	}
+	if(dialogid == DIALOG_WEAPONS_SHOTGUNS)
+	{
+		if(response)
+		{
+			new weapons[] = {25,26,27};
+			GiveWeaponsToAllPlayers(3, weapons[listitem], 9999);
+		}
+		else ShowPlayerMenu(playerid, DIALOG_WEAPONS);
+	}
+	if(dialogid == DIALOG_WEAPONS_SUBMACHINE)
+	{
+		if(response)
+		{
+			new weapons[] = {28,29,32};
+			GiveWeaponsToAllPlayers(4, weapons[listitem], 9999);
+		}
+		else ShowPlayerMenu(playerid, DIALOG_WEAPONS);
+	}
+	if(dialogid == DIALOG_WEAPONS_ASSAULT)
+	{
+		if(response)
+		{
+			new weapons[] = {30,31};
+			GiveWeaponsToAllPlayers(5, weapons[listitem], 9999);
+		}
+		else ShowPlayerMenu(playerid, DIALOG_WEAPONS);
+	}
+	if(dialogid == DIALOG_WEAPONS_RIFLES)
+	{
+		if(response)
+		{
+			new weapons[] = {33,34};
+			GiveWeaponsToAllPlayers(6, weapons[listitem], 9999);
+		}
+		else ShowPlayerMenu(playerid, DIALOG_WEAPONS);
+	}
+	if(dialogid == DIALOG_WEAPONS_HEAVY)
+	{
+		if(response)
+		{
+			new weapons[] = {35,36,37,38};
+			GiveWeaponsToAllPlayers(7, weapons[listitem], 9999);
+		}
+		else ShowPlayerMenu(playerid, DIALOG_WEAPONS);
+	}
+	if(dialogid == DIALOG_WEAPONS_GRENADES)
+	{
+		if(response)
+		{
+			new weapons[] = {16,17,18};
+			GiveWeaponsToAllPlayers(8, weapons[listitem], 9999);
+		}
+		else ShowPlayerMenu(playerid, DIALOG_WEAPONS);
+	}
+	if(dialogid == DIALOG_WEAPONS_HANDHELD)
+	{
+		if(response)
+		{
+			new weapons[] = {41,42,43,44};
+			GiveWeaponsToAllPlayers(9, weapons[listitem], 9999);
+		}
+		else ShowPlayerMenu(playerid, DIALOG_WEAPONS);
+	}
 	if(dialogid == DIALOG_VAE)
 	{	
 		if(response)
@@ -6380,7 +6618,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Телепортироваться в город\t{FFFF00}/tplist\n"\
 				"Обновить все динамические элементы\t\n"\
 				"Протестировать ID звука из игры\t\n"\
-				"Вывести Gametext\t\n");
+				"Вывести Gametext\t\n"\
+				"Оружие\t{FFFF00}/w\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				" \t \n"\
@@ -6392,7 +6631,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Teleport to city\t{FFFF00}/tplist\n"\
 				"Update All Dynamic Elements\t\n"\
 				"Test sound ID from game\t\n"\
-				"Gametext\t\n");
+				"Gametext\t\n"\
+				"Weapons\t{FFFF00}/w\n");
 			}
 			
 			ShowPlayerDialog(playerid, DIALOG_ETC, DIALOG_STYLE_TABLIST_HEADERS,
@@ -6441,6 +6681,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				[>] Интерьер\n\
 				[>] Уличные\n\
 				[>] Ландшафт\n\
+				[>] Дороги\n\
 				[>] Мусор\n\
 				Поиск объектов");
 			} else {
@@ -6454,6 +6695,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				[>] Interior\n\
 				[>] Street\n\
 				[>] Landscape\n\
+				[>] Roads\n\
 				[>] Trash\n\
 				Search objects");
 			}
@@ -7220,6 +7462,38 @@ public ShowPlayerMenu(playerid, dialogid)
 			"[EDIT - Rotate]",
 			"Enter a value by how many degrees to rotate the object:",
 			"OK","Cancel");
+		}
+		case DIALOG_WEAPONS:
+		{
+			new tbtext[300];
+			if(GetPVarInt(playerid, "lang") == 0)
+			{		
+				format(tbtext, sizeof(tbtext),
+				"Холодное\n\
+				Пистолеты\n\
+				Дробовики\n\
+				Пулеметы\n\
+				Штурмовые\n\
+				Винтовки\n\
+				Тяжелое\n\
+				Гранаты\n\
+				Ручное\n\
+				{FF0000}Reset weapons{FFFFFF}");
+			} else {
+				format(tbtext, sizeof(tbtext),
+				"Melee\n\
+				Pistols\n\
+				Shotguns\n\
+				Sub-machine guns\n\
+				Assault\n\
+				Rifles\n\
+				Heavy weapons\n\
+				Grenades\n\
+				Hand held\n\
+				{FF0000}Reset weapons{FFFFFF}");
+			}
+			ShowPlayerDialog(playerid, DIALOG_WEAPONS, DIALOG_STYLE_LIST,
+			"Weapons list", tbtext, "Select", "Cancel");
 		}
 		case DIALOG_VAE:
 		{
@@ -8252,6 +8526,20 @@ SaveAttachedObjects(playerid)
 	return 1;
 }
 // END attach objects editor
+
+stock GiveWeaponsToAllPlayers(slot, weaponid, ammo)
+{
+	weapon[slot] = weaponid;
+	// SelectedWeapon = weapons[listitem];
+	#if defined foreach
+	foreach(new i : Player)
+	#else
+	for(new i = 0; i < MAX_PLAYERS; i++)
+	#endif
+	{
+		GivePlayerWeapon(i, weaponid, ammo);
+	}
+}
 
 stock GetPlayerCameraLookAt(playerid, &Float:rX, &Float:rY, &Float:rZ, Float:dist = 10.0) 
 {
