@@ -8,7 +8,10 @@ Mtools gives mappers more features to be more productive.
 >The main menu is called by default on ALT (Can be changed in the settings)\
 For the list of all server commands and features type /help
 
-# Installation:
+## Fast installation
+* Download a ready snapshot with [Texture Studio 2.1 RU + mtools 0.3.20](https://drive.google.com/file/d/1XD8O2OWmQSAjqvhN5C5Vq1PGTi6EPF8q/view?usp=sharing)
+* Unpack archive and run samp-server.exe, connect to localhost in client
+## Manual installation
 * Install latest version *[Texture Studio](https://vk.com/tip_mapper?w=page-89889560_49251374)*
 * Copy the mtools.amx file to the filterscripts folder
 * Create /scriptfiles/mtools folder
