@@ -26,7 +26,7 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.19"
+#define VERSION              	"0.3.20"
 #define BUILD_DATE             	"10.02.2021"
 
 #define DIALOG_MAIN 				6001
@@ -153,21 +153,18 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 //#define DIALOG_WEAPONS_RESERVE	6130
 #define DIALOG_PICKUPS_ENTER		6131
 #define DIALOG_PICKUPS_HOUSE		6132
+#define DIALOG_UGMP_FEATURES		6133
 
 #define COLOR_SERVER_GREY		0x87bae7FF
 #define COLOR_GREY 				0xAFAFAFAA
 #define COLOR_RED  				0xF40B74FF
 #define COLOR_LIME 				0x33DD1100
 
-/*
-#tryinclude <ugmp/ugmp>
-#if defined UGMP_INCLUDED
-	#include <ugmp/a_samp>
-#else
-	#include <a_samp> 
-#endif
-*/
-#include <a_samp> 
+#include <a_samp>
+// UG-MP optional and can work without it
+#tryinclude <ugmp>
+#tryinclude <ugmp_postfx>
+
 #include <foreach>
 #if !defined foreach
 	#define foreach(%1,%2) for (new %2 = 0; %2 < MAX_PLAYERS; %2++) if (IsPlayerConnected(%2))
@@ -176,7 +173,6 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 
 // Add YSF func later
 //#include <YSF> //https://github.com/IllidanS4/YSF/wiki
-
 #if !defined _YSF_included
 	#if !defined GetGravity
 	native Float:GetGravity();
@@ -193,8 +189,18 @@ IsPlayerSpawned(playerid)
 }
 #endif
 
-#include "/modules/streamer.inc"
+// old include streamer version 2.7.2 (TS 2.0 RU)
+#include "/modules/streamer.inc" 
+// new include streamer version 2.9.4 (TS 1.9 EN)
 //#include <streamer>
+
+// check old or new streamer plugin connected
+#if defined INVALID_STREAMER_ID
+	#define _new_streamer_included
+#else 
+	#define INVALID_STREAMER_ID (0)
+#endif
+
 #include <filemanager>
 
 /* ** Macros ** */
@@ -227,19 +233,15 @@ IsPlayerSpawned(playerid)
 #define GetNearestVisible3DText(%0)				GetNearestVisibleItem((%0),STREAMER_TYPE_3D_TEXT_LABEL)
 #define GetNearestVisibleArea(%0)				GetNearestVisibleItem((%0),STREAMER_TYPE_AREA)
 #define GetNearestVisibleActor(%0)				GetNearestVisibleItem((%0),STREAMER_TYPE_ACTOR)
-// check old or new streamer plugin connected
-#if defined INVALID_STREAMER_ID
-	#define _new_streamer_included
-#else 
-	#define INVALID_STREAMER_ID (0)
-#endif
 
 #if defined _streamer_included
+	#if !defined _new_streamer_included
 	#define MAX_OBJECTS			4096
 	#define MAX_ACTORS			4096
 	#define MAX_PICKUPS			4096
 	#define MAX_MAPICONS		512
 	#define MAX_3DTEXT_GLOBAL	4096
+	#endif
 	#define MAX_REMOVED_OBJECTS	1000
 #else
 	#define MAX_MAPICONS		100
@@ -498,9 +500,6 @@ Float:	gIndexSca				[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][3],
 
 // Actors
 new indexActor = 0, animactordatalib[32], animactordataname[32];
-#if defined STREAMER_TAG_ACTOR
-new massactor[10];
-#endif
 //new Actors[11] = {0, 0, ...};
 new Actors[10];
 // Spawn weapons (default none weapons on spawn)
@@ -830,8 +829,41 @@ public OnPlayerConnect(playerid)
 		#if defined TEXTURE_STUDIO
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/loadmap");		
 		#endif
-	}	
-	
+	}
+	#if defined UGMP_POSTFX_INCLUDED
+	// Makes rubbish (e.g. the flying 'zombie elvis found' newspapers and leaves) (in)visible for a single player.
+	// Rubbish is visible by all players by default.
+	TogglePlayerRubbish(playerid, true);
+	// Makes procedural grass visible to a single player. 
+	// The grass will move with the in-game wind, and is visible to all players by default.
+	TogglePlayerGrass(playerid, true);
+	SetPVarInt(playerid, "TogglePlayerGrass", true);
+	// Enables or disables the sun for a single player.
+	TogglePlayerSun(playerid, true);
+	SetPVarInt(playerid, "TogglePlayerSun", true);
+	// Enables or disables the night vision effect inmediately.
+	TogglePlayerNightVision(playerid, true);
+	SetPVarInt(playerid, "TogglePlayerNightVision", true);
+	// Enables or disables the infrared effect inmediately.
+	TogglePlayerInfraRed(playerid, true);
+	SetPVarInt(playerid, "TogglePlayerInfraRed", true);
+	// Enables or disables the CCTV effect inmediately. This effect is never used in the original game.
+	TogglePlayerCCTV(playerid, true);
+	SetPVarInt(playerid, "TogglePlayerCCTV", true);
+	// Enables or disables the fog effect inmediately. This effect is never used in the original game.
+	TogglePlayerFogOverlay(playerid, true);
+	SetPVarInt(playerid, "TogglePlayerFogOverlay", true);
+	// Enables or disables the video camera effect inmediately. This effect is present in GTA: SA, but never used.
+	// It is used in GTA: VC as the camera overlay you see when entering/exiting the golf club or airport.
+	TogglePlayerVideoCameraOverlay(playerid, true);
+	SetPVarInt(playerid, "TogglePlayerVideoCameraOverlay", true);
+	// Makes real-time shadows visible to a single player.
+	// This includes the stencil shadow you see below the player on the PC version of GTA: SA. 
+	// By default, real-time shadows are enabled for all players.
+	TogglePlayerRealTimeShadows(playerid, true);
+	SetPVarInt(playerid, "TogglePlayerRealTimeShadows", true);
+	#endif 
+
 	return 1;
 }
 
@@ -2000,6 +2032,66 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if(GetGravity() != 0.008) SetGravity(0.008);
 		SetPVarInt(playerid, "freezed", 0);
 		hideMtoolsMenu = false;
+		return 1;
+	}
+	if(!strcmp(cmdtext, "/ugmp", true))
+	{
+		#if defined UGMP_POSTFX_INCLUDED
+		new
+			grass_state[14], rubbish_state[14],
+			sun_state[14], nightvision_state[14],
+			infared_state[14], cctv_state[14],
+			fogoverlay_state[14], vccam_state[14],
+			realtimeshadows_state[14]
+		;
+		
+		if (GetPVarInt(playerid, "TogglePlayerGrass") > 0) grass_state = "{00FF00}[ON]";
+		else grass_state = "{FF0000}[OFF]";
+		if (IsRubbishVisibleForPlayer(playerid)) rubbish_state = "{00FF00}[ON]";
+		else rubbish_state = "{FF0000}[OFF]";
+		if (GetPVarInt(playerid, "TogglePlayerSun") > 0) sun_state = "{00FF00}[ON]";
+		else sun_state = "{FF0000}[OFF]";
+		if (GetPVarInt(playerid, "TogglePlayerNightVision") > 0) nightvision_state = "{00FF00}[ON]";
+		else nightvision_state = "{FF0000}[OFF]";
+		if (GetPVarInt(playerid, "TogglePlayerInfraRed") > 0) infared_state = "{00FF00}[ON]";
+		else infared_state = "{FF0000}[OFF]";
+		if (GetPVarInt(playerid, "TogglePlayerCCTV") > 0) cctv_state = "{00FF00}[ON]";
+		else cctv_state = "{FF0000}[OFF]";
+		if (GetPVarInt(playerid, "TogglePlayerFogOverlay") > 0) fogoverlay_state = "{00FF00}[ON]";
+		else fogoverlay_state = "{FF0000}[OFF]";
+		if (GetPVarInt(playerid, "TogglePlayerVideoCameraOverlay") > 0) vccam_state = "{00FF00}[ON]";
+		else vccam_state = "{FF0000}[OFF]";
+		if (GetPVarInt(playerid, "TogglePlayerRealTimeShadows") > 0) realtimeshadows_state = "{00FF00}[ON]";
+		else realtimeshadows_state = "{FF0000}[OFF]";
+		
+		new tablisttext[350];
+		format(tablisttext, sizeof(tablisttext),
+		"option\tstate\n\
+		Crass on floor\t%s\n\
+		Rubbish on ground\t%s\n\
+		Show sun to a player\t%s\n\
+		Night vision\t%s\n\
+		InfaRed vision\t%s\n\
+		CCTV\t%s\n\
+		FogOverlay\t%s\n\
+		VideoCameraOverlay\t%s\n\
+		RealTimeShadows\t%s\n",
+		grass_state, rubbish_state, 
+		sun_state, nightvision_state,
+		infared_state, cctv_state,
+		fogoverlay_state, vccam_state,
+		realtimeshadows_state);
+
+		ShowPlayerDialog(playerid, DIALOG_UGMP_FEATURES, DIALOG_STYLE_TABLIST_HEADERS,
+		"UG-MP Features", tablisttext, "Select", "Cancel");
+		#else
+		ShowPlayerDialog(playerid, DIALOG_UGMP_FEATURES, DIALOG_STYLE_MSGBOX,
+		"UG-MP Features", 
+		"UG:MP functions not included.\n\
+		Use ug-mp client and connect plugin.\n\
+		NOTE: If you really use ugmp client and plugin, try recompile this filterscript.",
+		"Select", "Cancel");
+		#endif
 		return 1;
 	}
 	// Debug commands
@@ -6510,6 +6602,114 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			PlayerTextDrawShow(playerid, DashCam2[playerid]);
 		}
 	}
+	#if defined UGMP_POSTFX_INCLUDED
+	if (dialogid == DIALOG_UGMP_FEATURES)
+	{
+		if (response)
+		{
+			switch(listitem)
+			{
+				case 0:
+				{
+					if (GetPVarInt(playerid, "TogglePlayerGrass") > 0)
+					{
+						TogglePlayerGrass(playerid, false);
+						SetPVarInt(playerid, "TogglePlayerGrass", false);
+					} else {
+						TogglePlayerGrass(playerid, true);
+						SetPVarInt(playerid, "TogglePlayerGrass", true);
+					}
+				}
+				case 1: 
+				{
+					if (IsRubbishVisibleForPlayer(playerid)) {
+						TogglePlayerRubbish(playerid, false);
+					} else {
+						TogglePlayerRubbish(playerid, true);
+					}
+				}
+				case 2:
+				{
+					if (GetPVarInt(playerid, "TogglePlayerSun") > 0)
+					{
+						TogglePlayerSun(playerid, false);
+						SetPVarInt(playerid, "TogglePlayerSun", false);
+					} else {
+						TogglePlayerSun(playerid, true);
+						SetPVarInt(playerid, "TogglePlayerSun", true);
+					}
+				}
+				case 3:
+				{
+					if (GetPVarInt(playerid, "TogglePlayerNightVision") > 0)
+					{
+						TogglePlayerNightVision(playerid, false);
+						SetPVarInt(playerid, "TogglePlayerNightVision", false);
+					} else {
+						TogglePlayerNightVision(playerid, true);
+						SetPVarInt(playerid, "TogglePlayerNightVision", true);
+					}
+				}
+				case 4:
+				{
+					if (GetPVarInt(playerid, "TogglePlayerInfraRed") > 0)
+					{
+						TogglePlayerInfraRed(playerid, false);
+						SetPVarInt(playerid, "TogglePlayerInfraRed", false);
+					} else {
+						TogglePlayerInfraRed(playerid, true);
+						SetPVarInt(playerid, "TogglePlayerInfraRed", true);
+					}
+				}
+				case 5:
+				{
+					if (GetPVarInt(playerid, "TogglePlayerCCTV") > 0)
+					{
+						TogglePlayerCCTV(playerid, false);
+						SetPVarInt(playerid, "TogglePlayerCCTV", false);
+					} else {
+						TogglePlayerCCTV(playerid, true);
+						SetPVarInt(playerid, "TogglePlayerCCTV", true);
+					}
+				}
+				case 6:
+				{
+					if (GetPVarInt(playerid, "TogglePlayerFogOverlay") > 0)
+					{
+						TogglePlayerFogOverlay(playerid, false);
+						SetPVarInt(playerid, "TogglePlayerFogOverlay", false);
+					} else {
+						TogglePlayerFogOverlay(playerid, true);
+						SetPVarInt(playerid, "TogglePlayerFogOverlay", true);
+					}
+				}
+				case 7:
+				{
+					if (GetPVarInt(playerid, "TogglePlayerVideoCameraOverlay") > 0)
+					{
+						TogglePlayerVideoCameraOverlay(playerid, false);
+						SetPVarInt(playerid, "TogglePlayerVideoCameraOverlay", false);
+					} else {
+						TogglePlayerVideoCameraOverlay(playerid, true);
+						SetPVarInt(playerid, "TogglePlayerVideoCameraOverlay", true);
+					}
+				}
+				case 8:
+				{
+					if (GetPVarInt(playerid, "TogglePlayerRealTimeShadows") > 0)
+					{
+						TogglePlayerRealTimeShadows(playerid, false);
+						SetPVarInt(playerid, "TogglePlayerRealTimeShadows", false);
+					} else {
+						TogglePlayerRealTimeShadows(playerid, true);
+						SetPVarInt(playerid, "TogglePlayerRealTimeShadows", true);
+					}
+				}
+			}
+		}
+	}
+	#endif
+	// lastdialogid | lastdialog
 	return 1;
 }
 
@@ -7347,6 +7547,7 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_MAPINFO:
 		{
+			#if defined FM_DIR
 			new dir:dHandle = dir_open("./scriptfiles/tstudio/SavedMaps/");
 			new tbtext[450], buf[20], item[40], type;
 			format(tbtext, sizeof tbtext, "{FFFFFF}");
@@ -7363,6 +7564,11 @@ public ShowPlayerMenu(playerid, dialogid)
 			
 			ShowPlayerDialog(playerid, DIALOG_MAPINFO, DIALOG_STYLE_LIST,
 			"[MAP INFO]", tbtext, "Select","Cancel");
+			#else
+			ShowPlayerDialog(playerid, DIALOG_MAPINFO, DIALOG_STYLE_MSGBOX,
+			"[MAP INFO]", "Error: Need filemanager plugin to run this func",
+			"Select","Cancel");
+			#endif
 		}
 		case DIALOG_CAMSET:
 		{
@@ -8228,6 +8434,7 @@ stock IsDuplicateObject(objectid, objectid2)
 
 stock LoadMapInfo(playerid, listitem)
 {
+	#if defined FM_DIR
 	new dir:dHandle = dir_open("./scriptfiles/tstudio/SavedMaps/");
 	new 
 		version, lasttime, author[32], DB: mapDB,
@@ -8283,8 +8490,12 @@ stock LoadMapInfo(playerid, listitem)
 		}
 	}
 	dir_close(dHandle);
-	
 	return f_counter;
+	#else
+	printf("Error: need filemanager plugin to run LoadMapInfo!  id:%d|listitem: %d",
+	playerid, listitem);
+	return 0;
+	#endif	
 }
 
 public DeleteObjectsInRange(playerid, Float:range)
