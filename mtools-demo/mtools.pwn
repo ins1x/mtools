@@ -1,7 +1,7 @@
 /*
 filterscript: MTOOLS
-site: https://vk.com/1nsanemapping
-homepage: https://github.com/ins1x/mtools/wiki
+homepage: https://vk.com/1nsanemapping
+wiki: https://github.com/ins1x/mtools/wiki
 
 About: MTOOLS for Texture Studio SA:MP
 
@@ -26,8 +26,8 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.20"
-#define BUILD_DATE             	"10.02.2021"
+#define VERSION              	"0.3.21"
+#define BUILD_DATE             	"12.02.2021"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -88,7 +88,7 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_RANGEDEL				6057
 #define DIALOG_CAMPOINT				6058
 #define DIALOG_CAMDELAY				6059
-#define DIALOG_CAMENVIROMENT		6060
+#define DIALOG_ENVIRONMENT			6060
 #define DIALOG_MOVINGOBJ			6061
 #define DIALOG_CAMFIX				6062
 #define DIALOG_WHEELS				6063
@@ -124,7 +124,7 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_CAMDESCRIPTION		6093
 #define DIALOG_SETINTERIOR			6094
 #define DIALOG_SETWORLD				6095
-//#define DIALOG_		6096
+#define DIALOG_ENVPRESETS			6096
 #define DIALOG_TEXTUREBUFFER		6097
 #define DIALOG_OBJECTSSEARCH		6098
 #define DIALOG_MTAFAVORITES			6099
@@ -154,6 +154,7 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_PICKUPS_ENTER		6131
 #define DIALOG_PICKUPS_HOUSE		6132
 #define DIALOG_UGMP_FEATURES		6133
+#define DIALOG_AUTOTIME				6134
 
 #define COLOR_SERVER_GREY		0x87bae7FF
 #define COLOR_GREY 				0xAFAFAFAA
@@ -295,6 +296,7 @@ new askDelete = true;
 new savePlayerPos = true;
 new hideMtoolsMenu = false;
 new useFastMove = false;
+new cSelector = true;
 new DEBUG = false;
 new mainMenuKeyCode = 1024; // ALT key
 new LangSet = 0;
@@ -334,6 +336,7 @@ forward SetPlayerLookAt(playerid,Float:x,Float:y); // cam set look at point
 forward GetVehicleRotation(vehicleid,&Float:rx,&Float:ry,&Float:rz); 
 forward MtoolsHudToggle(playerid);// on-off hud
 forward FirstPersonMode(playerid);// on-off 1-st person mode
+forward AutoTimeChange(playerid);// steps forward 1 hour on the timer
 forward SendTexdrawMessage(playerid, hidedelay, text[]); // show textdraw message 
 forward HideTexdrawMessage(playerid); // hide mess at the bottom of the screen
 
@@ -511,6 +514,7 @@ new array_FavObjects[28] = {
 	3524,3472,3437,19588,18728,1361,8623,2811,
 	3509,738,19943,1255,946,638,650,3471,1460
 };
+new AutoTimeTimer = -1;
 
 isNumeric(const string[])
 {
@@ -555,6 +559,7 @@ public LoadMtoolsDb()
 		db_query(mtoolsDB, "INSERT INTO Settings (Option, Value) VALUES('fpsBarTD',1)");
 		db_query(mtoolsDB, "INSERT INTO Settings (Option, Value) VALUES('autoLoadMap',1)");
 		db_query(mtoolsDB, "INSERT INTO Settings (Option, Value) VALUES('showEditMenu',1)");
+		db_query(mtoolsDB, "INSERT INTO Settings (Option, Value) VALUES('cSelector',1)");
 		if(fexist("mtools/mtools.db")) print("mtools.db created");
 		else print("[fail] create mtools.db. Check /scriptfiles/mtools the directory was created!");
 	}
@@ -634,6 +639,10 @@ public LoadMtoolsDb()
 	
 	db_get_field_assoc(MtoolsSettings, "Value", field, 24);
 	showEditMenu = strval(field);
+	db_next_row(DBResult:MtoolsSettings);
+
+	db_get_field_assoc(MtoolsSettings, "Value", field, 24);
+	cSelector = strval(field);
 	db_next_row(DBResult:MtoolsSettings);
 	//db_free_result(MtoolsSettings);
 	return 1;
@@ -1098,6 +1107,18 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			new Float:SuperJump[3];
 			GetPlayerVelocity(playerid, SuperJump[0], SuperJump[1], SuperJump[2]);
 			SetPlayerVelocity(playerid, SuperJump[0], SuperJump[1], SuperJump[2]+5);
+		}
+	}
+	// Select object in C key <KEY_CROUCH>
+	if(PRESSED(KEY_CROUCH))
+	{
+		if(cSelector)
+		{
+			#if defined TEXTURE_STUDIO
+			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/csel");		
+			#else 
+			SelectObject(playerid);
+			#endif
 		}
 	}
 	return 1;
@@ -2028,10 +2049,23 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		//if the player gets into a bug
 		CancelEdit(playerid);
 		SetCameraBehindPlayer(playerid);
-		Jump(playerid);
 		if(GetGravity() != 0.008) SetGravity(0.008);
 		SetPVarInt(playerid, "freezed", 0);
 		hideMtoolsMenu = false;
+		return 1;
+	}
+	if(!strcmp(cmdtext, "/autotime", true))
+	{
+		if(GetPVarInt(playerid, "AutoTime") > 0)
+		{
+			KillTimer(AutoTimeTimer);
+			SetPVarInt(playerid, "AutoTime", 0);
+			SendClientMessageEx(playerid, -1,
+			"Функция автоматической смены времени остановлена",
+			"Automatic time change function stopped");
+		} else {
+			ShowPlayerMenu(playerid, DIALOG_AUTOTIME);
+		}
 		return 1;
 	}
 	if(!strcmp(cmdtext, "/ugmp", true))
@@ -2104,11 +2138,12 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		//SendClientMessagef(playerid, -1, "cam mode: %i", GetPlayerCameraMode(playerid));
 		//SendClientMessagef(playerid, -1, "obj: %i", Streamer_GetUpperBound(STREAMER_TYPE_OBJECT)-1);
 		//IsPlayerInRangeOfAnyObject(playerid, 20.0);
-		new internalid = Streamer_GetItemInternalID(playerid,
+		/*new internalid = Streamer_GetItemInternalID(playerid,
 		 STREAMER_TYPE_OBJECT, EDIT_OBJECT_ID[playerid]);
 		new streamerid = Streamer_GetItemStreamerID(playerid,
 		 STREAMER_TYPE_OBJECT, EDIT_OBJECT_ID[playerid]);
 		printf("internalid %i streamerid %i", internalid, streamerid);
+		*/
         return 1;
     }
 	if (!strcmp(cmdtext, "/reloadmtools", true)) 
@@ -3539,6 +3574,26 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					ShowPlayerMenu(playerid, DIALOG_KEYBINDS);
 				}
+				case 4:
+				{
+					if(cSelector) 
+					{
+						SendClientMessageEx(playerid, -1,
+						"Выбор объектов на клавишу C отключен",
+						"Object selection on the C key is disabled");
+						cSelector = false;
+					} else { 
+						SendClientMessageEx(playerid, -1,
+						"Выбор объектов на клавишу C включен",
+						"Super jump activated, press jump key to view");
+						cSelector = true;
+					}
+					new query[128];
+					format(query,sizeof(query),
+					"UPDATE `Settings` SET Value=%d WHERE Option='cSelector'", cSelector);
+					db_query(mtoolsDB,query);
+					ShowPlayerMenu(playerid, DIALOG_KEYBINDS);
+				}
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_SETTINGS);
@@ -3553,6 +3608,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1: mainMenuKeyCode = 65536;
 				case 2: mainMenuKeyCode = 131072;
 				case 3: mainMenuKeyCode = 262144;
+				case 4: mainMenuKeyCode = 320;
 			}
 			new query[128];
 			format(query,sizeof(query),
@@ -3564,6 +3620,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				SendClientMessageEx(playerid, -1,
 				"Не рекомендуется использовать эту клавишу - она задействована под стандартное меню TS",
 				"Not recommended to use this key - it is used under the standard TS menu");
+			}
+			if(mainMenuKeyCode == 320)
+			{
+				SendClientMessageEx(playerid, -1,
+				"Нажмите колесико мышки для просмотра",
+				"Press Middle Mouse Button (MMB) to open main menu");
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_SETTINGS);
@@ -3595,7 +3657,22 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/position");
+					#else 
+					GetPlayerCoords(playerid);
 					#endif
+					// hides overlaid text-frames
+					if(streamedObjectsTD) {
+						PlayerTextDrawHide(playerid, Objrate[playerid]);
+						streamedObjectsTD = false;
+					} else { 
+						PlayerTextDrawShow(playerid, Objrate[playerid]);
+						streamedObjectsTD = true;
+					}
+					if(fpsBarTD) {
+						fpsBarTD = false;
+					} else { 
+						fpsBarTD = true;
+					}
 					ShowPlayerMenu(playerid, DIALOG_INTERFACE_SETTINGS);
 				}
 				case 2:
@@ -5337,17 +5414,37 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 6: ShowPlayerMenu(playerid, DIALOG_FLYMODESETTINGS);
 				case 7: ShowPlayerMenu(playerid, DIALOG_CAMINTERPOLATE);
-				case 8: 
-				{
-					ShowPlayerDialog(playerid, DIALOG_CAMENVIROMENT, DIALOG_STYLE_LIST,
-					"[CAM] - Enviroment", 
-					"Night vision\nThermal vision\nWelcome2Hell\nMatrix\n\
-					Realistic physic\nOpen space\nSlow-Mo\nDefault",
-					"Select", "Cancel");
-				}
+				case 8: ShowPlayerMenu(playerid, DIALOG_ENVIRONMENT);
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
+	}
+	if (dialogid == DIALOG_AUTOTIME)
+	{
+		if(response)
+		{
+			if(isnull(inputtext) || !isNumeric(inputtext))
+			{
+				return SendClientMessageEx(playerid, COLOR_GREY,
+				"Неверное значение", "Incorrect value");
+			}
+			if(strval(inputtext) > 7200 || strval(inputtext) < 1)
+			{
+				return SendClientMessageEx(playerid, COLOR_GREY,
+				"Неверное значение! минимальное 1, максимальное 7200",
+				"Incorrect value! min 1 , max 7200");
+			}
+			new tmpstr[128];
+			format(tmpstr, sizeof(tmpstr), "In-game time change every %d seconds", strval(inputtext));
+			SendClientMessage(playerid, COLOR_LIME, tmpstr);
+			
+			SendClientMessageEx(playerid, -1,
+			"Чтобы остановить автосмену, введите /autotime",
+			"To stop auto change, enter /autotime");
+
+			AutoTimeTimer = SetTimerEx("AutoTimeChange", strval(inputtext)*1000, true, "i", playerid);
+			SetPVarInt(playerid, "AutoTime", 1);
+		}		
 	}
 	if (dialogid == DIALOG_MOVINGOBJ)
 	{
@@ -5445,7 +5542,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		}
 		else ShowPlayerMenu(playerid, DIALOG_OBJECTSMENU);
 	}
-	if (dialogid == DIALOG_CAMENVIROMENT)
+	if (dialogid == DIALOG_ENVIRONMENT)
 	{
 		if(response)
 		{
@@ -5465,25 +5562,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					"Режим тепловизора",
 					"Thermal vision mode");
 				}
-				case 2: 
-				{
-					//SetPlayerWeather(playerid, 1276);
-					//SetPlayerTime(playerid, 6, 0);
-					new Float:x, Float:y, Float:z;
-					GetPlayerPos(playerid, x, y, z);
-					SetPlayerInterior(playerid, 0);
-					SetPlayerWeather(playerid,42);
-					SetPlayerTime(playerid, 23, 0);
-					SetPlayerSkin(playerid, 162);
-					//new explode_object = CreateDynamicObject(18682,
-					//x, y, z, 0.0,0.0,0.0, -1,-1,-1, 300); 
-					//DestroyDynamicObject(explode_object);	
-					CreateExplosion(x, y, z, 12, 7);
-					SendClientMessageEx(playerid, COLOR_RED,
-					"В аду нет света и воды. Welcome to hell!",
-					"No light, no water. no mercy. Welcome to hell!");
-				}
-				case 3:
+				case 2:
 				{
 					SetGravity(0.005);
 					SetPlayerWeather(playerid, 20);
@@ -5495,14 +5574,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					"В этом режиме изменена гравитация и включен супер прыжок",
 					"In this mode, the gravity is changed and the super jump is enabled");
 				}
-				case 4:
+				case 3:
 				{
 					SetGravity(0.013);
 					SendClientMessageEx(playerid, COLOR_LIME,
 					"В этом режиме изменена физика на более реалистичную",
 					"In this mode, physics has been changed to more realistic");
 				}
-				case 5:
+				case 4:
 				{
 					SendClientMessageEx(playerid, COLOR_LIME,
 					"В этом режиме полностью отключена гравитация",
@@ -5511,17 +5590,44 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SetPlayerWeather(playerid, 21);
 					SetPlayerTime(playerid, 5, 0);
 				}
-				case 6:
+				case 5:
 				{
 					SendClientMessageEx(playerid, COLOR_LIME,
 					"Включен режим слоумо",
 					"Slow motion mode enabled");
 					SetGravity(0.001); 
 				}
+				case 6:
+				{
+					if(GetPVarInt(playerid, "AutoTime") > 0)
+					{
+						KillTimer(AutoTimeTimer);
+						SetPVarInt(playerid, "AutoTime", 0);
+						SendClientMessageEx(playerid, -1,
+						"Функция автоматической смены времени остановлена",
+						"Automatic time change function stopped");
+					} else {
+						ShowPlayerMenu(playerid, DIALOG_AUTOTIME);
+					}
+				}
 				case 7:
 				{
+					ShowPlayerDialog(playerid, DIALOG_ENVPRESETS, DIALOG_STYLE_TABLIST_HEADERS,
+					"[CAM] - Environment presets", 
+					"Option\tDescription\n\
+					Welcome2Hell\tRed hell desert\n\
+					Monochrome\tAbsolutely dark skin\n\
+					Very dark night\t\n\
+					Desert Storm\t\n\
+					LA sunny\tOrange lighting\n\
+					Silent hill\tExtra Foggy\n\
+					90's retrowave\tPurple night\n",
+					"Select", "Cancel");
+				}
+				case 8:
+				{
 					SetGravity(0.008);
-					SetPlayerWeather(playerid,0);
+					SetPlayerWeather(playerid,2);
 					SetPlayerTime(playerid, 12, 0);
 					superJump = false;
 					SendClientMessageEx(playerid, COLOR_LIME,
@@ -5531,6 +5637,63 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_CAMSET);
+	}
+	if (dialogid == DIALOG_ENVPRESETS)
+	{
+		if(response)
+		{
+			switch(listitem)
+			{
+				case 0:
+				{
+					new Float:x, Float:y, Float:z;
+					GetPlayerPos(playerid, x, y, z);
+					SetPlayerInterior(playerid, 0);
+					SetPlayerWeather(playerid,42);
+					SetPlayerTime(playerid, 23, 0);
+					SetPlayerSkin(playerid, 162);
+					//new explode_object = CreateDynamicObject(18682,
+					//x, y, z, 0.0,0.0,0.0, -1,-1,-1, 300); 
+					//DestroyDynamicObject(explode_object);	
+					CreateExplosion(x, y, z, 12, 7);
+					SendClientMessageEx(playerid, COLOR_RED,
+					"В аду нет света, воды, и прощения. Welcome to hell!",
+					"No light, no water. no mercy. Welcome to hell!");
+				}
+				case 1:
+				{
+					SetPlayerTime(playerid, 2, 0);
+					SetPlayerWeather(playerid,22);
+				}
+				case 2:
+				{
+					SetPlayerTime(playerid, 22, 0);
+					SetPlayerWeather(playerid,22);
+				}
+				case 3:
+				{
+					SetPlayerTime(playerid, 12, 0);
+					SetPlayerWeather(playerid,19);
+					SetPlayerSkin(playerid, 287);
+				}
+				case 4:
+				{
+					SetPlayerTime(playerid, 21, 0);
+					SetPlayerWeather(playerid,3);
+				}
+				case 5:
+				{
+					SetPlayerTime(playerid, 18, 0);
+					SetPlayerWeather(playerid,9);
+				}
+				case 6:
+				{
+					SetPlayerTime(playerid, 3, 0);
+					SetPlayerWeather(playerid,10);
+				}
+			}
+		}
+		else ShowPlayerMenu(playerid, DIALOG_ENVIRONMENT);
 	}
 	if (dialogid == DIALOG_CAMDELAY)
 	{
@@ -7722,10 +7885,11 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_KEYBINDS:
 		{
-			new tbtext[500];
+			new tbtext[400];
 			new 
 				SuperJump_st[16], FastMove_st[16],
-				bindFkeyToFlymode_st[16], mainMenuKeyCode_st[16]
+				bindFkeyToFlymode_st[16], mainMenuKeyCode_st[16],
+				cSelector_st[16]
 			;
 			
 			if(superJump) 
@@ -7734,12 +7898,15 @@ public ShowPlayerMenu(playerid, dialogid)
 			FastMove_st = "{00FF00}[ON]"; else FastMove_st = "{FF0000}[OFF]";
 			if(bindFkeyToFlymode)
 			bindFkeyToFlymode_st = "{00FF00}[ON]"; else bindFkeyToFlymode_st = "{FF0000}[OFF]";
+			if(cSelector) 
+			cSelector_st = "{00FF00}[ON]"; else cSelector_st = "{FF0000}[OFF]";
 			switch(mainMenuKeyCode)
 			{
 				case 1024: mainMenuKeyCode_st = "{00FF00}< ALT >";
 				case 65536: mainMenuKeyCode_st = "{00FF00}< Y >";
 				case 131072: mainMenuKeyCode_st = "{00FF00}< N >";
 				case 262144: mainMenuKeyCode_st = "{00FF00}< H >";
+				case 320: mainMenuKeyCode_st = "{00FF00}< MMB >";
 			}
 			
 			if(GetPVarInt(playerid, "lang") == 1)
@@ -7749,16 +7916,20 @@ public ShowPlayerMenu(playerid, dialogid)
 				Flymode mode at <F>\t%s\n\
 				Main menu hotkey\t%s\n\
 				SuperJump\t%s\n\
-				Fast move\t%s\n",
-				bindFkeyToFlymode_st, mainMenuKeyCode_st, SuperJump_st, FastMove_st);
+				Fast move\t%s\n\
+				Select object at <C>\t%s\n",
+				bindFkeyToFlymode_st, mainMenuKeyCode_st,
+				SuperJump_st, FastMove_st, cSelector_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Опция\tСтатус\n\
 				Режим полета на <F>\t%s\n\
 				Вызов главного меню на клавишу\t%s\n\
 				Cупер прыжок\t%s\n\
-				Быстрое перемещение\t%s\n",
-				bindFkeyToFlymode_st, mainMenuKeyCode_st, SuperJump_st, FastMove_st);
+				Быстрое перемещение\t%s\n\
+				Выбор объекта на <C>\t%s\n",
+				bindFkeyToFlymode_st, mainMenuKeyCode_st,
+				SuperJump_st, FastMove_st, cSelector_st);
 			}
 			
 			ShowPlayerDialog(playerid, DIALOG_KEYBINDS, DIALOG_STYLE_TABLIST_HEADERS,
@@ -7928,6 +8099,41 @@ public ShowPlayerMenu(playerid, dialogid)
 			}
 			ShowPlayerDialog(playerid, DIALOG_WEAPONS, DIALOG_STYLE_LIST,
 			"Weapons list", tbtext, "Select", "Cancel");
+		}
+		case DIALOG_ENVIRONMENT:
+		{
+			ShowPlayerDialog(playerid, DIALOG_ENVIRONMENT, DIALOG_STYLE_TABLIST_HEADERS,
+			"[CAM] - Environment", 
+			"Option\tDescription\n\
+			Night vision\tNight vision toggles\n\
+			Thermal vision\tThermal vision like Predator\n\
+			Matrix\tAltered gravity and green weather\n\
+			Realistic physic\tVery plausible gravity\n\
+			Open space\tDarkness and no gravity\n\
+			Slow-Mo\tSlow moving\n\
+			Autotime\tAuto change ingame time\n\
+			[>] Weather presets\tWeather and time presets for photo\n\
+			{ff0000}Default",
+			"Select", "Cancel");
+		}
+		case DIALOG_AUTOTIME:
+		{
+			if(GetPVarInt(playerid, "lang") == 0)
+			{
+				ShowPlayerDialog(playerid, DIALOG_AUTOTIME, DIALOG_STYLE_INPUT,
+				"Autotime /autotime",
+				"Функция автоматической смены игрового времени.\n\
+				Укажите промежток через который игровое время будет сдвигаться на 1 час.\n\
+				Введите время в секундах:",
+				"Select", "Cancel");
+			} else {
+				ShowPlayerDialog(playerid, DIALOG_AUTOTIME, DIALOG_STYLE_INPUT,
+				"Autotime /autotime",
+				"Function to automatically change game time.\n\
+				Specify the interval through which the game time will be shifted by 1 hour.\n\
+				Enter the time in seconds:",
+				"Select", "Cancel");
+			}
 		}
 		case DIALOG_VAE:
 		{
@@ -8646,6 +8852,18 @@ public SurflyMode(playerid)
 		~r~~k~~PED_SPRINT~ ~w~- increase speed~n~\
 		~r~~k~~SNEAK_ABOUT~ ~w~- reduce speed",10000,3);*/
 	}
+	return 1;
+}
+
+public AutoTimeChange(playerid)
+{
+	// Steps forward one hour
+	if(GetPVarInt(playerid,"Hour") < 23) {
+		SetPVarInt(playerid,"Hour",GetPVarInt(playerid,"Hour")+1);
+	} else {
+		SetPVarInt(playerid,"Hour", 0);
+	}
+	SetPlayerTime(playerid,GetPVarInt(playerid,"Hour"),0); 
 	return 1;
 }
 
