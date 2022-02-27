@@ -26,8 +26,8 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.21"
-#define BUILD_DATE             	"12.02.2021"
+#define VERSION              	"0.3.22"
+#define BUILD_DATE             	"27.02.2022"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -297,7 +297,6 @@ new savePlayerPos = true;
 new hideMtoolsMenu = false;
 new useFastMove = false;
 new cSelector = true;
-new DEBUG = false;
 new mainMenuKeyCode = 1024; // ALT key
 new LangSet = 0;
 
@@ -657,9 +656,6 @@ public OnFilterScriptInit()
 	if(fexist("mtools/rcon.txt")) {
 		mtoolsRcon = true;
 	}
-	if(fexist("mtools/debug.txt")) {
-		DEBUG = true;
-	}
 
 	// vae init
 	for(new i = 0; i < MAX_PLAYERS; ++i)
@@ -879,10 +875,10 @@ public OnPlayerConnect(playerid)
 public OnPlayerSpawn(playerid)
 {
 	SetPlayerHealth(playerid, 99999);
-	if(DEBUG)
-	{
-		SetPlayerSkin(playerid, 160);
-	}
+	// TODO: Add save skin option
+	new hostname[64]; 
+    GetServerVarAsString("hostname", hostname, sizeof(hostname));
+	if(strfind(hostname,"1nsanemapping") != -1) SetPlayerSkin(playerid, 160);
 	// Restore last position
 	if(savePlayerPos)
 	{
@@ -2100,8 +2096,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		
 		new tablisttext[350];
 		format(tablisttext, sizeof(tablisttext),
-		"option\tstate\n\
-		Crass on floor\t%s\n\
+		"Crass on floor\t%s\n\
 		Rubbish on ground\t%s\n\
 		Show sun to a player\t%s\n\
 		Night vision\t%s\n\
@@ -2116,7 +2111,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		fogoverlay_state, vccam_state,
 		realtimeshadows_state);
 
-		ShowPlayerDialog(playerid, DIALOG_UGMP_FEATURES, DIALOG_STYLE_TABLIST_HEADERS,
+		ShowPlayerDialog(playerid, DIALOG_UGMP_FEATURES, DIALOG_STYLE_TABLIST,
 		"UG-MP Features", tablisttext, "Select", "Cancel");
 		#else
 		ShowPlayerDialog(playerid, DIALOG_UGMP_FEATURES, DIALOG_STYLE_MSGBOX,
@@ -2492,7 +2487,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(GetPVarInt(playerid, "lang") == 0)
 					{		
 						format(tbtext, sizeof(tbtext),
-						"Опция\tcmd\n"\
 						"Цвета\t{00FF00}/avcarcolor\n"\
 						"Покрасочные работы\t{00FF00}/avpaint\n"\
 						"Телепорт в мастерскую\t{00FF00}/avmodcar\n"\
@@ -2502,7 +2496,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"[>] Стайлинг\t\n");
 					} else {
 						format(tbtext, sizeof(tbtext),
-						"Option\tCommand\n"\
 						"Color\t{00FF00}/avcarcolor\n"\
 						"Paintjobs\t{00FF00}/avpaint\n"\
 						"Workshop teleport\t{00FF00}/avmodcar\n"\
@@ -2512,7 +2505,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"[>] Styling\t\n");
 					}
 					
-					ShowPlayerDialog(playerid, DIALOG_VEHMOD, DIALOG_STYLE_TABLIST_HEADERS,
+					ShowPlayerDialog(playerid, DIALOG_VEHMOD, DIALOG_STYLE_TABLIST,
 					"[VEHICLE - TUNING]",tbtext, "OK","Cancel");
 				}
 				case 9: 
@@ -3282,7 +3275,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					ShowPlayerMenu(playerid, DIALOG_PREFABMENU);
 				}
-				case 8:
+				case 8: 
+				{
+					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gall");		
+					#endif
+				}
+				case 9:
 				{
 					if(GetPVarInt(playerid, "lang") == 0)
 					{
@@ -3295,7 +3294,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"{FFFFFF}Type {00FF00}mapicon ID:\n","Create","Back");
 					}
 				}
-				case 9:
+				case 10:
 				{
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
@@ -3318,7 +3317,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"Select","Cancel");
 					}
 				}
-				case 10:
+				case 11:
 				{
 					new tbtext[300], CountActors;
 					
@@ -3334,7 +3333,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					#endif
 						
 					format(tbtext, sizeof(tbtext),
-					" \t \n"\
 					"Objects:\t{FFFF00}%i\n"\
 					"Pickups:\t{FFFF00}%i\n"\
 					"CPs:\t{FFFF00}%i\n"\
@@ -3355,10 +3353,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					CountDynamicAreas()
 					);
 					
-					ShowPlayerDialog(playerid, DIALOG_LIMITS, DIALOG_STYLE_TABLIST_HEADERS, "Limits",
+					ShowPlayerDialog(playerid, DIALOG_LIMITS, DIALOG_STYLE_TABLIST, "Limits",
 					tbtext,"OK","");
 				}
-				case 11:
+				case 12:
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/deletemap");		
@@ -3779,6 +3777,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 				}
 				case 6: ShowPlayerMenu(playerid, DIALOG_ACTORS);
+				case 7: ShowPlayerMenu(playerid, DIALOG_MAPMENU);
 			}
 		} 
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -3833,7 +3832,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new tbtext[400];
 					
 					format(tbtext, sizeof tbtext,
-					" \t \n"\
 					"Select object\t\n"\
 					"Set start position\t%.2f,%.2f,%.2f\n"\
 					"Set final position\t%.2f,%.2f,%.2f\n"\
@@ -3849,7 +3847,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ObjectsMoveData[playerid][Z2],
 					ObjectsMoveData[playerid][MoveSpeed]);
 					
-					ShowPlayerDialog(playerid, DIALOG_MOVINGOBJ, DIALOG_STYLE_TABLIST_HEADERS,
+					ShowPlayerDialog(playerid, DIALOG_MOVINGOBJ, DIALOG_STYLE_TABLIST,
 					"[CAM] - Object moviements (MoveDynamicObject)", tbtext,
 					"Select", "Cancel");
 				}
@@ -4905,14 +4903,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					new tbtext[300];
 					
 					format(tbtext, sizeof tbtext,
-					" \t \n"\
 					"Starting position\t %.2f %.2f %.2f\n"\
 					"End position\t %.2f %.2f %.2f\n"\
 					"{FF0000}Reset positions\t\n",
 					CamData[playerid][Cam_StartX], CamData[playerid][Cam_StartY], CamData[playerid][Cam_StartZ],
 					CamData[playerid][Cam_EndX], CamData[playerid][Cam_EndY], CamData[playerid][Cam_EndZ]);
 					
-					ShowPlayerDialog(playerid, DIALOG_CAMPOINT, DIALOG_STYLE_TABLIST_HEADERS,
+					ShowPlayerDialog(playerid, DIALOG_CAMPOINT, DIALOG_STYLE_TABLIST,
 					"[CAM] - Point", tbtext, "Select", "Cancel");
 				}
 				case 1:
@@ -5612,10 +5609,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 7:
 				{
-					ShowPlayerDialog(playerid, DIALOG_ENVPRESETS, DIALOG_STYLE_TABLIST_HEADERS,
+					ShowPlayerDialog(playerid, DIALOG_ENVPRESETS, DIALOG_STYLE_TABLIST,
 					"[CAM] - Environment presets", 
-					"Option\tDescription\n\
-					Welcome2Hell\tRed hell desert\n\
+					"Welcome2Hell\tRed hell desert\n\
 					Monochrome\tAbsolutely dark skin\n\
 					Very dark night\t\n\
 					Desert Storm\t\n\
@@ -7146,7 +7142,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				" \t \n"\
 				"Прыгнуть вперед\t{00FF00}/jump\n"\
 				"Surfly mode\t{00FF00}/surfly\n"\
 				"Взять джетпак\t{FFFF00}/jetpack\n"\
@@ -7158,7 +7153,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Оружие\t{FFFF00}/w\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
-				" \t \n"\
 				"Jump forward\t{00FF00}/jump\n"\
 				"Surfly mode\t{00FF00}/surfly\n"\
 				"Take a jetpack\t{FFFF00}/jetpack\n"\
@@ -7170,7 +7164,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Weapons\t{FFFF00}/w\n");
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_ETC, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_ETC, DIALOG_STYLE_TABLIST,
 			"[ETC]",tbtext,"OK","Close");
 		}
 		case DIALOG_CREATEMENU:
@@ -7186,7 +7180,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				"[>] Pickup\n"\
 				"{A9A9A9}[>] Attach к игроку\n"\
 				"[>] Attach на транспорт\n"\
-				"{A9A9A9}[>] Актера\n");
+				"{A9A9A9}[>] Актера\n"\
+				"[>] Новую карту\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"{A9A9A9}[>] Object\n"\
@@ -7195,7 +7190,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				"[>] Pickup\n"\
 				"{A9A9A9}[>] Attach to Player\n"\
 				"[>] Attach to Vehicle\n"\
-				"{A9A9A9}[>] Actor\n");
+				"{A9A9A9}[>] Actor\n"\
+				"[>] New map\n");
 			}
 			
 			ShowPlayerDialog(playerid, DIALOG_CREATEMENU, DIALOG_STYLE_LIST,
@@ -7253,7 +7249,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Действие\tКоманда\n"\
 				"Выбрать объект\t{00FF00}/csel\n"\
 				"Переместить объект\t{00FF00}/editobject\n"\
 				"Повернуть объект\t{00FF00}/rot\n"\
@@ -7266,7 +7261,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Информация о текущем объектe\t{00FF00}/oprop\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Description\tCommand\n"\
 				"Select object\t{00FF00}/csel\n"\
 				"Move object\t{00FF00}/editobject\n"\
 				"Rotate object\t{00FF00}/rot\n"\ 
@@ -7279,16 +7273,15 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Information about the current object\t{00FF00}/oprop\n");
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_EDITMENU, DIALOG_STYLE_TABLIST_HEADERS, 
+			ShowPlayerDialog(playerid, DIALOG_EDITMENU, DIALOG_STYLE_TABLIST, 
 			header ,tbtext, "OK","Cancel");
 		}
 		case DIALOG_OBJECTSMENU:
 		{
 			if (GetPVarInt(playerid, "lang") == 0)
 			{
-				ShowPlayerDialog(playerid, DIALOG_OBJECTSMENU, DIALOG_STYLE_TABLIST_HEADERS, 
+				ShowPlayerDialog(playerid, DIALOG_OBJECTSMENU, DIALOG_STYLE_TABLIST, 
 				"[CREATE - Objects]",
-				"Действие\tКоманда\n"\
 				"[>] Создать объект по номеру\t{00FF00}/oadd\n"\
 				"{A9A9A9}[>] Список загруженных объектов\t{00FF00}/lsel\n"\
 				"[>] Категории объектов\t\n"\
@@ -7298,9 +7291,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				//"[>] Движение объектов\t\n",
 				"Select","Cancel");
 			} else {
-				ShowPlayerDialog(playerid, DIALOG_OBJECTSMENU, DIALOG_STYLE_TABLIST_HEADERS, 
+				ShowPlayerDialog(playerid, DIALOG_OBJECTSMENU, DIALOG_STYLE_TABLIST, 
 				"[CREATE - Objects]",
-				"Description\tCommand\n"\
 				"[>] Create object by number\t{00FF00}/oadd\n"\
 				"{A9A9A9}[>] List of loaded objects\t{00FF00}/lsel\n"\
 				"[>] Object categories\t\n"\
@@ -7315,18 +7307,16 @@ public ShowPlayerMenu(playerid, dialogid)
 		{
 			if (GetPVarInt(playerid, "lang") == 0)
 			{
-				ShowPlayerDialog(playerid, DIALOG_OBJECTSSEARCH, DIALOG_STYLE_TABLIST_HEADERS, 
+				ShowPlayerDialog(playerid, DIALOG_OBJECTSSEARCH, DIALOG_STYLE_TABLIST, 
 				"[CREATE - Objects]",
-				"Действие\tКоманда\n"\
 				"{A9A9A9}Поиск объектов по слову\t{00FF00}/osearch\n"\
 				"Поиск дубликатов объектов\t\n"\
 				"{A9A9A9}Определить расстояние между двумя объектами\t\n"\
 				"Ближайший объект\t{00FF00}/nearest\n",
 				"Select","Cancel");
 			} else {
-				ShowPlayerDialog(playerid, DIALOG_OBJECTSSEARCH, DIALOG_STYLE_TABLIST_HEADERS, 
+				ShowPlayerDialog(playerid, DIALOG_OBJECTSSEARCH, DIALOG_STYLE_TABLIST, 
 				"[CREATE - Objects]",
-				"Description\tCommand\n"\
 				"{A9A9A9}Search objects\t{00FF00}/osearch\n"\
 				"Finding duplicate objects\t\n"\
 				"{A9A9A9}Determine the distance between two objects\t\n"\
@@ -7341,7 +7331,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Действие\tКоманда\n"\
 				"Добавление/удаление объекта из группы\t{00FF00}/gsel\n"\
 				"Установить идентификатор группы\t{00FF00}/setgroup\n"\
 				"Сгруппировать все объекты\t{00FF00}/selectgroup\n"\
@@ -7349,10 +7338,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Удалить все объекты из группы\t{00FF00}/gclear\n"\
 				"Удалить объекты которые находятся в группе\t{00FF00}/gdelete\n"\
 				"Создание objectmetry фигуры\t{00FF00}/obmedit\n");
-				
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Description\tCommand\n"\
 				"Adding/removing an object from the group\t{00FF00}/gsel\n"\
 				"Set group id \t{00FF00}/setgroup\n"\
 				"Group all objects \t{00FF00}/selectgroup\n"\
@@ -7362,7 +7349,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Creating an objectmetry figure\t{00FF00}/obmedit\n");
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_GROUPEDIT, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_GROUPEDIT, DIALOG_STYLE_TABLIST,
 			"[GROUP]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_REMMENU:
@@ -7372,7 +7359,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Действие\tКоманда\n"\
 				"Удалить текущий объект\t{FF0000}/dobject\n"\
 				"Удалить ближайший объект\t{FF0000}/dcsel\n"\
 				"Удалить объекты в радиусе\t{FF0000}/rangedel\n"\
@@ -7382,7 +7368,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Удалить временные файлы mtools\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Description\tCommand\n"\
 				"Delete current object\t{FF0000}/dobject\n"\
 				"Delete nearest object\t{FF0000}/dcsel\n"\
 				"Remove objects in radius\t{FF0000}/rangedel\n"\
@@ -7392,7 +7377,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Delete temporary files mtools\n");
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_REMMENU, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_REMMENU, DIALOG_STYLE_TABLIST,
 			"[REMOVE]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_TEXTUREMENU:
@@ -7401,7 +7386,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),	
-				"Действие\tКоманда\n"\
 				"Менеджер текстур\t{00FF00}/mtextures\n"\
 				"Редактор текстур\t{00FF00}/stexture\n"\
 				"Добавить текст на объект\t{00FF00}/text\n"\
@@ -7412,7 +7396,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Буффер текстур\t{00FF00}/tbuffer\n");
 			} else {
 				format(tbtext, sizeof(tbtext),	
-				"Description\tCommand\n"\
 				"Texture manager\t{00FF00}/mtextures\n"\
 				"Texture editor\t{00FF00}/stexture\n"\
 				"Add text to object\t{00FF00}/text\n"\
@@ -7423,7 +7406,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Texture buffer\t{00FF00}/tbuffer\n");
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_TEXTUREMENU, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_TEXTUREMENU, DIALOG_STYLE_TABLIST,
 			"[TEXTURE]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_TEXTUREBUFFER:
@@ -7432,19 +7415,17 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),	
-				"Действие\tКоманда\n"\
 				"Копировать свойства объекта (текстура/цвет/текст) в буфер\t{00FF00}/copy\n"\
 				"Вставить свойства на выбранный объект из буфера\t{00FF00}/paste\n"\
 				"{FF0000}Очистить свойства объекта из буфера\t{FF0000}/clear\n");
 			} else {
 				format(tbtext, sizeof(tbtext),	
-				"Description\tCommand\n"\
 				"Copy object properties (texture/color/text) to buffer\t{00FF00}/copy\n"\
 				"Paste properties on the selected object from the buffer\t{00FF00}/paste\n"\
 				"{FF0000}Clear object properties from buffer \t{FF0000}/clear\n");
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_TEXTUREBUFFER, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_TEXTUREBUFFER, DIALOG_STYLE_TABLIST,
 			"[TEXTURE]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_CREATEOBJ:
@@ -7566,7 +7547,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{	
 				format(tbtext, sizeof(tbtext),
-				"Действие\tКоманда\n"\
 				"Создать 3DText\t\n"\
 				"Индекс\t%i\n"\
 				"Изменить текст\t%s\n"\
@@ -7582,7 +7562,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Action\tCommand\n"\
 				"Create 3DText\t\n"\
 				"Index\t%i\n"\
 				"Change text\t%s\n"\
@@ -7596,7 +7575,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				Text3dArray[CurrentIndex3dText][Text3Dcolor],
 				Text3dArray[CurrentIndex3dText][Text3Ddistance]);
 			}
-			ShowPlayerDialog(playerid, DIALOG_3DTEXTMENU, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_3DTEXTMENU, DIALOG_STYLE_TABLIST,
 			"[3D TEXT]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_VEHICLE:
@@ -7615,7 +7594,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Действие\tКоманда\n"\
 				"Выбрать машину для редактирования\t{00FF00}/avsel\n"\
 				"Тестовый автомобиль\t{00FF00}/v\n"\
 				"Создать новую машину\t{00FF00}/avnewcar\n"\
@@ -7629,7 +7607,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				"[>] Настройки\t\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Action\tCommand\n"\
 				"Select vehicle\t{00FF00}/avsel\n"\
 				"Test vehicle\t{00FF00}/v\n"\
 				"Create new vehicle\t{00FF00}/avnewcar\n"\
@@ -7643,7 +7620,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"[>] Settings\t\n");
 			}
 
-			ShowPlayerDialog(playerid, DIALOG_VEHICLE, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_VEHICLE, DIALOG_STYLE_TABLIST,
 			header, tbtext, "OK","Cancel");
 		}
 		case DIALOG_MAPMENU:
@@ -7653,7 +7630,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),	
-				"Действие\tКоманда\n"\
 				"Загрузить карту\t{00FF00}/loadmap\n"\
 				"Создать карту\t{00FF00}/newmap\n"\
 				"Переименовать карту\t{00FF00}/renamemap\n"\
@@ -7662,13 +7638,13 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Экспортировать весь транспорт\t{00FF00}/avexportall\n"\
 				"Показать стандартные объекты на карте\t{800080}/gtaobjects\n"\
 				"Управление prefab\t{00FF00}/prefab\n"\
+				"Добавить все объекты в группу\t{00FF00}/gall\n"\
 				"Добавить mapicon на карту\t\n"\
 				"Сохранить координаты\t\n"\
 				"Лимиты\t\n"\
 				"{FF0000}Удалить карту\t{FF0000}/deletemap\n");
 			} else {
 				format(tbtext, sizeof(tbtext),	
-				"Action\tCommand\n"\
 				"Load map\t{00FF00}/loadmap\n"\
 				"New map\t{00FF00}/newmap\n"\
 				"Rename map\t{00FF00}/renamemap\n"\
@@ -7677,13 +7653,14 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Export all vehicles\t{00FF00}/avexportall\n"\
 				"Show default objects on map\t{800080}/gtaobjects\n"\
 				"Manage prefab\t{00FF00}/prefab\n"\
+				"Add all objects to group\t{00FF00}/gall\n"\
 				"Add mapicon\t\n"\
 				"Save coords\t\n"\
 				"Limits\t\n"\
 				"{FF0000}Delete map\t{FF0000}/deletemap\n");
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_MAPMENU, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_MAPMENU, DIALOG_STYLE_TABLIST,
 			"[MAP]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_PREFABMENU:
@@ -7693,19 +7670,17 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),	
-				"Действие\tКоманда\n"\
 				"Экспорт группы объектов в загружаемый файл префаба \t{00FF00}/gprefab\n"\
 				"Установить смещение загрузки файла префаба \t{00FF00}/prefabsetz\n"\
 				"Показать все префабы \t{00FF00}/prefab\n");
 			} else {
 				format(tbtext, sizeof(tbtext),	
-				"Action\tCommand\n"\
 				"Export a group of objects to a loadable prefab file\t{00FF00}/gprefab\n"\
 				"Set the load offset of a prefab file\t{00FF00}/prefabsetz\n"\
 				"Show all prefabs\t{00FF00}/prefab\n");
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_PREFABMENU, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_PREFABMENU, DIALOG_STYLE_TABLIST,
 			"[PREFAB]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_MAPINFO:
@@ -7746,7 +7721,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 1)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Option\tState\n"\
 				"Flycam\t{FFFF00}/flymode\n"\
 				"First person cam\t%s\n"\
 				"Take a photocamera\t{FFFF00}/camera\n"\
@@ -7759,7 +7733,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				Firstperson_st, dashcam_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
 				"Полет камерой\t{FFFF00}/flymode\n"\
 				"Вид от первого лица\t%s\n"\
 				"Взять фотоаппарат\t{FFFF00}/camera\n"\
@@ -7772,7 +7745,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				Firstperson_st, dashcam_st);
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_CAMSET, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_CAMSET, DIALOG_STYLE_TABLIST,
 			"[CAMSET]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_CAMINTERPOLATE:
@@ -7811,7 +7784,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 1)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Option\tState\n"\
 				"[>] Interface\t\n"\
 				"{A9A9A9}[>] HotKeys\t\n"\
 				"[>] Vehicles settings\t\n"\
@@ -7829,7 +7801,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				 GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
 				"[>] Интерфейс\t\n"\
 				"{A9A9A9}[>] Горячие клавиши\t\n"\
 				"[>] Настройки транспорта\t\n"\
@@ -7846,7 +7817,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				GetPVarInt(playerid,"Hour"), GetGravity(),
 				GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
 			}
-			ShowPlayerDialog(playerid, DIALOG_SETTINGS, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_SETTINGS, DIALOG_STYLE_TABLIST,
 			"[SETTINGS]",tbtext, "Select","Cancel");
 		}
 		case DIALOG_FLYMODESETTINGS:
@@ -7862,8 +7833,7 @@ public ShowPlayerMenu(playerid, dialogid)
 			if (GetPVarInt(playerid, "lang") == 0)
 			{
 				format(tbtext, sizeof(tbtext),
-				"Option\tState\n\
-				Точка по центру экрана в полете\t%s\n\
+				"Точка по центру экрана в полете\t%s\n\
 				Информация о объектах и транспорте в режиме полета\t%s\n\
 				установить максимальную скорость в режиме полета\t{00FF00}/fmspeed\n\
 				установить ускорение в режиме полета\t{00FF00}/fmaccel\n\
@@ -7871,8 +7841,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				AIMTD_st,TargetInfo_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Option\tState\n\
-				Point in the center of the screen in flight\t%s\n\
+				"Point in the center of the screen in flight\t%s\n\
 				Information about objects and vehicles in flymode\t%s\n\
 				set max speed in flymode\t{00FF00}/fmspeed\n\
 				set acceleration in flymode\t{00FF00}/fmaccel\n\
@@ -7880,7 +7849,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				AIMTD_st,TargetInfo_st);
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_FLYMODESETTINGS, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_FLYMODESETTINGS, DIALOG_STYLE_TABLIST,
 			"[CAM] - Flymode settings",tbtext, "Select","Cancel");
 		}
 		case DIALOG_KEYBINDS:
@@ -7912,8 +7881,7 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 1)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Option\tState\n\
-				Flymode mode at <F>\t%s\n\
+				"Flymode mode at <F>\t%s\n\
 				Main menu hotkey\t%s\n\
 				SuperJump\t%s\n\
 				Fast move\t%s\n\
@@ -7922,8 +7890,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				SuperJump_st, FastMove_st, cSelector_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n\
-				Режим полета на <F>\t%s\n\
+				"Режим полета на <F>\t%s\n\
 				Вызов главного меню на клавишу\t%s\n\
 				Cупер прыжок\t%s\n\
 				Быстрое перемещение\t%s\n\
@@ -7932,7 +7899,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				SuperJump_st, FastMove_st, cSelector_st);
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_KEYBINDS, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_KEYBINDS, DIALOG_STYLE_TABLIST,
 			"Keybinds",tbtext, "Select","Cancel");
 		}
 		case DIALOG_INTERFACE_SETTINGS:
@@ -7955,7 +7922,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 1)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Option\tState\n"\
 				"Streamed objects counter TD\t%s\n"\
 				"Information about the current position\t(/position)\n"\
 				"Editor 3dtext settings\t(/edittext3d)\n"\
@@ -7967,7 +7933,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				 autoLoadMap_st, showEditMenu_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
 				"TD подсчета объектов в области стрима\t%s\n"\
 				"Информация о текущей позиции\t/position\n"\
 				"Настройки 3d текста на объектах\t/edittext3d\n"\
@@ -7979,7 +7944,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				autoLoadMap_st, showEditMenu_st);
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_INTERFACE_SETTINGS, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_INTERFACE_SETTINGS, DIALOG_STYLE_TABLIST,
 			"[SETTINGS - Interface]",tbtext, "Select","Cancel");
 		}
 		case DIALOG_VEHSETTINGS:
@@ -8014,7 +7979,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
 				"Speed Boost\t%s\n"\
 				"Автопополение Nos\t%s\n"\
 				"Автопочинка\t%s\n"\
@@ -8026,7 +7990,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				useFlip_st, vecol_st, autoremveh_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Option\tCommand\n"\
 				"Speed Boost\t%s\n"\
 				"Autorefill Nos\t%s\n"\
 				"Autofix\t%s\n"\
@@ -8038,7 +8001,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				useFlip_st, vecol_st, autoremveh_st);
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_VEHSETTINGS, DIALOG_STYLE_TABLIST_HEADERS, 
+			ShowPlayerDialog(playerid, DIALOG_VEHSETTINGS, DIALOG_STYLE_TABLIST, 
 			"[VEHICLE - Settings]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_ROTATION:
@@ -8048,8 +8011,7 @@ public ShowPlayerMenu(playerid, dialogid)
 			GetDynamicObjectRot(EDIT_OBJECT_ID[playerid], RotX, RotY, RotZ);
 			
 			format(tbtext, sizeof(tbtext),
-			"Mode\tValue\n\
-			Auto rotation\t/arot\n\
+			"Auto rotation\t/arot\n\
 			{3f70d6}/Rx \t %.2f\n\
 			{e0364e}/Ry \t %.2f\n\
 			{26b85d}/Rz \t %.2f\n\
@@ -8058,7 +8020,7 @@ public ShowPlayerMenu(playerid, dialogid)
 			Reset object rotation\t{FF0000}/rotreset\n\
 			Basic movement commands\n", RotX, RotY, RotZ);
 			
-			ShowPlayerDialog(playerid, DIALOG_ROTATION, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_ROTATION, DIALOG_STYLE_TABLIST,
 			"[EDIT - Rotate]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_ROTSET:
@@ -8102,10 +8064,9 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_ENVIRONMENT:
 		{
-			ShowPlayerDialog(playerid, DIALOG_ENVIRONMENT, DIALOG_STYLE_TABLIST_HEADERS,
+			ShowPlayerDialog(playerid, DIALOG_ENVIRONMENT, DIALOG_STYLE_TABLIST,
 			"[CAM] - Environment", 
-			"Option\tDescription\n\
-			Night vision\tNight vision toggles\n\
+			"Night vision\tNight vision toggles\n\
 			Thermal vision\tThermal vision like Predator\n\
 			Matrix\tAltered gravity and green weather\n\
 			Realistic physic\tVery plausible gravity\n\
@@ -8150,7 +8111,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			if(GetPVarInt(playerid, "lang") == 1)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Option\tState\n"\
 				"Change model\t{00FF00}/vaemodel\n"\
 				"adjustment X\t%.2f\n"\
 				"adjustment Y\t%.2f\n"\
@@ -8165,7 +8125,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ]);
 			} else {
 				format(tbtext, sizeof(tbtext),
-				"Опция\tСтатус\n"\
 				"Изменить модель\t{00FF00}/vaemodel\n"\
 				"Регулировка оси X\t%.2f\n"\
 				"Регулировка оси Y\t%.2f\n"\
@@ -8180,7 +8139,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ]);
 			}
 			
-			ShowPlayerDialog(playerid, DIALOG_VAE, DIALOG_STYLE_TABLIST_HEADERS, 
+			ShowPlayerDialog(playerid, DIALOG_VAE, DIALOG_STYLE_TABLIST, 
 			header,tbtext, "Select","Cancel");
 		}
 		case DIALOG_CMDS:
@@ -9025,8 +8984,7 @@ ShowMainAttachEditMenu(playerid)
 		gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z]);
 	} else {
 		format(string, sizeof(string),
-		"Option\tState\n\
-		Index \t(%d) \n\
+		"Index \t(%d) \n\
 		Object \t(%d) \n\
 		Bone \t(%d) \n\
 		X position \t(%.4f) \n\
@@ -9055,7 +9013,7 @@ ShowMainAttachEditMenu(playerid)
 		gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z]);
 	}
 
-	ShowPlayerDialog(playerid, DIALOG_PLAYERATTACHMAIN, DIALOG_STYLE_TABLIST_HEADERS,
+	ShowPlayerDialog(playerid, DIALOG_PLAYERATTACHMAIN, DIALOG_STYLE_TABLIST,
 	"Attachments editor", string, "OK", "Cancel");
 
 	gEditingAttachments[playerid] = true;
