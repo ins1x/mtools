@@ -28,8 +28,8 @@ Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 * **mtools** works correctly with  *[Texture Studio 2.0](https://vk.com/tip_mapper?w=page-89889560_49251374)* and above
 
 ## **[Wiki](https://github.com/ins1x/mtools/wiki)**
-* [English](https://github.com/ins1x/mtools/wiki)
-* [Russian](https://github.com/ins1x/mtools/wiki/Home-%5BRus%5D)
+:gb: [English](https://github.com/ins1x/mtools/wiki)  
+:ru: [Russian](https://github.com/ins1x/mtools/wiki/Home-%5BRus%5D)  
 
 ### Disclaimer:
 
