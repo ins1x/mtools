@@ -27,7 +27,7 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
 #define VERSION              	"0.3.22"
-#define BUILD_DATE             	"27.02.2022"
+#define BUILD_DATE             	"16.03.2022"
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -304,6 +304,7 @@ new EDIT_OBJECT_ID[MAX_PLAYERS];
 new EDIT_OBJECT_MODELID[MAX_PLAYERS];
 new LAST_OBJECT_ID[MAX_PLAYERS];
 new LAST_DIALOG[MAX_PLAYERS];
+new SELECTION_MODE[MAX_PLAYERS];
 new EDIT_VEHICLE_ID[MAX_PLAYERS];
 new PlayerVehicle[MAX_PLAYERS];
 new bool:OnFly[MAX_PLAYERS];
@@ -815,7 +816,10 @@ public OnPlayerConnect(playerid)
 	VaeData[playerid][obj] =  -1;
 	EDIT_OBJECT_ID[playerid] = -1;
 	EDIT_VEHICLE_ID[playerid] = -1;
-	
+	SELECTION_MODE[playerid] = 0;
+    EDIT_OBJECT_MODELID[playerid] = -1;
+    LAST_DIALOG[playerid] = -1;
+
 	OnFly[playerid] = false;
 	//hide logo
 	//#if defined TEXTURE_STUDIO
@@ -1279,6 +1283,16 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 
 	if(showEditMenu)
 	{
+		if(SELECTION_MODE[playerid] == 4)
+		{
+			if(response == EDIT_RESPONSE_CANCEL)
+			{
+				CancelEdit(playerid);
+				SELECTION_MODE[playerid] = 0;
+				SetPVarInt(playerid, "Editmode",0);
+			}
+			return 1;
+		}
 		if(response == EDIT_RESPONSE_FINAL || response == EDIT_RESPONSE_CANCEL)
 		{
 			CancelEdit(playerid);
@@ -1994,22 +2008,36 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		SetPlayerTime(playerid, 21, 0); 
 		return 1;
 	}
-	if (!strcmp(cmdtext, "/weather", true))
+	if (!strcmp("/weather", cmd, true))
 	{
-	    SendClientMessageEx(playerid, COLOR_GREY,
-		"Использование: /weather [№ погоды]", "Use: /weather [weather ID]");
-		ShowPlayerDialog(playerid, DIALOG_WEATHER, DIALOG_STYLE_INPUT,
-		"Set weather",
-		"Weather IDs 1-22 appear to work correctly (max 255)\n"\
-		"Enter weather id\n", "Ok", "Cancel");
-	    return true;
+		tmp = strtok(cmdtext, idx);
+		if (strlen(tmp) == 0 || strval(tmp) > 255 || strval(tmp) < 1){
+			SendClientMessageEx(playerid, COLOR_GREY,
+			"Использование: /weather [№ погоды]", "Use: /weather [weather ID]");
+			ShowPlayerDialog(playerid, DIALOG_WEATHER, DIALOG_STYLE_INPUT,
+			"Set weather",
+			"Weather IDs 1-22 appear to work correctly (max 255)\n"\
+			"Enter weather id\n", "Ok", "Cancel");
+			return true;
+		}
+		
+		SetPlayerWeather(playerid, strval(tmp)); 
+		SetPVarInt(playerid,"Weather",strval(tmp));
+		return true;
 	}
-	if (!strcmp(cmdtext, "/time", true))
+	if (!strcmp("/time", cmd, true))
 	{
-		SendClientMessageEx(playerid, COLOR_GREY,
-		"Использование: /time [час]", "Use: /time [hour]");
-		ShowPlayerDialog(playerid, DIALOG_TIME, DIALOG_STYLE_INPUT,
-		"Set time", "Enter time [0-23]. Default [12].", "Ok", "Cancel");
+		tmp = strtok(cmdtext, idx);
+		if (strlen(tmp) == 0 || strval(tmp) > 23 || strval(tmp) < 0){
+			SendClientMessageEx(playerid, COLOR_GREY,
+			"Использование: /time [час]", "Use: /time [hour]");
+			ShowPlayerDialog(playerid, DIALOG_TIME, DIALOG_STYLE_INPUT,
+			"Set time", "Enter time [0-23]. Default [12].", "Ok", "Cancel");
+			return true;
+		}
+		
+		SetPlayerTime(playerid,strval(tmp),0); 
+		SetPVarInt(playerid,"Hour",strval(tmp));
 		return true;
 	}
 	if (!strcmp(cmdtext, "/jetpack", true) || !strcmp(cmdtext, "/jp", true))
@@ -2411,6 +2439,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
+			#if defined UGMP_INCLUDED
 			switch(listitem)
 			{
 				case 0: SetPlayerPos(playerid,1765.7373,-1895.3802,14.1300); // LS
@@ -2420,6 +2449,19 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 4: SetPlayerPos(playerid, 9348.4795,7643.6357,16.4687); // LC
 				case 5: SetPlayerPos(playerid, 8754.6406,14210.1553,6.4485); // bullworth
 			}
+			#else 
+			switch(listitem)
+			{
+				case 0: SetPlayerPos(playerid,1765.7373,-1895.3802,14.1300); // LS
+				case 1: SetPlayerPos(playerid,-1984.3955,138.3253,27.9796); // SF
+				case 2: SetPlayerPos(playerid, 1317.222167, 1267.032104, 10.820312); // LV
+				case 3: SetPlayerPos(playerid,-2256.1833,2364.7615,5.6276); // Bayside
+				case 4: SetPlayerPos(playerid,43.8830,1173.1411,18.8473); // LV bone country
+				case 5: SetPlayerPos(playerid,-1064.1818,-1223.9795,130.1247); // SF Flint country
+				case 6: SetPlayerPos(playerid,1078.4608,-331.7300,74.8740); // LS Red country 
+				case 7: SetPlayerPos(playerid,-2095.4441,-2368.0361,31.3874); // Whetsone - chilliad
+			}
+			#endif
 		}
 	}
 	if(dialogid == DIALOG_VEHICLE)
@@ -3777,7 +3819,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 				}
 				case 6: ShowPlayerMenu(playerid, DIALOG_ACTORS);
-				case 7: ShowPlayerMenu(playerid, DIALOG_MAPMENU);
+				case 7: 
+				{
+					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/newmap");		
+					#endif
+				}
 			}
 		} 
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -4622,6 +4669,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gsel");		
+					SELECTION_MODE[playerid] = 4;
 					#else 
 					SelectObject(playerid);
 					#endif
@@ -4641,22 +4689,28 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 3: 
 				{
 					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclone");
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editgroup");
 					#endif
 				}
 				case 4: 
 				{
 					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclear");
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclone");
 					#endif
 				}
 				case 5: 
 				{
 					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gdelete");
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclear");
 					#endif
 				}
 				case 6: 
+				{
+					#if defined TEXTURE_STUDIO
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gdelete");
+					#endif
+				}
+				case 7: 
 				{
 					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/obmedit");
@@ -5411,7 +5465,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 6: ShowPlayerMenu(playerid, DIALOG_FLYMODESETTINGS);
 				case 7: ShowPlayerMenu(playerid, DIALOG_CAMINTERPOLATE);
-				case 8: ShowPlayerMenu(playerid, DIALOG_ENVIRONMENT);
+				//case 8: ShowPlayerMenu(playerid, DIALOG_ENVIRONMENT);
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -6604,6 +6658,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 7:
 				{
+					VaeData[playerid][OffSetX]  = 0.0;
+					VaeData[playerid][OffSetY]  = 0.0;
+					VaeData[playerid][OffSetZ]  = 0.0;
+					VaeData[playerid][OffSetRX] = 0.0;
+					VaeData[playerid][OffSetRY] = 0.0;
+					VaeData[playerid][OffSetRZ] = 0.0;
+					SendClientMessageEx(playerid, -1,
+					"Значения XYZ и осей сброшены", "Reset XYZ and adjustment");
+					ShowPlayerMenu(playerid, DIALOG_VAE);
+				}
+				case 8:
+				{
 					if(GetPVarInt(playerid, "freezed") > 0)
 					{
 						TogglePlayerControllable(playerid, true);
@@ -6615,7 +6681,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SendClientMessageEx(playerid, -1, "Вы замороженны","You are freezed");
 					}
 				}
-				case 8:
+				case 9:
 				{
 					KillTimer(VaeData[playerid][timer]);
 					TogglePlayerControllable(playerid, true);
@@ -6624,7 +6690,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SendClientMessageEx(playerid, -1,
 					"Редактирование закончено.", "Finish vae edit");
 				}
-				case 9:
+				case 10:
 				{
 					new File: file = fopen("mtools/Vaeditions.txt", io_append);
 					new str[200];
@@ -7181,7 +7247,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"{A9A9A9}[>] Attach к игроку\n"\
 				"[>] Attach на транспорт\n"\
 				"{A9A9A9}[>] Актера\n"\
-				"[>] Новую карту\n");
+				"[>] Карту\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"{A9A9A9}[>] Object\n"\
@@ -7333,7 +7399,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				format(tbtext, sizeof(tbtext),
 				"Добавление/удаление объекта из группы\t{00FF00}/gsel\n"\
 				"Установить идентификатор группы\t{00FF00}/setgroup\n"\
-				"Сгруппировать все объекты\t{00FF00}/selectgroup\n"\
+				"Выбрать группу\t{00FF00}/selectgroup\n"\
+				"Редактировать группу\t{00FF00}/editgroup\n"\
 				"Копировать объекты которые находятся в группе\t{00FF00}/gclone\n"\
 				"Удалить все объекты из группы\t{00FF00}/gclear\n"\
 				"Удалить объекты которые находятся в группе\t{00FF00}/gdelete\n"\
@@ -7342,7 +7409,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				format(tbtext, sizeof(tbtext),
 				"Adding/removing an object from the group\t{00FF00}/gsel\n"\
 				"Set group id \t{00FF00}/setgroup\n"\
-				"Group all objects \t{00FF00}/selectgroup\n"\
+				"Select a group of objects to edit\t{00FF00}/selectgroup\n"\
+				"Start editing a group\t{00FF00}/editgroup\n"\
 				"Copy objects that are in the group\t{00FF00}/gclone\n"\
 				"Remove all objects from the group\t{00FF00}/gclear\n"\
 				"Delete objects that are in the group\t{00FF00}/gdelete\n"\
@@ -7728,8 +7796,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Police dash cam\t%s\n"\
 				"[>] Camera position\t\n"\
 				"[>] Camera speed\t\n"\
-				"[>] Interpolate camera\t\n"\
-				"[>] Environment and effects\t\n",
+				"[>] Interpolate camera\t\n",
 				Firstperson_st, dashcam_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
@@ -7740,8 +7807,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Режим полицейской камеры\t%s\n"\
 				"[>] Позиция камеры\t\n"\
 				"[>] Скорость перемещения камеры\t\n"\
-				"[>] Интерполяция камеры\t\n"\
-				"[>] Окружение и эффекты\t\n",
+				"[>] Интерполяция камеры\t\n",
 				Firstperson_st, dashcam_st);
 			}
 			
@@ -8118,6 +8184,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"adjustment RX\t%.2f\n"\
 				"adjustment RY\t%.2f\n"\
 				"adjustment RZ\t%.2f\n"\
+				"Reset XYZ and adjustment\t\n"\
 				"Freeze-Unfreeze\t{00FF00}/freeze\n"\
 				"Stop edit\t{00FF00}/vaestop\n"\
 				"Save\t{00FF00}/vaesave\n",
@@ -8132,6 +8199,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Регулировка оси RX\t%.2f\n"\
 				"Регулировка оси RY\t%.2f\n"\
 				"Регулировка оси RZ\t%.2f\n"\
+				"Сбросить XYZ и Оси\t\n"\
 				"Заморозить-Разморозить\t{00FF00}/freeze\n"\
 				"Закончить редактирование\t{00FF00}/vaestop\n"\
 				"Сохранить\t{00FF00}/vaesave\n",
@@ -8162,6 +8230,7 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_TPLIST:
 		{
+			#if defined UGMP_INCLUDED
 			ShowPlayerDialog(playerid, DIALOG_TPLIST, DIALOG_STYLE_LIST,
 			"Teleports", 
 			"{FFD700}Los-Santos\n\
@@ -8171,6 +8240,19 @@ public ShowPlayerMenu(playerid, dialogid)
 			{FFD700}Liberty City\n\
 			{FFD700}Bullworth\n",
 			"OK","Cancel");
+			#else 
+			ShowPlayerDialog(playerid, DIALOG_TPLIST, DIALOG_STYLE_LIST,
+			"Teleports", 
+			"{F8F8FF}Los-Santos\n\
+			{A9A9A9}San Fierro\n\
+			{F8F8FF}Las-Venturas\n\
+			{A9A9A9}Tierra Robada\n\
+			{F8F8FF}Bone Country\n\
+			{A9A9A9}Flint Country\n\
+			{F8F8FF}Red Country\n\
+			{A9A9A9}Whetstone\n",
+			"OK","Cancel");
+			#endif
 		}
 	}
 	return 1;
