@@ -1,4 +1,5 @@
 # MTOOLS for Texture Studio SA:MP
+**Homepage: https://vk.com/1nsanemapping**
 
 ![logo](/img/logo_mtools.png)
 
@@ -31,8 +32,8 @@ Note: mtools is connected after tstudio (filterscripts tstudio mtools)
 :gb: [English](https://github.com/ins1x/mtools/wiki)  
 :ru: [Russian](https://github.com/ins1x/mtools/wiki/Home-%5BRus%5D)  
 
-### Disclaimer:
+## Disclaimer
 
-this script does not claim to be original and is provided as is. The developer is not tasked with making another map editor, but supplementing the existing one for the convenience of work. **This is a demo version**, perhaps you will find errors and shortcomings, report them to the group messages.
+**This script** does not claim to be original and is provided as is. The developer is not tasked with making another map editor, but supplementing the existing one for the convenience of work.  
 
-#### VK Homepage: https://vk.com/1nsanemapping
+[![WTFPL](http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-1.png)](http://www.wtfpl.net/about/) 
