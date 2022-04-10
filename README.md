@@ -16,12 +16,12 @@ For the list of all server commands and features type /help
 * Install latest version *[Texture Studio](https://vk.com/tip_mapper?w=page-89889560_49251374)*
 * Copy the mtools.amx file to the filterscripts folder
 * Create /scriptfiles/mtools folder
-* Open the server.cfg file in any editor and add mtools to filtescripts.
+* Open the [server.cfg](https://open.mp/docs/server/server.cfg) file in any editor and add mtools to filtescripts.
 ```
 filterscripts tstudio mtools
 plugins crashdetect sscanf streamer filemanager
 ```
-Note: mtools is connected after tstudio (filterscripts tstudio mtools)
+> Note: mtools is connected after tstudio (server.cfg)  
 
 ## Requirements
 * [SA:MP 0.3.7 R2 server](https://www.sa-mp.com/download.php) or highter (DL not requred)
