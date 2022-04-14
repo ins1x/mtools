@@ -11,7 +11,7 @@ Mtools gives mappers more features to be more productive.
 For the list of all server commands and features type /help
 
 ## Fast installation
-* Download a ready snapshot with [Texture Studio 2.1 + mtools](https://drive.google.com/file/d/1_bN9u0y4VgE7pq7dgx_BI_u36dQqQxlT/view?usp=sharing)
+* Download a ready snapshot with [Texture Studio 2.1 + mtools](https://drive.google.com/file/d/1y-4jfvl5EpzH5FeN2Hji62NBIB88rMkv/view?usp=sharing)
 * Unpack archive and run samp-server.exe, connect to localhost in client
 ## Manual installation
 * Install latest version *[Texture Studio](https://vk.com/tip_mapper?w=page-89889560_49251374)*
