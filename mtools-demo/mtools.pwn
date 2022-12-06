@@ -26,8 +26,8 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.22"
-#define BUILD_DATE             	"16.03.2022"
+#define VERSION              	"0.3.23"
+#define BUILD_DATE             	__date
 
 #define DIALOG_MAIN 				6001
 #define DIALOG_OBJECTS				6002
@@ -822,9 +822,7 @@ public OnPlayerConnect(playerid)
 
 	OnFly[playerid] = false;
 	//hide logo
-	//#if defined TEXTURE_STUDIO
 	//CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/logo");
-	//#endif
 	
 	SendClientMessageToAllEx(0x33DD1100, 
 	"Нажмите <ALT> для вызова mtools. Подробнее /help ",
@@ -833,12 +831,8 @@ public OnPlayerConnect(playerid)
 	"Прежде чем приступать к работе создайте либо загрузите карту (/loadmap)",
 	"Create or load a map before getting started (/loadmap)");
 	
-	if(autoLoadMap)
-	{
-		#if defined TEXTURE_STUDIO
-		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/loadmap");		
-		#endif
-	}
+	if(autoLoadMap) CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/loadmap");		
+
 	#if defined UGMP_POSTFX_INCLUDED
 	// Makes rubbish (e.g. the flying 'zombie elvis found' newspapers and leaves) (in)visible for a single player.
 	// Rubbish is visible by all players by default.
@@ -1039,20 +1033,16 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	{
 		if(bindFkeyToFlymode)
 		{	
-			#if defined TEXTURE_STUDIO
 			if(GetPVarInt(playerid, "Editmode") != 5) { 
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
 			}
-			#endif
 		} else {
 			/*
 			if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
 			{
-				#if defined TEXTURE_STUDIO
 				if(GetPVarInt(playerid, "Editmode") != 5) { 
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
 				}
-				#endif
 			}
 			*/
 			if(OnFly[playerid])// disable surfly
@@ -1112,14 +1102,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	// Select object in C key <KEY_CROUCH>
 	if(PRESSED(KEY_CROUCH))
 	{
-		if(cSelector)
-		{
-			#if defined TEXTURE_STUDIO
-			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/csel");		
-			#else 
-			SelectObject(playerid);
-			#endif
-		}
+		if(cSelector) CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/csel");		
 	}
 	return 1;
 }
@@ -1315,27 +1298,15 @@ public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y
 		
 	switch(GetPVarInt(playerid, "Editmode"))
 	{
-		case 2:
-	    {
-			#if defined TEXTURE_STUDIO
-			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editobject");
-			#else
-			EditDynamicObject(playerid, objectid);
-			#endif
-		}
+		case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editobject");
 		case 4:
 		{
 			if(askDelete)
 			{
 				ShowPlayerDialog(playerid, DIALOG_ASKDELETE, DIALOG_STYLE_MSGBOX,
 				"You are sure?", "Delete this object?", "Delete", "Cancel");
-			} else {
-				#if defined TEXTURE_STUDIO
-				CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dobject");
-				#else
-				DestroyDynamicObject(objectid);
-				#endif
 			}
+			else CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dobject");
 		}
 	}
 	
@@ -1387,9 +1358,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	}
 	if (!strcmp(cmdtext, "/mapload", true))
 	{
-		#if defined TEXTURE_STUDIO
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/loadmap");		
-		#endif
 		return true;
 	}
 	if (!strcmp(cmdtext, "/mapinfo", true))
@@ -1448,11 +1417,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
     }
 	if(!strcmp(cmdtext,"/v", true))
     {
-		#if defined TEXTURE_STUDIO
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/tcar");		
-		#else
-		SendClientMessage(playerid, -1, "Function unavaiable. Need TextureStudio");
-		#endif
         return 1;
     }
 	if (!strcmp(cmdtext, "/v ", true, 3))
@@ -1461,9 +1426,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		{
 			SendClientMessageEx(playerid, COLOR_GREY,
 			"Использование: /v [vehicleid]", "Use: /v [vehicleid]");
-			#if defined TEXTURE_STUDIO
 			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/tcar");		
-			#endif
 			return true;
 		}
 		new PARAM = strval(cmdtext[3]);
@@ -1584,11 +1547,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 				hideMtoolsMenu = true;
 			}
 		} else {
-			#if defined TEXTURE_STUDIO
-			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtextures");		
-			#else
-			SendClientMessage(playerid, -1, "Function unavaiable. Need TextureStudio");
-			#endif
+			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtextures");
 			SetPVarInt(playerid, "Editmode", 0);
 			if(mainMenuKeyCode == 1024 || mainMenuKeyCode == 262144) {
 				hideMtoolsMenu = false;
@@ -1610,11 +1569,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 				hideMtoolsMenu = false;
 			}
 		}
-		#if defined TEXTURE_STUDIO
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtextures");		
-		#else
-		SendClientMessage(playerid, -1, "Function unavaiable. Need TextureStudio");
-		#endif
         return 1;
     }
 	if(!strcmp(cmdtext, "/tbuffer", true))
@@ -1730,7 +1685,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 			return SendClientMessageEx(playerid, -1,
 			"сперва нужно выбрать объект!", "first you need to select an object!");
 		
-		#if defined TEXTURE_STUDIO
 		new param[24];
 		format(param, sizeof(param), "/rx %d", rx);
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
@@ -1738,9 +1692,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
 		format(param, sizeof(param), "/rz %d", rz);
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
-		#else
-		SetDynamicObjectRot(EDIT_OBJECT_ID[playerid], rx, ry, rz);
-		#endif
 		return 1;
 	}
 	if (!strcmp(cmd, "/spos", true))
@@ -1799,7 +1750,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 			return SendClientMessageEx(playerid, -1,
 			"сперва нужно выбрать объект!", "first you need to select an object!");
 		
-		#if defined TEXTURE_STUDIO
 		new param[24];
 		format(param, sizeof(param), "/ox %d", ox);
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
@@ -1807,9 +1757,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
 		format(param, sizeof(param), "/oz %d", oz);
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
-		#else
-		SetDynamicObjectRot(EDIT_OBJECT_ID[playerid], ox, oy, oz);
-		#endif
 		return 1;
 	}
 	if (!strcmp(cmd, "/tplist", true) || !strcmp(cmd, "/teles", true))
@@ -1836,14 +1783,11 @@ public OnPlayerCommandText(playerid, cmdtext[])
 			return SendClientMessage(playerid, -1, "Use: /tpc [x] [y] [z]");
 		}
 		new pz = strval(tmp);
-		
-		#if defined TEXTURE_STUDIO
+				
 		new param[24];
 		format(param, sizeof(param), "/tpcoord %d %d %d", px, py, pz);
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
-		#else
-		SetPlayerPos(playerid, px, py, pz);
-		#endif
+
 		return 1;
 	}
 	if(!strcmp(cmdtext, "/oadd", true))
@@ -1915,9 +1859,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	{
 		if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
 		{
-			#if defined TEXTURE_STUDIO
 			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
-			#endif
 		} else {
 			SetCameraBehindPlayer(playerid);
 		}
@@ -2225,14 +2167,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			switch(listitem)
 			{
 				case 0: ShowPlayerMenu(playerid, DIALOG_CMDS);
-				case 1:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/thelp");		
-					#else
-					SendClientMessage(playerid, -1, "Function unavaiable. Need TextureStudio");
-					#endif
-				}
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/thelp");		
 				case 2: 
 				{
 					if (GetPVarInt(playerid, "lang") == 0)
@@ -2397,9 +2332,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 3:
 				{
-					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gotoint");
-					#endif
 				}
 				case 4:
 				{
@@ -2472,7 +2405,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				case 0: 
 				{
-					#if defined TEXTURE_STUDIO
 					if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 					{
 						new param[24];
@@ -2480,48 +2412,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						format(param, sizeof(param), "/avsel %i", EDIT_VEHICLE_ID[playerid]);
 						CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
 					}
-					#else
-					if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)	{
-						EDIT_VEHICLE_ID[playerid] = GetPlayerVehicleID(playerid);
-					}
-					#endif
 				}
-				case 1: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/tcar");
-					#endif
-				}
-				case 2: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avnewcar");
-					#endif
-				}
-				case 3: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avclonecar");
-					#endif
-				}
-				case 4: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avdeletecar");
-					#endif
-				}
-				case 5: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avsetspawn");
-					#endif
-				}
-				case 6: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avexport");
-					#endif
-				}
+				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/tcar");
+				case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avnewcar");
+				case 3: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avclonecar");
+				case 4:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avdeletecar");
+				case 5: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avsetspawn");
+				case 6: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avexport");
 				case 7: RespawnAllVehicles();
 				case 8: 
 				{
@@ -3066,24 +2963,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avcarcolor");		
-					#endif
-				}
-				case 1: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avpaint");		
-					#endif
-				}
-				case 2: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avmodcar");		
-					#endif
-				}
+				case 0: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avcarcolor");		
+				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avpaint");		
+				case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avmodcar");		
 				case 3:
 				{
 					// hydraulics
@@ -3158,7 +3040,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					}
 
-					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtextures");		
 					if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
 					{
@@ -3180,32 +3061,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SendClientMessageEx(playerid, COLOR_LIME,
 					"/stop - Закончить редактирование",
 					"/stop - Finish editing");
-					#endif
 				}
-				case 1: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/stexture");		
-					#endif
-				}
-				case 2: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/text");		
-					#endif
-				}
-				case 3: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/sindex");		
-					#endif
-				}
-				case 4: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/ttextures");		
-					#endif
-				}
+				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/stexture");		
+				case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/text");		
+				case 3: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/sindex");		
+				case 4: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/ttextures");		
 				case 5:
 				{
 					if (GetPVarInt(playerid, "lang") == 0)
@@ -3221,18 +3081,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"Select", "Cancel");
 					}
 				}
-				case 6: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtreset");		
-					#endif
-				}
-				case 7:
-				{
-					#if defined TEXTURE_STUDIO
-					ShowPlayerMenu(playerid, DIALOG_TEXTUREBUFFER);
-					#endif
-				}	
+				case 6: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtreset");		
+				case 7:	ShowPlayerMenu(playerid, DIALOG_TEXTUREBUFFER);
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -3243,24 +3093,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/copy");		
-					#endif
-				}
-				case 1:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/paste");		
-					#endif
-				}
-				case 2:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/clear");		
-					#endif
-				}
+				case 0:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/copy");		
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/paste");		
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/clear");		
 			}
 		}
 		//else ShowPlayerMenu(playerid, DIALOG_TEXTUREMENU;
@@ -3271,58 +3106,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/loadmap");		
-					#endif
-				}
-				case 1: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/newmap");		
-					#endif
-				}
-				case 2:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/renamemap");		
-					#endif
-				}
-				case 3:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/importmap");		
-					#endif
-				}
-				case 4:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/export");		
-					#endif
-				}
-				case 5:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avexportall");		
-					#endif
-				}
-				case 6:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gtaobjects");		
-					#endif
-				}
-				case 7:
-				{
-					ShowPlayerMenu(playerid, DIALOG_PREFABMENU);
-				}
-				case 8: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gall");		
-					#endif
-				}
+				case 0: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/loadmap");		
+				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/newmap");		
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/renamemap");		
+				case 3:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/importmap");		
+				case 4:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/export");		
+				case 5:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avexportall");		
+				case 6:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gtaobjects");		
+				case 7:	ShowPlayerMenu(playerid, DIALOG_PREFABMENU);
+				case 8: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gall");		
 				case 9:
 				{
 					if(GetPVarInt(playerid, "lang") == 0)
@@ -3398,12 +3190,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowPlayerDialog(playerid, DIALOG_LIMITS, DIALOG_STYLE_TABLIST, "Limits",
 					tbtext,"OK","");
 				}
-				case 12:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/deletemap");		
-					#endif
-				}
+				case 12:  CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/deletemap");
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -3414,24 +3201,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gprefab");		
-					#endif
-				}
-				case 1:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/prefabsetz");		
-					#endif
-				}
-				case 2:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/prefab");		
-					#endif
-				}
+				case 0:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gprefab");		
+				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/prefabsetz");		
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/prefab");		
 			}
 		}
 	}
@@ -3451,12 +3223,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 0: ShowPlayerMenu(playerid, DIALOG_INTERFACE_SETTINGS);
 				case 1: ShowPlayerMenu(playerid, DIALOG_KEYBINDS);
 				case 2: ShowPlayerMenu(playerid, DIALOG_VEHSETTINGS);
-				case 3:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/bindeditor");
-					#endif
-				}
+				case 3:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/bindeditor");
 				case 4: ShowPlayerMenu(playerid, DIALOG_FLYMODESETTINGS);
 				case 5:
 				{
@@ -3695,11 +3462,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 1:
 				{
-					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/position");
-					#else 
-					GetPlayerCoords(playerid);
-					#endif
 					// hides overlaid text-frames
 					if(streamedObjectsTD) {
 						PlayerTextDrawHide(playerid, Objrate[playerid]);
@@ -3715,15 +3478,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					ShowPlayerMenu(playerid, DIALOG_INTERFACE_SETTINGS);
 				}
-				case 2:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/edittext3d");
-					#endif
-				}
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/edittext3d");
 				case 3:
 				{
-					#if defined TEXTURE_STUDIO
 					if(use3dTextOnObjects)
 					{
 						CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/hidetext3d");
@@ -3735,10 +3492,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					format(query,sizeof(query),
 					"UPDATE `Settings` SET Value=%d WHERE Option='use3dTextOnObjects'", use3dTextOnObjects);
 					db_query(mtoolsDB,query);
-					#else
-					SendClientMessageEx(playerid, -1, "Эта функция доступна только в TextureStudio",
-					"This feature is only available in TextureStudio");
-					#endif
 				}
 				case 4:
 				{
@@ -3797,12 +3550,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				case 0: ShowPlayerMenu(playerid, DIALOG_OBJECTSMENU);
 				case 1: ShowPlayerMenu(playerid, DIALOG_3DTEXTMENU);
-				case 2: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/textobj");
-					#endif
-				}
+				case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/textobj");
 				case 3: ShowPlayerMenu(playerid, DIALOG_CREATEPICKUP);
 				case 4: ShowMainAttachEditMenu(playerid);
 				case 5:
@@ -3819,12 +3567,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 				}
 				case 6: ShowPlayerMenu(playerid, DIALOG_ACTORS);
-				case 7: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/newmap");		
-					#endif
-				}
+				case 7: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/newmap");		
 			}
 		} 
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -3836,12 +3579,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			switch(listitem)
 			{
 				case 0: ShowPlayerMenu(playerid,DIALOG_CREATEOBJ);
-				case 1: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/lsel");
-					#endif
-				}
+				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/lsel");
 				case 2:	ShowPlayerMenu(playerid,DIALOG_OBJECTSCAT);
 				case 3: ShowPlayerMenu(playerid,DIALOG_OBJECTSSEARCH);
 				case 4:
@@ -4059,7 +3797,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		else ShowPlayerMenu(playerid, DIALOG_OBJECTSCAT);
 	}
 
-	#if defined TEXTURE_STUDIO
 	if(dialogid == DIALOG_OBJECTSCAT)
 	{
 		if(response)
@@ -4399,7 +4136,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			//TODO Add preview TD later
 		}
 	}
-	#endif
 
 	if(dialogid == DIALOG_CREATEOBJ)
 	{
@@ -4413,9 +4149,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			new param[24];
 			format(param, sizeof(param), "/cobject %d", modelid);
-			#if defined TEXTURE_STUDIO
-			CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
-			#endif
+			CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
 		}
 	}
 	if(dialogid == DIALOG_CREATE3DTEXT)
@@ -4560,97 +4294,40 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/csel");		
-					#else 
-					SelectObject(playerid);
-					#endif
-				}
-				case 1: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editobject");
-					#else 
-					EditDynamicObject(playerid, EDIT_OBJECT_ID[playerid]);
-					#endif
-				}
-				case 2:
-				{
-					ShowPlayerMenu(playerid, DIALOG_ROTATION);
-				}
+				case 0: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/csel");		
+				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editobject");
+				case 2:	ShowPlayerMenu(playerid, DIALOG_ROTATION);
 				case 3:
 				{
-					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/scsel");
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editobject");
-					#else
-					new clo_object = GetClosestDynamicObject(playerid);
-					format(string, sizeof(string), "~w~the closest ID~g~%i", clo_object);
-					SendTexdrawMessage(playerid, 2000, string);
-					EditDynamicObject(playerid, clo_object);
-					#endif
 				}
 				case 4:
 				{
-					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/clone");
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editobject");
-					#else
-					new 
-						Float: ox, Float: oy, Float: oz,
-						Float: rx, Float: ry, Float: rz,
-					;
-					GetDynamicObjectPos(EDIT_OBJECT_ID[playerid], ox, oy, oz);
-					GetDynamicObjectRot(EDIT_OBJECT_ID[playerid], rx, ry, rz);
-					CreateDynamicObject(GetDynamicObjectModel(EDIT_OBJECT_ID[playerid]),
-					ox, oy, oz, rx, ry, rz,-1,-1,-1, STREAMER_OBJECT_SD); 
-					EditDynamicObject(playerid, objectid);
-					#endif
 				}
-				case 5:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dobject");		
-					#else 
-					DestroyDynamicObject(EDIT_OBJECT_ID[playerid]);
-					#endif
-				}
+				case 5:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dobject");		
 				/*case 7:
 				{
-					#if defined TEXTURE_STUDIO
 					new param[64];
 					format(param, sizeof(param), "/minfo %i",
 					GetDynamicObjectModel(EDIT_OBJECT_ID[playerid]));
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);					
-					#endif
 				}*/
 				case 6: ShowPlayerMenu(playerid, DIALOG_TEXTUREMENU);
 				case 7: ShowPlayerMenu(playerid, DIALOG_GROUPEDIT);
 				case 8: 
 				{
-					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/undo");
-					#endif
 					SendClientMessageEx(playerid, -1, 
 					"{00FF00}>>>{FFFFFF} Возврат предыдущего действия {00FF00}/redo",
 					"{00FF00}>>>{FFFFFF} Reverting the previous action {00FF00}/redo" );
 				}
 				/*
-				case 9: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/redo");
-					#endif
-				}
+				case 9: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/redo");
 				*/
-				case 9: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/oprop");
-					#endif
-				}
+				case 9: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/oprop");
 			}
 		} else {
 			if(LAST_DIALOG[playerid] == DIALOG_MAIN) {
@@ -4667,55 +4344,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				case 0: 
 				{
-					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gsel");		
 					SELECTION_MODE[playerid] = 4;
-					#else 
-					SelectObject(playerid);
-					#endif
 				}
-				case 1: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/setgroup");
-					#endif
-				}
-				case 2: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/selectgroup");
-					#endif
-				}
-				case 3: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editgroup");
-					#endif
-				}
-				case 4: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclone");
-					#endif
-				}
-				case 5: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclear");
-					#endif
-				}
-				case 6: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gdelete");
-					#endif
-				}
-				case 7: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/obmedit");
-					#endif
-				}
+				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/setgroup");
+				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/selectgroup");
+				case 3: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editgroup");
+				case 4: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclone");
+				case 5: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclear");
+				case 6: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gdelete");
+				case 7: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/obmedit");
 			}
 		}
 	}
@@ -4725,26 +4363,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0: 
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dobject");		
-					#else 
-					DestroyDynamicObject(EDIT_OBJECT_ID);
-					#endif
-				}
-				case 1:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dcsel");		
-					#endif
-				}
+				case 0: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dobject");		
+				case 1:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dcsel");		
 				case 2: 
 				{
-					#if defined TEXTURE_STUDIO
-						SendClientMessage(playerid, COLOR_GREY, "not available for demo version");
-					#else
-					
+					SendClientMessage(playerid, COLOR_GREY, "not available for demo version");
 					if (GetPVarInt(playerid, "lang") == 1) {
 						ShowPlayerDialog(playerid, DIALOG_RANGEDEL, DIALOG_STYLE_INPUT, "/rangedel",
 						"{FFFFFF}This action {FF0000}delete all{FFFFFF} in the specified radius. Enter radius:\n",
@@ -4754,7 +4377,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"{FF0000}Удалить все{FFFFFF} объекты в радиусе. Ввдеите радиус:\n",
 						"Удалить"," < ");
 					}
-					#endif
 				}
 				case 3: ShowPlayerDialog(playerid, DIALOG_REMDEFOBJECT, DIALOG_STYLE_INPUT,
 				"/remobject", "{FFFFFF}Delete default objects by index.\nEnter index:","Delete","<");
@@ -4763,11 +4385,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					#if defined _streamer_included
 					if(EDIT_OBJECT_ID[playerid] != 0)
 					{
-						#if defined TEXTURE_STUDIO
 						new param[64];
 						format(param, sizeof(param), "/dobject %i", EDIT_OBJECT_ID[playerid]);
 						CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
-						#endif
 					} else {
 						SendClientMessageEx(playerid, COLOR_GREY,
 						"Не найден последний созданный объект",
@@ -4789,14 +4409,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						#endif
 					#endif
 				}
-				case 5:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/undo");		
-					#else
-					SendClientMessage(playerid, -1, "Function unavaiable. Need TextureStudio");
-					#endif
-				}
+				case 5:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/undo");		
 				case 6:
 			 	{ 
 					ShowPlayerDialog(playerid, DIALOG_CLEARTEMPFILES, DIALOG_STYLE_MSGBOX, "",
@@ -4823,24 +4436,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if(!isnull(inputtext) && isNumeric(inputtext))
 			{
-				#if defined TEXTURE_STUDIO
 				new param[64];
 				format(param, sizeof(param), "/remobject %i", strval(inputtext));
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
-				#endif
 			}
 		}
 	}
 	if(dialogid == DIALOG_ASKDELETE)
 	{
-		if(response)
-		{
-			#if defined TEXTURE_STUDIO
-			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dobject");
-			#else
-		    DestroyDynamicObject(objectid);
-			#endif
-		}
+		if(response) CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dobject");
 	}
 	if(dialogid == DIALOG_ROTSET)
 	{
@@ -4869,11 +4473,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						RotZ+=strval(inputtext);
 					}
 				}
-				#if defined TEXTURE_STUDIO
+				
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
-				#else				
-				SetDynamicObjectRot(EDIT_OBJECT_ID[playerid], RotX, RotY, RotZ);
-				#endif
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_ROTATION);
@@ -4900,26 +4501,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SetPVarInt(playerid, "RotAxis",3);
 					ShowPlayerMenu(playerid, DIALOG_ROTSET);
 				}
-				case 4:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/pivot");
-					#endif
-				}
-				case 5:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/togpivot");
-					#endif
-				}
-				case 6:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/rotreset");
-					#else
-					SetDynamicObjectRot(EDIT_OBJECT_ID[playerid], 0,0,0);
-					#endif
-				}
+				case 4:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/pivot");
+				case 5:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/togpivot");
+				case 6:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/rotreset");
 				case 7:
 				{
 					SendClientMessageEx(playerid, COLOR_LIME,
@@ -5055,12 +4639,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		if(response)
 		{
 			if(GetPlayerState(playerid) != PLAYER_STATE_SPECTATING) {
-				#if defined TEXTURE_STUDIO
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
-				#else
-				SendClientMessageEx(playerid, COLOR_GREY,
-				"Вы должны быть в режиме наблюдения!", "You should be in spectator mode");
-				#endif
 			}
 
 			switch(listitem)
@@ -5252,12 +4831,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						PlayerSpectateVehicle (playerid, vehicleid, SPECTATE_MODE_SIDE);
 					}*/
 				}
-				case 4:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/ogoto");
-					#endif
-				}
+				case 4:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/ogoto");
 				case 5:
 				{
 					//Attach camera to vehicle
@@ -5295,9 +4869,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					Vehcam[playerid] = 0; // Fix vehcam
 					if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
 					{
-						#if defined TEXTURE_STUDIO
 						CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
-						#endif
 					} else {
 						if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)	{
 							TogglePlayerSpectating (playerid, 0);
@@ -5358,9 +4930,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 4:
 				{
-					#if defined TEXTURE_STUDIO
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/fmtoggle");
-					#endif
 				}
 			}
 		} else {
@@ -5377,9 +4947,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			new param[64];
 			format(param, sizeof(param), "/fmaccel %s", inputtext);
-			#if defined TEXTURE_STUDIO
 			CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
-			#endif
 		}
 	}
 	if(dialogid == DIALOG_FMSPEED)
@@ -5389,9 +4957,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			//if(strval(inputtext) <= 5 && strval(inputtext) >= 500)
 			new param[64];
 			format(param, sizeof(param), "/fmspeed %s", inputtext);
-			#if defined TEXTURE_STUDIO
 			CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
-			#endif
 		}
 	}
 	if(dialogid == DIALOG_CAMSET)
@@ -5400,12 +4966,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
-					#endif
-				}
+				case 0: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
 				case 1: FirstPersonMode(playerid);
 				case 2: GivePlayerWeapon(playerid, 43, 100);
 				case 3: 
@@ -5503,14 +5064,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0:
-				{
-					#if defined TEXTURE_STUDIO
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/csel");		
-					#else 
-					SelectObject(playerid);
-					#endif
-				}
+				case 0: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/csel");		
 				case 1:
 				{
 					new Float: x, Float: y, Float: z;
@@ -5773,9 +5327,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new param[64];
 				format(param, sizeof(param), "/osearch %s", inputtext);
-				#if defined TEXTURE_STUDIO
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
-				#endif
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY,
 				"Неверное значение", "Incorrect value");
@@ -5790,9 +5342,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new param[64];
 				format(param, sizeof(param), "/minfo %s", inputtext);
-				#if defined TEXTURE_STUDIO
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
-				#endif
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY,
 				"Неверное значение", "Incorrect value");
@@ -5807,9 +5357,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new param[64];
 				format(param, sizeof(param), "/tsearch %s", inputtext);
-				#if defined TEXTURE_STUDIO
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
-				#endif
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY,
 				"Неверное значение", "Incorrect value");
@@ -6035,9 +5583,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				GetPlayerPos(playerid, pos[0],pos[1],pos[2]);
 				PlayerPlaySound(playerid, Value, pos[0], pos[1], pos[2]);
 			}
-			#if defined TEXTURE_STUDIO
 			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/cobject 2226");
-			#endif
 		}
 	}
 	if(dialogid == DIALOG_3DTEXTMENU)
@@ -7819,12 +7365,11 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_CAMINTERPOLATE:
 		{
-			#if defined TEXTURE_STUDIO
 			if(GetPlayerState(playerid) != PLAYER_STATE_SPECTATING)
 			{
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
 			}
-			#endif
+			
 			if (GetPVarInt(playerid, "lang") == 0)
 			{
 				ShowPlayerDialog(playerid, DIALOG_CAMINTERPOLATE, DIALOG_STYLE_LIST,
@@ -8347,16 +7892,14 @@ stock AutoRotateObject(playerid, objectid)
 	RotX = RotateAngle(RotX);
 	RotY = RotateAngle(RotY);
 	RotZ = RotateAngle(RotZ);
-	#if defined TEXTURE_STUDIO
+	
 	format(param, sizeof(param), "/ox %f", RotX);
 	CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
 	format(param, sizeof(param), "/oy %f", RotY);
 	CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
 	format(param, sizeof(param), "/oz %f", RotZ);
 	CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
-	#else
-	SetDynamicObjectRot(objectid, RotX, RotY, RotZ);
-	#endif
+	
 }
 
 stock GetClosestDynamicObject(playerid)
@@ -8457,14 +8000,10 @@ stock CreateDynamicObjectByModelid(playerid, modelid)
 	GetPlayerPos(playerid, playerpos[0], playerpos[1], playerpos[2]);
 	new param[24];
 	format(param, sizeof(param), "/cobject %d", modelid);
-	#if defined TEXTURE_STUDIO
+	
 	CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
 	LAST_OBJECT_ID[playerid] = Streamer_GetUpperBound(STREAMER_TYPE_OBJECT) -1;
-	#else
-	new objectid = CreateDynamicObject(modelid, playerpos[0]+1, playerpos[1]+1, playerpos[2]+1,
-	0.0, 0.0, 0.0, -1, -1, -1, 200.0);
-	LAST_OBJECT_ID[playerid] = objectid;
-	#endif
+	
 	/*
 	if(originalcoords){
 		id = CreateDynamicObject(modelid, playerpos[0]+1, playerpos[1]+1,
@@ -8759,15 +8298,11 @@ public DeleteObjectsInRange(playerid, Float:range)
 			GetDynamicObjectPos(objectid, x,y,z);
 			if(IsPlayerInRangeOfPoint(playerid, range, x, y, z))
 			{
-				#if defined TEXTURE_STUDIO
 				new param[24], param2[24];
 				format(param, sizeof(param), "/sel %d", objectid);
 				format(param2, sizeof(param2), "/dobject %d", objectid);
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);	
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, param2);	
-				#else
-				DestroyDynamicObject(objectid);
-				#endif
 			}
 		}
 	}
@@ -9363,9 +8898,7 @@ public MtoolsHudToggle(playerid)
 		PlayerTextDrawHide(playerid, FPSBAR[playerid]);
 		PlayerTextDrawHide(playerid, TDAIM[playerid]);
 		PlayerTextDrawHide(playerid, Logo[playerid]);
-		#if defined TEXTURE_STUDIO
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/logo");
-		#endif
 		SendClientMessageEx(playerid, -1, 
 		"Все текстдравы и худ игрока были временно скрыты",
 		"All textdraws and player hud have been temporarily hidden");
@@ -9378,9 +8911,7 @@ public MtoolsHudToggle(playerid)
 			PlayerTextDrawShow(playerid, TDAIM[playerid]);
 		}
 		PlayerTextDrawShow(playerid, Logo[playerid]);
-		#if defined TEXTURE_STUDIO
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/logo");
-		#endif
 		SendClientMessageEx(playerid, -1, 
 		"Все текстдравы и худ игрока были восстановлены",
 		"All text and player skin have been restored");
