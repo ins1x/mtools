@@ -25,6 +25,7 @@ plugins crashdetect sscanf streamer filemanager
 > Note: mtools is connected after tstudio (server.cfg)  
 
 ## Requirements
+* Use the [Zeex's improved compiler](https://github.com/pawn-lang/compiler) to compile this filterscript!
 * [SA:MP 0.3.7 R2 server](https://www.sa-mp.com/download.php) or highter (DL not requred)
 * [Incognito Streamer plugin v2.7 - 2.9.4](https://github.com/samp-incognito/samp-streamer-plugin/releases)
 * **mtools** works correctly with  *[Texture Studio 2.0](https://vk.com/tip_mapper?w=page-89889560_49251374)* and above
