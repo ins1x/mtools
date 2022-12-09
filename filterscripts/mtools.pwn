@@ -6489,7 +6489,7 @@ public OnScriptUpdate()
 	// used to optimize some functions instead of  OnPlayerUpdate
 	// OnScriptUpdate - interval: 500 ms
 
-	SendRconCommand("gamemodetext mtools  "#BUILD_DATE" ");
+	SendRconCommand("gamemodetext mtools  "#VERSION" ");
 
 	foreach(new i : Player)
 	{
