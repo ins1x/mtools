@@ -29,8 +29,9 @@ plugins crashdetect sscanf streamer filemanager
 * **mtools** works correctly with  *[Texture Studio 2.0](https://vk.com/tip_mapper?w=page-89889560_49251374)* and above
 
 ## **[Wiki](https://github.com/ins1x/mtools/wiki)**
-:gb: [Mtools English wiki](https://github.com/ins1x/mtools/wiki) :ru: [Mtools Russian wiki](https://github.com/ins1x/mtools/wiki/Home-%5BRus%5D)  
-[Texture Studio wiki](https://github.com/Crayder/Texture-Studio/wiki/Using-Texture-Studio)  
+* :gb: [Mtools English wiki](https://github.com/ins1x/mtools/wiki)
+* :ru: [Mtools Russian wiki](https://github.com/ins1x/mtools/wiki/Home-%5BRus%5D)  
+* [Texture Studio wiki](https://github.com/Crayder/Texture-Studio/wiki/Using-Texture-Studio)  
 
 ## Disclaimer
 
