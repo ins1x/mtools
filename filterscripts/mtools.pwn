@@ -26,7 +26,7 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.23"
+#define VERSION              	"0.3.24"
 #define BUILD_DATE             	__date
 
 #define DIALOG_MAIN 				6001
@@ -70,13 +70,7 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_ACTORCREATE			6039
 #define DIALOG_ACTORANIMLIB			6040
 #define DIALOG_ACTORANIMNAME		6041
-#define DIALOG_PLAYERATTACHMAIN		6042
-#define DIALOG_ATPINDEX_SELECT		6043
-#define DIALOG_ATPMODEL_SELECT		6044
-#define DIALOG_ATPBONE_SELECT		6045
-#define DIALOG_ATPCOORD_INPUT		6046
-#define DIALOG_VAE					6047
-#define DIALOG_VAENEW				6048
+// empty 6042 - 6048
 #define DIALOG_CREATEPICKUP_BYNUM	6049
 #define DIALOG_OBJECTSMENU			6050
 #define DIALOG_FAVORITES			6051
@@ -328,8 +322,6 @@ forward OnScriptUpdate(); // 0,5 sec timer (replace OnPlayerUpdtae)
 forward ShowPlayerMenu(playerid, dialogid); // mtools main menu
 forward DeleteObjectsInRange(playerid, Float:range);
 forward SpawnNewVehicle(playerid, vehiclemodel); //spawn new veh by id
-forward VaeUnDelay(target); // vae delay timer
-forward VaeGetKeys(playerid); // vae keys hook
 forward SurflyMode(playerid); // switch on/off surfly
 forward Surfly(playerid); // timer
 forward SetPlayerLookAt(playerid,Float:x,Float:y); // cam set look at point
@@ -396,110 +388,6 @@ enum oMovData
 }
 
 new Float:ObjectsMoveData[MAX_PLAYERS][oMovData];
-// VAE Vehicle attachments editor
-enum playerSets
-{
-	Float:OffSetX,
-	Float:OffSetY,
-	Float:OffSetZ,
-	Float:OffSetRX,
-	Float:OffSetRY,
-	Float:OffSetRZ,
-	obj,
-	EditStatus,
-	bool: delay,
-	lr,
-	VehicleID,
-	objmodel,
-	timer
-}
-
-new Float:VaeData[MAX_PLAYERS][playerSets];
-
-const vaeFloatX =  1;
-const vaeFloatY =  2;
-const vaeFloatZ =  3;
-const vaeFloatRX = 4;
-const vaeFloatRY = 5;
-const vaeFloatRZ = 6;
-const vaeModel   = 7;
-// END vae
-
-// attachobjectseditor
-enum
-{
-	Float:ATPCOORD_X,
-	Float:ATPCOORD_Y,
-	Float:ATPCOORD_Z
-}
-enum
-{
-	ATPPOS_OFFSET_X,
-	ATPPOS_OFFSET_Y,
-	ATPPOS_OFFSET_Z,
-	ROT_OFFSET_X,
-	ROT_OFFSET_Y,
-	ROT_OFFSET_Z,
-	ATPSCALE_X,
-	ATPSCALE_Y,
-	ATPSCALE_Z
-}
-
-new AttachmentBones[18][15] =
-{
-	{"Спина"},
-	{"Голова"},
-	{"Л. плечо"},
-	{"Пр. плечо"},
-	{"Л. кисть"},
-	{"Пр. кисть"},
-	{"Л. бедро"},
-	{"Пр. бедро"},
-	{"Л. стопа"},
-	{"Пр. стопа"},
-	{"Пр. голень"},
-	{"Л. голень"},
-	{"Л. предплечье"},
-	{"Пр. предплечье"},
-	{"Л. ключица"},
-	{"Пр. ключица"},
-	{"Шея"},
-	{"Челюсть"}
-};
-
-new AttachmentBonesEN[18][15] =
-{
-	{"Back"},
-	{"Head"},
-	{"L. shoulder"},
-	{"Right shoulder"},
-	{"L. Brush"},
-	{"Ex. Brush"},
-	{"L. thigh"},
-	{"Right thigh"},
-	{"L. stop"},
-	{"Right stop"},
-	{"Right shin"},
-	{"L. shin"},
-	{"L. forearm"},
-	{"R. forearm"},
-	{"L. collarbone"},
-	{"R. collarbone"},
-	{"Neck"},
-	{"Jaw"}
-};
-
-new
-bool:	gEditingAttachments		[MAX_PLAYERS],
-		gCurrentAttachIndex		[MAX_PLAYERS],
-bool:	gIndexUsed				[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS],
-		gIndexModel				[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS],
-		gIndexBone				[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS],
-Float:	gIndexPos				[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][3],
-Float:	gIndexRot				[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][3],
-Float:	gIndexSca				[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][3],
-		gCurrentAxisEdit		[MAX_PLAYERS];
-// END attachobjectseditor
 
 // Actors
 new indexActor = 0, animactordatalib[32], animactordataname[32];
@@ -658,15 +546,6 @@ public OnFilterScriptInit()
 		mtoolsRcon = true;
 	}
 
-	// vae init
-	for(new i = 0; i < MAX_PLAYERS; ++i)
-	{
-		if(IsPlayerConnected(i))
-		{
-			VaeData[i][timer] = -1;
-			VaeData[i][obj] =  -1;
-		}
-	}
 	// server version checker
 	new server_version[64];
     GetConsoleVarAsString("version", server_version, sizeof(server_version));
@@ -798,7 +677,6 @@ public OnPlayerConnect(playerid)
 	// vars init
 	SetPVarInt(playerid,"lang",LangSet); // Lang 0 - RU Lang 1 - EN
 	SetPVarInt(playerid,"hud",1); // toggle all internal textdraws 
-	SetPVarInt(playerid,"freezed",0); //used in VAE
 	SetPVarInt(playerid,"specbar",-1);  //toggle debug(spec) bar
 	SetPVarInt(playerid,"Firstperson",0); // toggle first person mod
 	SetPVarInt(playerid,"LightsStatus",0); // vehicle lights
@@ -812,8 +690,6 @@ public OnPlayerConnect(playerid)
 	SetPlayerWeather(playerid,2); 
 	SetPVarInt(playerid,"Weather",2);
 	
-	VaeData[playerid][timer] = -1;
-	VaeData[playerid][obj] =  -1;
 	EDIT_OBJECT_ID[playerid] = -1;
 	EDIT_VEHICLE_ID[playerid] = -1;
 	SELECTION_MODE[playerid] = 0;
@@ -1015,19 +891,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			RepairVehicle(GetPlayerVehicleID(playerid));
 		}
 	}
-	// Open vae menu on player attemp exit from veh
-	if(GetPVarInt(playerid, "VaeEdit") > 0)
-	{
-		if(newkeys == KEY_SECONDARY_ATTACK) // ENTER
-		{
-			TogglePlayerControllable(playerid, false);
-			SetPVarInt(playerid,"freezed",1);
-			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) {
-				PutPlayerInVehicle(playerid, PlayerVehicle[playerid], 0);
-			}
-			ShowPlayerMenu(playerid, DIALOG_VAE);
-		}
-	}
 	// Start/stop flymode on F/ENTER
 	if(newkeys == KEY_SECONDARY_ATTACK) // ENTER
 	{
@@ -1105,155 +968,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		if(cSelector) CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/csel");		
 	}
 	return 1;
-}
-
-public VaeGetKeys(playerid)
-{
-	new Keys, ud, gametext[36], Float: toAdd;
-	
-    GetPlayerKeys(playerid,Keys,ud,VaeData[playerid][lr]);    
-	switch(Keys)
-	{
-		case KEY_FIRE:   toAdd = 0.000500;		
-		default:         toAdd = 0.005000;
-	}	
-    if(VaeData[playerid][lr] == 128)
-    {
-        switch(VaeData[playerid][EditStatus])
-        {
-            case vaeFloatX:
-            {
-                VaeData[playerid][OffSetX] = floatadd(VaeData[playerid][OffSetX], toAdd);
-                format(gametext, 36, "offsetx: ~w~%f", VaeData[playerid][OffSetX]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeFloatY:
-            {
-                VaeData[playerid][OffSetY] = floatadd(VaeData[playerid][OffSetY], toAdd);
-                format(gametext, 36, "offsety: ~w~%f", VaeData[playerid][OffSetY]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeFloatZ:
-            {
-                VaeData[playerid][OffSetZ] = floatadd(VaeData[playerid][OffSetZ], toAdd);
-                format(gametext, 36, "offsetz: ~w~%f", VaeData[playerid][OffSetZ]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeFloatRX:
-            {
-				if(Keys == 0) VaeData[playerid][OffSetRX] = floatadd(VaeData[playerid][OffSetRX],
-				floatadd(toAdd, 1.000000));	
-				else VaeData[playerid][OffSetRX] = floatadd(VaeData[playerid][OffSetRX],
-				floatadd(toAdd,0.100000));					                			
-                format(gametext, 36, "offsetrx: ~w~%f", VaeData[playerid][OffSetRX]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeFloatRY:
-            {
-            	if(Keys == 0) VaeData[playerid][OffSetRY] = floatadd(VaeData[playerid][OffSetRY],
-				floatadd(toAdd, 1.000000));	
-				else VaeData[playerid][OffSetRY] = floatadd(VaeData[playerid][OffSetRY],
-				floatadd(toAdd,0.100000));	
-            	format(gametext, 36, "offsetry: ~w~%f", VaeData[playerid][OffSetRY]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeFloatRZ:
-            {
-                if(Keys == 0) VaeData[playerid][OffSetRZ] = floatadd(VaeData[playerid][OffSetRZ],
-				floatadd(toAdd, 1.000000));	
-				else VaeData[playerid][OffSetRZ] = floatadd(VaeData[playerid][OffSetRZ],
-				floatadd(toAdd,0.100000));	
-                format(gametext, 36, "offsetrz: ~w~%f", VaeData[playerid][OffSetRZ]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeModel:
-            {
-                SetTimerEx("VaeUnDelay", 1000, false, "d", playerid);
-                if(VaeData[playerid][delay]) return 1;
-                DestroyObject(VaeData[playerid][obj]);
-                VaeData[playerid][obj] = CreateObject(VaeData[playerid][objmodel]++,
-				0.0, 0.0, -10.0, -50.0, 0, 0, 0);
-                format(gametext, 36, "model: ~w~%d", VaeData[playerid][objmodel]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-				VaeData[playerid][delay] = true;
-            }
-		}
-		AttachObjectToVehicle(VaeData[playerid][obj], VaeData[playerid][VehicleID],
-		VaeData[playerid][OffSetX], VaeData[playerid][OffSetY], VaeData[playerid][OffSetZ],
-		VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ]);
-	}
-	else if(VaeData[playerid][lr] == -128)
-	{
-	    switch(VaeData[playerid][EditStatus])
-        {
-            case vaeFloatX:
-            {
-                VaeData[playerid][OffSetX] = floatsub(VaeData[playerid][OffSetX], toAdd);
-                format(gametext, 36, "offsetx: ~w~%f", VaeData[playerid][OffSetX]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeFloatY:
-            {
-                VaeData[playerid][OffSetY] = floatsub(VaeData[playerid][OffSetY], toAdd);
-                format(gametext, 36, "offsety: ~w~%f", VaeData[playerid][OffSetY]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeFloatZ:
-            {
-                VaeData[playerid][OffSetZ] = floatsub(VaeData[playerid][OffSetZ], toAdd);
-                format(gametext, 36, "offsetz: ~w~%f", VaeData[playerid][OffSetZ]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeFloatRX:
-            {
-				if(Keys == 0) VaeData[playerid][OffSetRX] = floatsub(VaeData[playerid][OffSetRX],
-				floatadd(toAdd, 1.000000));	
-				else VaeData[playerid][OffSetRX] = floatsub(VaeData[playerid][OffSetRX],
-				floatadd(toAdd,0.100000));			
-                format(gametext, 36, "offsetrx: ~w~%f", VaeData[playerid][OffSetRX]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeFloatRY:
-            {
-            	if(Keys == 0) VaeData[playerid][OffSetRY] = floatsub(VaeData[playerid][OffSetRY],
-				floatadd(toAdd, 1.000000));	
-				else VaeData[playerid][OffSetRY] = floatsub(VaeData[playerid][OffSetRY],
-				floatadd(toAdd,0.100000));	
-            	format(gametext, 36, "offsetry: ~w~%f", VaeData[playerid][OffSetRY]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeFloatRZ:
-            {
-                if(Keys == 0) VaeData[playerid][OffSetRZ] = floatsub(VaeData[playerid][OffSetRZ],
-				floatadd(toAdd, 1.000000));	
-				else VaeData[playerid][OffSetRZ] = floatsub(VaeData[playerid][OffSetRZ],
-				floatadd(toAdd,0.100000));	
-                format(gametext, 36, "offsetrz: ~w~%f", VaeData[playerid][OffSetRZ]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-            }
-            case vaeModel:
-            {
-                SetTimerEx("VaeUnDelay", 1000, false, "d", playerid);
-                if(VaeData[playerid][delay]) return 1;
-                DestroyObject(VaeData[playerid][obj]);
-                VaeData[playerid][obj] = CreateObject(VaeData[playerid][objmodel]--,
-				0.0, 0.0, -10.0, -50.0, 0, 0, 0);
-                format(gametext, 36, "model: ~w~%d", VaeData[playerid][objmodel]);
-				GameTextForPlayer(playerid, gametext, 1000, 3);
-				VaeData[playerid][delay] = true;
-            }
-		}
-		AttachObjectToVehicle(VaeData[playerid][obj], VaeData[playerid][VehicleID],
-		VaeData[playerid][OffSetX], VaeData[playerid][OffSetY], VaeData[playerid][OffSetZ],
-		VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ]);
-	}
-    return 1;
-}
-
-public VaeUnDelay(target)
-{
-    VaeData[target][delay] = false;
-    return 1;
 }
 
 #if defined _streamer_included
@@ -1481,47 +1195,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		return SendClientMessageEx(playerid, -1,
 		"Раскраска успешно удалена.", "Paintjob successfully deleted");
 	}
-	// vae
-	if(!strcmp("/vae", cmd, true))
-	{
-		// if no object selected
-		if(VaeData[playerid][obj] == -1)
-		{
-			ShowPlayerDialog(playerid, DIALOG_VAENEW, DIALOG_STYLE_INPUT, "VAE New attach", 
-			"specify the object model to attach to the vehicle.\
-			(For example minigun: 362)\nEnter model id:", ">>>","Cancel");
-		} else {
-			ShowPlayerMenu(playerid, DIALOG_VAE);
-		}
-		return true;
-	}
-	if(!strcmp("/vaestop", cmd, true))
-	{
-		KillTimer(VaeData[playerid][timer]);
-		return SendClientMessageEx(playerid, -1, "Редактирование закончено.", "Editing is complete");
-	}
-	if(!strcmp("/vaesave", cmd, true))
-	{		
-		tmp = strtok(cmdtext, idx);
-		new File: file = fopen("mtools/Vaeditions.txt", io_append);
-		new str[200];
-		format(str, 200, "\r\nAttachObjectToVehicle(objectid, vehicleid, %f, %f, %f, %f, %f, %f); //Object Model: %d | %s",
-		VaeData[playerid][OffSetX], VaeData[playerid][OffSetY], VaeData[playerid][OffSetZ],
-		VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ],
-		VaeData[playerid][objmodel], tmp);
-		fwrite(file, str);
-		fclose(file);
-		return SendClientMessageEx(playerid, -1, "Всё сохранено в \"vaeditions.txt\".", "Saved to \"vaeditions.txt\".");
-	}
-	if(!strcmp("/vaemodel", cmd, true))
-	{
-		//VaeData[playerid][EditStatus] = vaeModel;
-		SendClientMessage(playerid, -1, "Editing Object Model.");
-		ShowPlayerDialog(playerid, DIALOG_VAENEW, DIALOG_STYLE_INPUT,
-		"VAE New attach", "specify the object model to attach to the vehicle.\
-		(For example minigun: 362)\nEnter model id:", ">>>","Cancel");
-	}
-	// END vae
 	if(!strcmp(cmdtext, "/drunk", true))
     {	
 		tmp = strtok(cmdtext, idx);
@@ -3552,22 +3225,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1: ShowPlayerMenu(playerid, DIALOG_3DTEXTMENU);
 				case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/textobj");
 				case 3: ShowPlayerMenu(playerid, DIALOG_CREATEPICKUP);
-				case 4: ShowMainAttachEditMenu(playerid);
-				case 5:
-				{
-					// if no object selected
-					if(VaeData[playerid][obj] == -1)
-					{
-						ShowPlayerDialog(playerid, DIALOG_VAENEW, DIALOG_STYLE_INPUT, "VAE New attach", 
-						"specify the object model to attach to the vehicle.\
-						(For example minigun: 362)\nEnter model id:",
-						">>>","Cancel");
-					} else {
-						ShowPlayerMenu(playerid, DIALOG_VAE);
-					}
-				}
-				case 6: ShowPlayerMenu(playerid, DIALOG_ACTORS);
-				case 7: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/newmap");		
+				case 4: ShowPlayerMenu(playerid, DIALOG_ACTORS);
+				case 5: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/newmap");		
 			}
 		} 
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -5891,96 +5550,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		}
 		else ShowPlayerMenu(playerid, DIALOG_ACTORS);
 	}
-	if(dialogid == DIALOG_PLAYERATTACHMAIN)
-	{
-		if(response)
-		{
-			switch(listitem)
-			{
-				case 00:ShowIndexList(playerid);
-				case 01:ShowModelInput(playerid);
-				case 02:ShowBoneList(playerid);
-				case 03:EditAttachCoord(playerid, ATPPOS_OFFSET_X);
-				case 04:EditAttachCoord(playerid, ATPPOS_OFFSET_Y);
-				case 05:EditAttachCoord(playerid, ATPPOS_OFFSET_Z);
-				case 06:EditAttachCoord(playerid, ROT_OFFSET_X);
-				case 07:EditAttachCoord(playerid, ROT_OFFSET_Y);
-				case 08:EditAttachCoord(playerid, ROT_OFFSET_Z);
-				case 09:EditAttachCoord(playerid, ATPSCALE_X);
-				case 10:EditAttachCoord(playerid, ATPSCALE_Y);
-				case 11:EditAttachCoord(playerid, ATPSCALE_Z);
-				case 12:EditAttachment(playerid);
-				case 13:ClearCurrentIndex(playerid);
-				case 14:SaveAttachedObjects(playerid);
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_CREATEMENU);
-	}
-	if(dialogid == DIALOG_ATPINDEX_SELECT)
-	{
-		if(response)
-		{
-			gCurrentAttachIndex[playerid] = listitem;
-			ShowMainAttachEditMenu(playerid);
-		}
-		else ShowMainAttachEditMenu(playerid);
-
-		return 1;
-	}
-	if(dialogid == DIALOG_ATPMODEL_SELECT)
-	{
-		if(response)
-		{
-			gIndexModel[playerid][gCurrentAttachIndex[playerid]] = strval(inputtext);
-			ShowMainAttachEditMenu(playerid);
-		}
-		else ShowMainAttachEditMenu(playerid);
-	}
-
-	if(dialogid == DIALOG_ATPBONE_SELECT)
-	{
-		if(response)
-		{
-			gIndexBone[playerid][gCurrentAttachIndex[playerid]] = listitem + 1;
-			ShowMainAttachEditMenu(playerid);
-		}
-		else ShowMainAttachEditMenu(playerid);
-	}
-	if(dialogid == DIALOG_ATPCOORD_INPUT)
-	{
-		if(response)
-		{
-			new Float:value = floatstr(inputtext);
-
-			switch(gCurrentAxisEdit[playerid])
-			{
-				case ATPPOS_OFFSET_X:  gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X] = value;
-				case ATPPOS_OFFSET_Y:  gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y] = value;
-				case ATPPOS_OFFSET_Z:  gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z] = value;
-				case ROT_OFFSET_X:  gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X] = value;
-				case ROT_OFFSET_Y:  gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y] = value;
-				case ROT_OFFSET_Z:  gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z] = value;
-				case ATPSCALE_X:       gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X] = value;
-				case ATPSCALE_Y:       gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y] = value;
-				case ATPSCALE_Z:       gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z] = value;
-			}
-
-			SetPlayerAttachedObject(playerid,
-			gCurrentAttachIndex[playerid],
-			gIndexModel[playerid][gCurrentAttachIndex[playerid]],
-			gIndexBone[playerid][gCurrentAttachIndex[playerid]],
-			gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-			gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-			gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-			gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-			gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-			gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-			gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-			gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-			gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z]);
-		}
-		ShowMainAttachEditMenu(playerid);
-	}
 	if(dialogid == DIALOG_WEAPONS)
 	{	
 		if(response)
@@ -6142,165 +5711,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			GiveWeaponsToAllPlayers(9, weapons[listitem], 9999);
 		}
 		else ShowPlayerMenu(playerid, DIALOG_WEAPONS);
-	}
-	if(dialogid == DIALOG_VAE)
-	{	
-		if(response)
-		{
-			switch(listitem)
-			{
-				case 0:
-				{
-					//VaeData[playerid][EditStatus] = vaeModel;
-					if (GetPVarInt(playerid, "lang") == 0)
-					{
-						ShowPlayerDialog(playerid, DIALOG_VAENEW, DIALOG_STYLE_INPUT,
-						"VAE New attach", "Введите ID модели объекта для прикрепления на транспорт.\
-						(Например minigun: 362)\nВведите ID:",
-						">>>","Cancel");
-					} else {
-						ShowPlayerDialog(playerid, DIALOG_VAENEW, DIALOG_STYLE_INPUT,
-						"VAE New attach", "specify the object model to attach to the vehicle.\
-						(For example minigun: 362)\nEnter model id:",
-						">>>","Cancel");
-					}
-					//SendClientMessage(playerid, -1, "Editing Object Model.");
-				}
-				case 1:
-				{
-					VaeData[playerid][EditStatus] = vaeFloatX;
-					SendClientMessageEx(playerid, -1,
-					"Редактирование оси X.","X axis editing.");
-				}
-				case 2:
-				{
-					VaeData[playerid][EditStatus] = vaeFloatY;
-					SendClientMessageEx(playerid, -1,
-					"Редактирование оси Y.","Y axis editing.");
-				}
-				case 3:
-				{
-					VaeData[playerid][EditStatus] = vaeFloatZ;
-					SendClientMessageEx(playerid, -1,
-					"Редактирование оси Z.", "Z axis editing.");
-				}
-				case 4:
-				{
-					VaeData[playerid][EditStatus] = vaeFloatRX;
-					SendClientMessageEx(playerid, -1,
-					"Редактирование оси RX.", "RX axis editing.");
-				}
-				case 5:
-				{
-					VaeData[playerid][EditStatus] = vaeFloatRY;
-					SendClientMessageEx(playerid, -1,
-					 "Редактирование оси RY.", "RY axis editing.");
-				}
-				case 6:
-				{
-					VaeData[playerid][EditStatus] = vaeFloatRZ;
-					SendClientMessageEx(playerid, -1,
-					"Редактирование оси RZ.", "RZ axis editing.");
-				}
-				case 7:
-				{
-					VaeData[playerid][OffSetX]  = 0.0;
-					VaeData[playerid][OffSetY]  = 0.0;
-					VaeData[playerid][OffSetZ]  = 0.0;
-					VaeData[playerid][OffSetRX] = 0.0;
-					VaeData[playerid][OffSetRY] = 0.0;
-					VaeData[playerid][OffSetRZ] = 0.0;
-					SendClientMessageEx(playerid, -1,
-					"Значения XYZ и осей сброшены", "Reset XYZ and adjustment");
-					ShowPlayerMenu(playerid, DIALOG_VAE);
-				}
-				case 8:
-				{
-					if(GetPVarInt(playerid, "freezed") > 0)
-					{
-						TogglePlayerControllable(playerid, true);
-						SetPVarInt(playerid,"freezed",0);
-						SendClientMessageEx(playerid, -1, "Вы размороженны","You are unfreezed");
-					} else {
-						TogglePlayerControllable(playerid, false);
-						SetPVarInt(playerid,"freezed",1);
-						SendClientMessageEx(playerid, -1, "Вы замороженны","You are freezed");
-					}
-				}
-				case 9:
-				{
-					KillTimer(VaeData[playerid][timer]);
-					TogglePlayerControllable(playerid, true);
-					SetPVarInt(playerid,"freezed",0);
-					DeletePVar(playerid, "VaeEdit");
-					SendClientMessageEx(playerid, -1,
-					"Редактирование закончено.", "Finish vae edit");
-				}
-				case 10:
-				{
-					new File: file = fopen("mtools/Vaeditions.txt", io_append);
-					new str[200];
-					format(str, 200, "\r\nAttachObjectToVehicle(objectid, vehicleid, %f, %f, %f, %f, %f, %f); //Object Model: %d | %s",
-					VaeData[playerid][OffSetX], VaeData[playerid][OffSetY], VaeData[playerid][OffSetZ],
-					VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ], VaeData[playerid][objmodel]);
-					fwrite(file, str);
-					fclose(file);
-					return SendClientMessageEx(playerid, -1,
-					"Всё сохранено в \"vaeditions.txt\".", "Saved to \"vaeditions.txt\".");
-				}
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_CREATEMENU);
-	}
-	if(dialogid == DIALOG_VAENEW)
-	{
-		if(response)
-		{
-			if(!isnull(inputtext) && strval(inputtext) != INVALID_OBJECT_ID)
-			{
-				if(!IsPlayerInAnyVehicle(playerid)) {
-					 return SendClientMessageEx(playerid, -1,
-					"Вы не в машине.","You are not in the car.");
-				}
-				if(VaeData[playerid][timer] != -1) KillTimer(VaeData[playerid][timer]);
-				if(IsValidObject(VaeData[playerid][obj])) DestroyObject(VaeData[playerid][obj]);
-				
-				if(VaeData[playerid][obj] == -1)
-				{
-					SendClientMessageEx(playerid, -1, 
-					"Используйте клавиши {FF0000}ВЛЕВО-ВПРАВО{FFFFFF} для перемещения аттача",
-					"Use keys {FF0000}LEFT - RIGHT{FFFFFF} to move attach");
-					SendClientMessageEx(playerid, -1, 
-					"Удерживайте {FF0000}F / ENTER{FFFFFF} для того чтобы показать меню редактирования",
-					"Hold {FF0000}F / ENTER{FFFFFF} to show the edit menu");
-				}
-			
-				if(VaeData[playerid][timer] != -1) KillTimer(VaeData[playerid][timer]);
-				if(IsValidObject(VaeData[playerid][obj])) DestroyObject(VaeData[playerid][obj]);	
-				new Obj = CreateObject(strval(inputtext), 0.0, 0.0, -10.0, -50.0, 0, 0, 0);
-				new vId = GetPlayerVehicleID(playerid);
-				AttachObjectToVehicle(Obj, vId, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
-				VaeData[playerid][timer] = SetTimerEx("VaeGetKeys", 30, true, "i", playerid);
-				VaeData[playerid][EditStatus] = vaeFloatX;
-				VaeData[playerid][VehicleID] = vId;		
-				VaeData[playerid][objmodel] = strval(inputtext);
-				if(Obj != VaeData[playerid][obj])
-				{
-					VaeData[playerid][OffSetX]  = 0.0;
-					VaeData[playerid][OffSetY]  = 0.0;
-					VaeData[playerid][OffSetZ]  = 0.0;
-					VaeData[playerid][OffSetRX] = 0.0;
-					VaeData[playerid][OffSetRY] = 0.0;
-					VaeData[playerid][OffSetRZ] = 0.0;
-				}	
-				VaeData[playerid][obj] = Obj;
-				TogglePlayerControllable(playerid, false);
-				SetPVarInt(playerid,"freezed",1);
-				SetPVarInt(playerid, "VaeEdit",1);
-				ShowPlayerMenu(playerid, DIALOG_VAE);
-				GameTextForPlayer(playerid,"~w~HOLD ENTER~n~to open edit menu",5000,1);
-			}
-		} 
 	}
 	if(dialogid == DIALOG_GAMETEXTSTYLE)
 	{
@@ -6673,18 +6083,6 @@ public OnPlayerUpdate(playerid)
 	}
 }
 
-public OnFilterScriptExit()
-{
-	/*new query[128];
-	format(query,sizeof(query),
-	"UPDATE `Settings` SET Value=%d, WHERE Option='Language'", LangSet);
-	db_query(mtoolsDB,query);*/
-	db_close(mtoolsDB);
-	// vae
-	for(new i = 0; i < MAX_PLAYERS; ++i) DestroyObject(VaeData[i][obj]);
-	return 1;
-}
-
 //================================== [MENU] ====================================
 public ShowPlayerMenu(playerid, dialogid)
 {
@@ -6793,8 +6191,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				"[>] 3D текст\n"\
 				"{A9A9A9}[>] Текст\n"\
 				"[>] Pickup\n"\
-				"{A9A9A9}[>] Attach к игроку\n"\
-				"[>] Attach на транспорт\n"\
 				"{A9A9A9}[>] Актера\n"\
 				"[>] Карту\n");
 			} else {
@@ -6803,8 +6199,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				"[>] 3D text\n"\
 				"{A9A9A9}[>]  Text object\n"\
 				"[>] Pickup\n"\
-				"{A9A9A9}[>] Attach to Player\n"\
-				"[>] Attach to Vehicle\n"\
 				"{A9A9A9}[>] Actor\n"\
 				"[>] New map\n");
 			}
@@ -7710,54 +7104,6 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Select", "Cancel");
 			}
 		}
-		case DIALOG_VAE:
-		{
-			new tbtext[500];
-			new header[64];
-			
-			if(VaeData[playerid][objmodel] != -1)
-			{
-				format(header, sizeof(header),"[VAE] - Vehicle Attachments Editor - modelid: %i",
-				VaeData[playerid][objmodel]);
-			}
-			else format(header, sizeof(header),"[VAE] - Vehicle Attachments Editor");
-			
-			if(GetPVarInt(playerid, "lang") == 1)
-			{		
-				format(tbtext, sizeof(tbtext),
-				"Change model\t{00FF00}/vaemodel\n"\
-				"adjustment X\t%.2f\n"\
-				"adjustment Y\t%.2f\n"\
-				"adjustment Z\t%.2f\n"\
-				"adjustment RX\t%.2f\n"\
-				"adjustment RY\t%.2f\n"\
-				"adjustment RZ\t%.2f\n"\
-				"Reset XYZ and adjustment\t\n"\
-				"Freeze-Unfreeze\t{00FF00}/freeze\n"\
-				"Stop edit\t{00FF00}/vaestop\n"\
-				"Save\t{00FF00}/vaesave\n",
-				VaeData[playerid][OffSetX], VaeData[playerid][OffSetY], VaeData[playerid][OffSetZ],
-				VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ]);
-			} else {
-				format(tbtext, sizeof(tbtext),
-				"Изменить модель\t{00FF00}/vaemodel\n"\
-				"Регулировка оси X\t%.2f\n"\
-				"Регулировка оси Y\t%.2f\n"\
-				"Регулировка оси Z\t%.2f\n"\
-				"Регулировка оси RX\t%.2f\n"\
-				"Регулировка оси RY\t%.2f\n"\
-				"Регулировка оси RZ\t%.2f\n"\
-				"Сбросить XYZ и Оси\t\n"\
-				"Заморозить-Разморозить\t{00FF00}/freeze\n"\
-				"Закончить редактирование\t{00FF00}/vaestop\n"\
-				"Сохранить\t{00FF00}/vaesave\n",
-				VaeData[playerid][OffSetX], VaeData[playerid][OffSetY], VaeData[playerid][OffSetZ],
-				VaeData[playerid][OffSetRX], VaeData[playerid][OffSetRY], VaeData[playerid][OffSetRZ]);
-			}
-			
-			ShowPlayerDialog(playerid, DIALOG_VAE, DIALOG_STYLE_TABLIST, 
-			header,tbtext, "Select","Cancel");
-		}
 		case DIALOG_CMDS:
 		{
 			ShowPlayerDialog(playerid, DIALOG_CMDS, DIALOG_STYLE_MSGBOX, "CMDS", 
@@ -7770,7 +7116,7 @@ public ShowPlayerMenu(playerid, dialogid)
 			"{FFD700}Special commands:\n"\
 			"{FFFFFF}/jetpack, fly, /jump, /dive, /unbug\n"\
 			"{FFD700}Vehicle commands:\n"\
-			"{FFFFFF}/v, /veh, /vae, /flip, /fix\n"\
+			"{FFFFFF}/v, /veh, /flip, /fix\n"\
 			"{FFD700}Camera commands:\n"\
 			"{FFFFFF}/cam, /fixcam, /flymode, /slowmo\n"\
 			"{FFFFFF}\nPress Y to open Main menu or use: /mtools\n",
@@ -8034,8 +7380,6 @@ stock RemoveTempMapEditorFiles(playerid)
 	fremove("mtools/MapIcons.txt");
 	fremove("mtools/3DText.txt");
 	fremove("mtools/Pickup.txt");
-	fremove("mtools/Attachments.txt");
-	fremove("mtools/Vaeditions.txt");
 	SendClientMessageEx(playerid, -1, "Временные файлы из {FFD700}scriptfiles/mtools{FFFFFF} очищены",
 	"Temporary files from {FFD700}scriptfiles/mtools{FFFFFF} have been cleared");
 }
@@ -8565,212 +7909,6 @@ stock GetPlayerFPS(playerid)
 	}
 	return 0;
 }
-
-// Attach editor
-ShowMainAttachEditMenu(playerid)
-{
-	new string[350];
-
-	if (GetPVarInt(playerid, "lang") == 0)
-	{
-		format(string, sizeof(string),
-		"Опция\tСтатус\n\
-		Индекс \t(%d)\n\
-		Объект \t(%d)\n\
-		Кость \t(%d)\n\
-		X-позиция \t(%.4f)\n\
-		Y-позиция \t(%.4f)\n\
-		Z-позиция \t(%.4f)\n\
-		X-вращение \t(%.4f)\n\
-		Y-вращение \t(%.4f)\n\
-		Z-вращение \t(%.4f)\n\
-		X-масштаб \t(%.4f)\n\
-		Y-масштаб \t(%.4f)\n\
-		Z-масштаб \t(%.4f)\n\
-		Редактировать\t\n\
-		{FF0000}Очистить{FFFFFF} этот индекс\t\n\
-		Сохранить",
-		gCurrentAttachIndex[playerid],
-		gIndexModel[playerid][gCurrentAttachIndex[playerid]],
-		gIndexBone[playerid][gCurrentAttachIndex[playerid]],
-		gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-		gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-		gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-		gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-		gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-		gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-		gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-		gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-		gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z]);
-	} else {
-		format(string, sizeof(string),
-		"Index \t(%d) \n\
-		Object \t(%d) \n\
-		Bone \t(%d) \n\
-		X position \t(%.4f) \n\
-		Y position \t(%.4f) \n\
-		Z position \t(%.4f) \n\
-		X-rotation \t(%.4f) \n\
-		Y-rotation \t(%.4f) \n\
-		Z Rotation \t(%.4f) \n\
-		X-scale \t(%.4f) \n\
-		Y-scale \t(%.4f) \n\
-		Z-scale \t(%.4f) \n\
-		Edit \t\n\
-		{FF0000}Clear{FFFFFF} this index \t\n\
-		Save",
-		gCurrentAttachIndex[playerid],
-		gIndexModel[playerid][gCurrentAttachIndex[playerid]],
-		gIndexBone[playerid][gCurrentAttachIndex[playerid]],
-		gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-		gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-		gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-		gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-		gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-		gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-		gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-		gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-		gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z]);
-	}
-
-	ShowPlayerDialog(playerid, DIALOG_PLAYERATTACHMAIN, DIALOG_STYLE_TABLIST,
-	"Attachments editor", string, "OK", "Cancel");
-
-	gEditingAttachments[playerid] = true;
-}
-
-ShowIndexList(playerid)
-{
-	new string[512];
-
-	for(new i; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
-	{
-		if(IsPlayerAttachedObjectSlotUsed(playerid, i))
-		{
-			if (GetPVarInt(playerid, "lang") == 0)
-			{
-				if(gIndexUsed[playerid][i]) format(string, sizeof(string),"%sСлот %d (%s - %d)\n",
-				string, i, AttachmentBones[gIndexBone[playerid][i]], gIndexModel[playerid][i]);
-				else format(string, sizeof(string), "%sСлот %d (Внешний)\n", string, i);
-			} else {
-				if(gIndexUsed[playerid][i]) format(string, sizeof(string), "%sSlot %d (%s - %d)\n",
-				string, i, AttachmentBonesEN[gIndexBone[playerid][i]], gIndexModel[playerid][i]);
-				else format(string, sizeof(string), "%s Slot %d (External)\n", string, i);
-			}
-		}
-		else format(string, sizeof(string), "%sSlot %d\n", string, i);
-	}
-
-	ShowPlayerDialog(playerid, DIALOG_ATPINDEX_SELECT, DIALOG_STYLE_LIST,
-	"Attachments editor / Index", string, "OK", "Cancel");
-}
-
-ShowModelInput(playerid)
-{
-	ShowPlayerDialog(playerid, DIALOG_ATPMODEL_SELECT, DIALOG_STYLE_INPUT,
-	"Attachments editor / Object", "Введите объект для прикрепления", "OK", "Cancel");
-}
-
-ShowBoneList(playerid)
-{
-	new string[512];
-
-	for(new i; i < sizeof(AttachmentBones); i++) 
-	{
-		if (GetPVarInt(playerid, "lang") == 0)
-		{
-			format(string, sizeof(string), "%s%s\n", string, AttachmentBones[i]);
-		} else {
-			format(string, sizeof(string), "%s%s\n", string, AttachmentBonesEN[i]);
-		}
-	}
-	ShowPlayerDialog(playerid, DIALOG_ATPBONE_SELECT, DIALOG_STYLE_LIST,
-	"Attachments editor / Bone", string, "OK", "Cancel");
-}
-
-EditAttachCoord(playerid, coord)
-{
-	gCurrentAxisEdit[playerid] = coord;
-	ShowPlayerDialog(playerid, DIALOG_ATPCOORD_INPUT, DIALOG_STYLE_INPUT,
-	"Attachments editor / Scale", "Введите float-точку для смещения:", "OK", "Cancel");
-}
-
-EditAttachment(playerid)
-{
-	SetPlayerAttachedObject(playerid,
-	gCurrentAttachIndex[playerid],
-	gIndexModel[playerid][gCurrentAttachIndex[playerid]],
-	gIndexBone[playerid][gCurrentAttachIndex[playerid]],
-	gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-	gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-	gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-	gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-	gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-	gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-	gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-	gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-	gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z]);
-
-	EditAttachedObject(playerid, gCurrentAttachIndex[playerid]);
-
-	gIndexUsed[playerid][gCurrentAttachIndex[playerid]] = true;
-}
-
-ClearCurrentIndex(playerid)
-{
-	gIndexModel[playerid][gCurrentAttachIndex[playerid]] = 0;
-	gIndexBone[playerid][gCurrentAttachIndex[playerid]] = 1;
-	gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X] = 0.0;
-	gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y] = 0.0;
-	gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z] = 0.0;
-	gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X] = 0.0;
-	gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y] = 0.0;
-	gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z] = 0.0;
-	gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X] = 0.0;
-	gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y] = 0.0;
-	gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z] = 0.0;
-	gIndexUsed[playerid][gCurrentAttachIndex[playerid]] = false;
-
-	RemovePlayerAttachedObject(playerid, gCurrentAttachIndex[playerid]);
-	ShowMainAttachEditMenu(playerid);
-}
-
-SaveAttachedObjects(playerid)
-{
-	new str[256], File:file;
-	if(!fexist("mtools/Attachments.txt")) file = fopen("mtools/Attachments.txt", io_write);
-	else file = fopen("mtools/Attachments.txt", io_append);
-
-	if(!file)
-	{
-		SendClientMessage(playerid, COLOR_GREY, "Error. Not found mtools/Attachments.txt");
-		return 0;
-	}
-
-	format(str, 256,
-	"SetPlayerAttachedObject(playerid, %d, %d, %d,  %f, %f, %f,  %f, %f, %f,  %f, %f, %f); // %d\r\n",
-	gCurrentAttachIndex[playerid],
-	gIndexModel[playerid][gCurrentAttachIndex[playerid]],
-	gIndexBone[playerid][gCurrentAttachIndex[playerid]],
-	gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-	gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-	gIndexPos[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-	gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-	gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-	gIndexRot[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-	gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_X],
-	gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Y],
-	gIndexSca[playerid][gCurrentAttachIndex[playerid]][ATPCOORD_Z],
-	GetPlayerSkin(playerid));
-	
-	fwrite(file, str);
-	fclose(file);
-
-	ShowMainAttachEditMenu(playerid);
-
-	return 1;
-}
-// END attach objects editor
 
 stock GiveWeaponsToAllPlayers(slot, weaponid, ammo)
 {
