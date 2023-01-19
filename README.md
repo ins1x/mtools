@@ -36,5 +36,3 @@ plugins crashdetect sscanf streamer filemanager
 ## Disclaimer
 
 **This script** does not claim to be original and is provided as is. The developer is not tasked with making another map editor, but supplementing the existing one for the convenience of work.  
-
-[![WTFPL](http://www.wtfpl.net/wp-content/uploads/2012/12/wtfpl-badge-1.png)](http://www.wtfpl.net/about/) 
