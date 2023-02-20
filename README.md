@@ -9,8 +9,8 @@ Mtools gives mappers more features to be more productive.
 For the list of all server commands and features type /help
 
 ## Installation
-* Download and install *[Texture Studio 1.9](https://github.com/Pottus/Texture-Studio) or [Texture Studio 2.1](https://vk.com/tip_mapper?w=page-89889560_49251374) 
-* Download latest release mtools, unpack it into any folder
+* Download and install [Texture Studio 1.9](https://github.com/Pottus/Texture-Studio) or [TEXTURE STUDIO 2.0 RUS](https://vk.com/@tip_mapper-texture-studio-20-rus) 
+* Download [latest release mtools](https://github.com/ins1x/mtools/releases/tag/Release), unpack it into any folder
 * Copy files from this folder, pre-selecting the desired version TextureStudio
 * Copy the mtools.amx file to the filterscripts folder
 * Create /scriptfiles/mtools folder, copy mtools.db file
