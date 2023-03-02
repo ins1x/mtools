@@ -26,7 +26,7 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.24"
+#define VERSION              	"0.3.25"
 #define BUILD_DATE             	__date
 
 #define DIALOG_MAIN 				6001
@@ -37,7 +37,6 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_GROUPEDIT			6006
 #define DIALOG_OBJLIST				6007
 #define DIALOG_TUTORIAL				6008
-#define DIALOG_CREATEMENU			6009
 #define DIALOG_TPLIST				6010
 #define DIALOG_CREATEMAPICON		6011
 #define DIALOG_CREATEPICKUP			6012
@@ -64,14 +63,6 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_MAPMENU				6033
 #define DIALOG_INTERFACE_SETTINGS	6034
 #define DIALOG_MAINMENU_KEYBINDSET	6035
-#define DIALOG_ACTORS				6036
-#define DIALOG_ACTORSMASSMENU		6037
-#define DIALOG_ACTORSMASSANIM		6038
-#define DIALOG_ACTORCREATE			6039
-#define DIALOG_ACTORANIMLIB			6040
-#define DIALOG_ACTORANIMNAME		6041
-// empty 6042 - 6048
-#define DIALOG_CREATEPICKUP_BYNUM	6049
 #define DIALOG_OBJECTSMENU			6050
 #define DIALOG_FAVORITES			6051
 #define DIALOG_LIMITS				6052
@@ -101,10 +92,6 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_FLYMODESETTINGS		6076
 #define DIALOG_FMACCEL				6077
 #define DIALOG_FMSPEED				6078
-#define DIALOG_CREATE3DTEXT			6079
-#define DIALOG_3DTEXTMENU			6080
-#define DIALOG_INDEX3DTEXT			6081
-#define DIALOG_UPDATE3DTEXT			6082
 #define DIALOG_DYNOBJSPEED			6083
 #define DIALOG_DISTANCE3DTEXT		6084
 #define DIALOG_COLOR3DTEXT			6085
@@ -144,7 +131,6 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_WEAPONS_HEAVY		6127
 #define DIALOG_WEAPONS_GRENADES		6128
 #define DIALOG_WEAPONS_HANDHELD		6129
-//#define DIALOG_WEAPONS_RESERVE	6130
 #define DIALOG_PICKUPS_ENTER		6131
 #define DIALOG_PICKUPS_HOUSE		6132
 #define DIALOG_UGMP_FEATURES		6133
@@ -312,9 +298,6 @@ new PlayerText:TDspecbar[MAX_PLAYERS];
 new PlayerText:TDAIM[MAX_PLAYERS];
 new PlayerText:Logo[MAX_PLAYERS];
 new PlayerText:TDmessage[MAX_PLAYERS];
-// Dash Cam (etc Police cam)
-new PlayerText:DashCam[MAX_PLAYERS];
-new PlayerText:DashCam2[MAX_PLAYERS];
 
 // Forwards
 forward LoadMtoolsDb(); // load mtlools.db
@@ -369,16 +352,6 @@ enum preSetsCamedit
 
 new Float:CamData[MAX_PLAYERS][preSetsCamedit];
 
-// 3d texts global data
-enum text3dData
-{
-	Text3D:index3d, Text3Dvalue[64],
-	Text3Dcolor[11], Float: Text3Ddistance,
-	Float: tPosX, Float: tPosY, Float: tPosZ
-}
-new Text3dArray[MAX_3DTEXT_GLOBAL][text3dData];
-new CurrentIndex3dText = 0;
-
 // Object movements system
 enum oMovData
 {
@@ -389,10 +362,6 @@ enum oMovData
 
 new Float:ObjectsMoveData[MAX_PLAYERS][oMovData];
 
-// Actors
-new indexActor = 0, animactordatalib[32], animactordataname[32];
-//new Actors[11] = {0, 0, ...};
-new Actors[10];
 // Spawn weapons (default none weapons on spawn)
 // example: new weapon[11] = {0, 0, 26, 0, 0, 0, 0, 0, 0, 0, 0}; give sawn off 
 new weapon[11] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -646,28 +615,6 @@ public OnPlayerConnect(playerid)
 	PlayerTextDrawFont(playerid, TDmessage[playerid], 2);
 	PlayerTextDrawSetProportional(playerid, TDmessage[playerid], 1);
 
-	//DashCam[playerid] = CreatePlayerTextDraw(playerid,200.0, 15.0, "");
-	DashCam[playerid] = CreatePlayerTextDraw(playerid,150.0, 105.0, "");
-	PlayerTextDrawLetterSize(playerid, DashCam[playerid], 0.4, 1.0);
-	PlayerTextDrawAlignment(playerid, DashCam[playerid], 1);
-	PlayerTextDrawColor(playerid, DashCam[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, DashCam[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, DashCam[playerid], 1);
-	PlayerTextDrawBackgroundColor(playerid, DashCam[playerid], 51);
-	PlayerTextDrawFont(playerid, DashCam[playerid], 2);
-	PlayerTextDrawSetProportional(playerid, DashCam[playerid], 1);
-
-	//DashCam2[playerid] = CreatePlayerTextDraw(playerid,400.0, 15.0, "");
-	DashCam2[playerid] = CreatePlayerTextDraw(playerid,415.0, 105.0, "");
-	PlayerTextDrawLetterSize(playerid, DashCam2[playerid], 0.4, 1.0);
-	PlayerTextDrawAlignment(playerid, DashCam2[playerid], 1);
-	PlayerTextDrawColor(playerid, DashCam2[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, DashCam2[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, DashCam2[playerid], 1);
-	PlayerTextDrawBackgroundColor(playerid, DashCam2[playerid], 51);
-	PlayerTextDrawFont(playerid, DashCam2[playerid], 2);
-	PlayerTextDrawSetProportional(playerid, DashCam2[playerid], 1);
-
 	Logo[playerid] = CreatePlayerTextDraw(playerid, 500, 8, "~R~M~w~TOOLS"); 
 	PlayerTextDrawFont(playerid, Logo[playerid], 1); 
 	PlayerTextDrawLetterSize(playerid, Logo[playerid], 0.3, 1.0); 
@@ -681,7 +628,6 @@ public OnPlayerConnect(playerid)
 	SetPVarInt(playerid,"Firstperson",0); // toggle first person mod
 	SetPVarInt(playerid,"LightsStatus",0); // vehicle lights
 	SetPVarInt(playerid, "drunk", 0); // need for frs counter
-	SetPVarInt(playerid, "DashCam", 0); // toggle police cam
 	PlayerTextDrawShow(playerid, Objrate[playerid]);
 	PlayerTextDrawShow(playerid, FPSBAR[playerid]);
 
@@ -796,8 +742,6 @@ public OnPlayerDisconnect(playerid, reason)
 	PlayerTextDrawDestroy(playerid, TDAIM[playerid]);
 	PlayerTextDrawDestroy(playerid, FPSBAR[playerid]);
 	PlayerTextDrawDestroy(playerid, Objrate[playerid]);
-	PlayerTextDrawDestroy(playerid, DashCam[playerid]);
-	PlayerTextDrawDestroy(playerid, DashCam2[playerid]);
 	return 1;
 }
 
@@ -1102,11 +1046,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	if (!strcmp(cmdtext, "/edit", true))
 	{
 		ShowPlayerMenu(playerid,DIALOG_EDITMENU);
-		return true;
-	}
-	if (!strcmp(cmdtext, "/new", true))
-	{
-		ShowPlayerMenu(playerid,DIALOG_CREATEMENU);
 		return true;
 	}
 	if (!strcmp(cmdtext, "/help", true))
@@ -1465,7 +1404,19 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	}
 	if(!strcmp(cmdtext, "/oadd", true))
 	{
-		ShowPlayerMenu(playerid,DIALOG_CREATEOBJ);
+		tmp = strtok(cmdtext, idx);
+		if(!strlen(tmp))
+		{
+			ShowPlayerMenu(playerid,DIALOG_CREATEOBJ);
+		}
+		new param[24];
+		format(param, sizeof(param), "/cobject %d", strval(tmp));
+		CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
+		return 1;
+	}
+	if(!strcmp(cmdtext, "/ocat", true))
+	{
+		ShowPlayerMenu(playerid,DIALOG_OBJECTSCAT);
 		return 1;
 	}
 	if(!strcmp(cmdtext, "/dive", true))
@@ -1821,7 +1772,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			switch(listitem)
 			{
 				case 0: ShowPlayerMenu(playerid, DIALOG_EDITMENU);
-				case 1: ShowPlayerMenu(playerid, DIALOG_CREATEMENU);
+				case 1: ShowPlayerMenu(playerid, DIALOG_OBJECTSMENU);
 				case 2: ShowPlayerMenu(playerid, DIALOG_REMMENU);
 				case 3: ShowPlayerMenu(playerid, DIALOG_TEXTUREMENU);
 				case 4: ShowPlayerMenu(playerid, DIALOG_MAPMENU);
@@ -3215,22 +3166,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		}
 		else ShowPlayerMenu(playerid, DIALOG_SETTINGS);
 	}
-	if(dialogid == DIALOG_CREATEMENU)
-	{
-		if(response)
-		{
-			switch(listitem)
-			{
-				case 0: ShowPlayerMenu(playerid, DIALOG_OBJECTSMENU);
-				case 1: ShowPlayerMenu(playerid, DIALOG_3DTEXTMENU);
-				case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/textobj");
-				case 3: ShowPlayerMenu(playerid, DIALOG_CREATEPICKUP);
-				case 4: ShowPlayerMenu(playerid, DIALOG_ACTORS);
-				case 5: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/newmap");		
-			}
-		} 
-		else ShowPlayerMenu(playerid, DIALOG_MAIN);
-	}
 	if(dialogid == DIALOG_OBJECTSMENU)
 	{
 		if(response)
@@ -3238,10 +3173,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			switch(listitem)
 			{
 				case 0: ShowPlayerMenu(playerid,DIALOG_CREATEOBJ);
-				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/lsel");
-				case 2:	ShowPlayerMenu(playerid,DIALOG_OBJECTSCAT);
-				case 3: ShowPlayerMenu(playerid,DIALOG_OBJECTSSEARCH);
-				case 4:
+				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/textobj");
+				case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/lsel");
+				case 3:	ShowPlayerMenu(playerid,DIALOG_OBJECTSCAT);
+				case 4: ShowPlayerMenu(playerid,DIALOG_OBJECTSSEARCH);
+				case 5:
 				{
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
@@ -3256,7 +3192,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"Search", "Cancel");
 					}
 				}
-				case 5:
+				case 6:
 				{
 					#if defined STREAMER_ALL_TAGS
 					Streamer_ToggleAllItems(playerid, STREAMER_TYPE_OBJECT, 1);
@@ -3271,7 +3207,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SendClientMessageEx(playerid, -1,
 					"Все скрытые объекты были показаны","All hidden objects have been revealed");
 				}
-				case 6:
+				case 7:
 				{
 					new tbtext[400];
 					
@@ -3297,7 +3233,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 			}
 		}
-		else ShowPlayerMenu(playerid, DIALOG_CREATEMENU);
+		else ShowPlayerMenu(playerid, DIALOG_MAIN);
 	}
 	if(dialogid == DIALOG_OBJECTSSEARCH)
 	{
@@ -3359,93 +3295,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 		//else ShowPlayerMenu(playerid, DIALOG_OBJECTSMENU);
-	}
-	if(dialogid == DIALOG_CREATEPICKUP)
-	{
-		if(response)
-		{
-			switch(listitem)
-			{
-				case 0:
-				{
-					ShowPlayerDialog(playerid,DIALOG_CREATEPICKUP_BYNUM,DIALOG_STYLE_INPUT,
-					"Create pickup","Enter pickup id:","Create","Cancel");
-				}
-				case 1: mCreatePickup(1242, playerid);// armourpickup
-				case 2: mCreatePickup(1240, playerid);// hppickup
-				case 3: mCreatePickup(370, playerid);// jetpickup
-				case 4: mCreatePickup(1274, playerid);// dollar
-				case 5: mCreatePickup(1239, playerid);// infoicon
-				case 6:
-				{
-					ShowPlayerDialog(playerid, DIALOG_PICKUPS_ENTER, DIALOG_STYLE_LIST, 
-					"House pickup","{363636}Black arrow\n{FFFFFF}White arrow\n\
-					{FF0000}Red arrow\n{FFFF00}Yellow arrow\n{008000}Green arrow",
-					"Select","Cancel");
-				} 
-				case 7: mCreatePickup(3096, playerid);// fix vehicle
-				case 8: 
-				{
-					ShowPlayerDialog(playerid, DIALOG_PICKUPS_HOUSE, DIALOG_STYLE_LIST, 
-					"House pickup","{008000}Green\n{0000ff}Blue\n\
-					{FFFF00}Yellow\n{FF0000}Red\n{ffd800}Orange\n",
-					"Select","Cancel");
-				}
-				case 9: 
-				{
-					for(new i = 0, j = GetPlayerPoolSize(); i <= j; i++){
-						Streamer_Update(i);
-					}
-					// Note: dynamic objects are restored in 50 ms 
-					// (or through the specified value by the Streamer_TickRate function).
-					Streamer_DestroyAllVisibleItems(playerid, STREAMER_TYPE_PICKUP);
-					SendClientMessageEx(playerid, -1,
-					"Все пикапы были обновлены",
-					"All dynamic pickups have been updated");
-				}
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_CREATEMENU);
-	}
-	if(dialogid == DIALOG_CREATEPICKUP_BYNUM)
-	{
-		if(response)
-		{
-			if(!isnull(inputtext) && isNumeric(inputtext)){
-				mCreatePickup(strval(inputtext), playerid);
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_CREATEPICKUP);
-	}
-	if(dialogid == DIALOG_PICKUPS_HOUSE)
-	{
-		if(response)
-		{
-			switch(listitem)
-			{
-				case 0: mCreatePickup(1273, playerid);
-				case 1: mCreatePickup(1272, playerid);
-				case 2: mCreatePickup(19524, playerid);
-				case 3: mCreatePickup(19522, playerid);
-				case 4: mCreatePickup(19523, playerid);
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_CREATEPICKUP);
-	}
-	if(dialogid == DIALOG_PICKUPS_ENTER)
-	{
-		if(response)
-		{
-			switch(listitem)
-			{
-				case 0: mCreatePickup(19130, playerid);// black arrow
-				case 1: mCreatePickup(1318, playerid);// white arrow
-				case 2: mCreatePickup(19133, playerid);// red arrow
-				case 3: mCreatePickup(19198, playerid);// yellow arrow
-				case 4: mCreatePickup(19134, playerid);// green arrow
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_CREATEPICKUP);
 	}
 	if(dialogid == DIALOG_FAVORITES)
 	{
@@ -3810,95 +3659,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			format(param, sizeof(param), "/cobject %d", modelid);
 			CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
 		}
-	}
-	if(dialogid == DIALOG_CREATE3DTEXT)
-	{
-		if(response)
-		{
-			if(!isnull(inputtext))
-			{
-				if(strlen(inputtext) > 64) {
-					return SendClientMessageEx(playerid, COLOR_GREY, 
-					"Неверное значение (Max: 64 symbols)", "Incorrect value (Max: 64 symbols)");
-				}
-				new index =	CurrentIndex3dText;
-				strcat(Text3dArray[index][Text3Dvalue], inputtext);
-				Text3dArray[index][Text3Ddistance] = TEXT3D_DEFAULT_DISTANCE;
-				Text3dArray[index][Text3Dcolor] = TEXT3D_DEFAULT_COLOR;
-				GetPlayerPos(playerid,Text3dArray[index][tPosX],
-				Text3dArray[index][tPosY],Text3dArray[index][tPosZ]);
-				#if defined _streamer_included
-				Text3dArray[index][index3d] = CreateDynamic3DTextLabel(Text3dArray[index][Text3Dvalue],
-				Text3dArray[index][Text3Dcolor], Text3dArray[index][tPosX], Text3dArray[index][tPosY],
-				Text3dArray[index][tPosZ], Text3dArray[index][Text3Ddistance], INVALID_PLAYER_ID,
-				INVALID_VEHICLE_ID, 0, -1, -1, -1, Text3dArray[index][Text3Ddistance]);
-				#else
-				Text3dArray[index][index3d] = Create3DTextLabel(Text3dArray[index][Text3Dvalue],
-				Text3dArray[index][Text3Dcolor],Text3dArray[index][tPosX],Text3dArray[index][tPosY],
-				Text3dArray[index][tPosZ],Text3dArray[index][Text3Ddistance],0);
-				#endif
-			}
-		}
-	}
-	if(dialogid == DIALOG_COLOR3DTEXT)
-	{
-		if(response)
-		{
-			if(!isnull(inputtext) || strlen(inputtext) > 10)
-			{
-				new index = CurrentIndex3dText;
-				if(index <= MAX_3DTEXT_GLOBAL) {
-					Text3dArray[index][Text3Dcolor] = EOS;
-					strcat(Text3dArray[index][Text3Dcolor], inputtext);
-				}	
-			} else {
-				SendClientMessageEx(playerid, COLOR_GREY, 
-				"Неверное значение", "Incorrect value");
-			}
-		} 
-		else ShowPlayerMenu(playerid, DIALOG_3DTEXTMENU);
-	}
-	if(dialogid == DIALOG_INDEX3DTEXT)
-	{
-		if(response)
-		{
-			if(!isnull(inputtext) || !isNumeric(inputtext))
-			{
-				new index = strval(inputtext);
-				if(index <= MAX_3DTEXT_GLOBAL) {
-					CurrentIndex3dText = index;
-				}	
-			} else {
-				SendClientMessageEx(playerid, COLOR_GREY, 
-				"Неверное значение", "Incorrect value");
-			}
-		} 
-		else ShowPlayerMenu(playerid, DIALOG_3DTEXTMENU);
-	}
-	if(dialogid == DIALOG_DISTANCE3DTEXT)
-	{
-		if(response)
-		{
-			if(!isnull(inputtext))
-			{
-				new index = CurrentIndex3dText;
-				Text3dArray[index][Text3Ddistance] = strval(inputtext);
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_3DTEXTMENU);
-	}
-	if(dialogid == DIALOG_UPDATE3DTEXT)
-	{
-		if(response)
-		{
-			if(!isnull(inputtext))
-			{
-				new index = CurrentIndex3dText;
-				UpdateDynamic3DTextLabelText(Text3dArray[index][index3d],
-				Text3dArray[index][Text3Dcolor], inputtext);
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_3DTEXTMENU);
 	}
 	if(dialogid == DIALOG_SCOORDS)
 	{
@@ -4635,26 +4395,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 4:
 				{
-					if(GetPVarInt(playerid, "DashCam") > 0)
-					{
-						SetPVarInt(playerid, "DashCam", 0);
-						SendClientMessageEx(playerid, -1,
-						"Полицейская камера - [отключена]", "Dash cam - [disabled]");
-						PlayerTextDrawHide(playerid, DashCam[playerid]);
-						PlayerTextDrawHide(playerid, DashCam2[playerid]);
-					} else {
-						SetPVarInt(playerid, "DashCam", 1);
-						SendClientMessageEx(playerid, -1,
-						"Полицейская камера - [включена]", "Dash cam - [enabled]");
-						SendClientMessageEx(playerid, -1,
-						"Информация с камеры отбражается только в машине",
-						"Infotmation from the camera is displayed only in the car");
-						PlayerTextDrawShow(playerid, DashCam[playerid]);
-						PlayerTextDrawShow(playerid, DashCam2[playerid]);
-					}
-				}
-				case 5:
-				{
 					new tbtext[450];
 					
 					if(GetPVarInt(playerid, "lang") == 1)
@@ -4683,8 +4423,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowPlayerDialog(playerid, DIALOG_CAMFIX, DIALOG_STYLE_LIST,
 					"[CAM] camfix",tbtext, "OK","Cancel");
 				}
-				case 6: ShowPlayerMenu(playerid, DIALOG_FLYMODESETTINGS);
-				case 7: ShowPlayerMenu(playerid, DIALOG_CAMINTERPOLATE);
+				case 5: ShowPlayerMenu(playerid, DIALOG_FLYMODESETTINGS);
+				case 6: ShowPlayerMenu(playerid, DIALOG_CAMINTERPOLATE);
 				//case 8: ShowPlayerMenu(playerid, DIALOG_ENVIRONMENT);
 			}
 		}
@@ -5245,311 +4985,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/cobject 2226");
 		}
 	}
-	if(dialogid == DIALOG_3DTEXTMENU)
-	{
-		if(response)
-		{
-			switch(listitem)
-			{
-				case 0:	
-				{
-					if (GetPVarInt(playerid, "lang") == 0) {
-						ShowPlayerDialog(playerid, DIALOG_CREATE3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text","{FFFFFF}Введите текст\n",
-						"Create","Cancel");
-					} else {
-						ShowPlayerDialog(playerid, DIALOG_CREATE3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text","{FFFFFF}Enter text\n",
-						"Create","Cancel");
-					}
-				}
-				case 1:
-				{
-					if (GetPVarInt(playerid, "lang") == 0) {
-						ShowPlayerDialog(playerid, DIALOG_INDEX3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Index","{FFFFFF}Введите index для редактирования\n",
-						"Select","Cancel");
-					} else {
-						ShowPlayerDialog(playerid, DIALOG_INDEX3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Index","{FFFFFF}Enter index to edit\n",
-						"Select","Cancel");
-					}
-				}
-				case 2:
-				{
-					if (GetPVarInt(playerid, "lang") == 0) {
-						ShowPlayerDialog(playerid, DIALOG_UPDATE3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Edit text","{FFFFFF}Введите новый текст\n",
-						"Select","Cancel");
-					} else {
-						ShowPlayerDialog(playerid, DIALOG_UPDATE3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Edit text","{FFFFFF}Enter new text\n",
-						"Select","Cancel");
-					}
-				}
-				case 3:
-				{
-					if (GetPVarInt(playerid, "lang") == 0) {
-						ShowPlayerDialog(playerid, DIALOG_COLOR3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Color","{FFFFFF}Введите новый цвет в формате (0xAFAFAFAA)\n",
-						"Select","Cancel");
-					} else {
-						ShowPlayerDialog(playerid, DIALOG_COLOR3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Color","{FFFFFF}Enter new color. format(0xAFAFAFAA)\n",
-						"Select","Cancel");
-					}
-				}
-				case 4:
-				{
-					if (GetPVarInt(playerid, "lang") == 0) {
-						ShowPlayerDialog(playerid, DIALOG_DISTANCE3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Color","{FFFFFF}Введите дистанцию\n",
-						"Select","Cancel");
-					} else {
-						ShowPlayerDialog(playerid, DIALOG_DISTANCE3DTEXT, DIALOG_STYLE_INPUT,
-						"3D Text - Color","{FFFFFF}Enter new distance\n",
-						"Select","Cancel");
-					}
-				}
-				case 5:
-				{
-					new index =	CurrentIndex3dText;
-					new tmpstr[128];
-					GetPlayerPos(playerid,Text3dArray[index][tPosX],
-					Text3dArray[index][tPosY],Text3dArray[index][tPosZ]);
-					#if defined _streamer_included
-					DestroyDynamic3DTextLabel(Text3dArray[index][index3d]);
-					Text3dArray[index][index3d]= CreateDynamic3DTextLabel(Text3dArray[index][Text3Dvalue],
-					Text3dArray[index][Text3Dcolor], Text3dArray[index][tPosX], Text3dArray[index][tPosY],
-					Text3dArray[index][tPosZ], Text3dArray[index][Text3Ddistance],
-					INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 100.0);
-					#else
-					Delete3DTextLabel(Text3dArray[index][index3d]);
-					Text3dArray[index][index3d] = Create3DTextLabel(Text3dArray[index][Text3Dvalue],
-					Text3dArray[index][Text3Dcolor],Text3dArray[index][tPosX],Text3dArray[index][tPosY],
-					Text3dArray[index][tPosZ],Text3dArray[index][Text3Ddistance],0);
-					#endif
-					format(tmpstr, sizeof(tmpstr), "3Dtext:%i position %.2f,%.2f,%.2f",
-					index, Text3dArray[index][tPosX],
-					Text3dArray[index][tPosY],Text3dArray[index][tPosZ]);
-					SendClientMessage(playerid, -1, tmpstr);
-					//Streamer_Update(playerid);
-				}
-				case 6:
-				{
-					new index =	CurrentIndex3dText;
-					Text3dArray[index][Text3Dvalue] = EOS;
-					Text3dArray[index][Text3Dcolor] = TEXT3D_DEFAULT_COLOR;
-					Text3dArray[index][Text3Ddistance] = TEXT3D_DEFAULT_DISTANCE;
-					Text3dArray[index][tPosX] = 0.0;
-					Text3dArray[index][tPosY] = 0.0;
-					Text3dArray[index][tPosY] = 0.0;
-					DestroyDynamic3DTextLabel(Text3dArray[index][index3d]);
-				}
-				case 7:
-				{
-					new buffer[450];
-					new File:pos = fopen("mtools/3DText.txt", io_append);
-					new index =	CurrentIndex3dText;
-					
-					#if defined _streamer_included
-					format(buffer, sizeof buffer, 
-					"CreateDynamic3DTextLabel(\"%s\", %s, %.2f, %.2f, %.2f, %.1f, 0,\
-					INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, %.1f);\r\n",
-					Text3dArray[index][Text3Dvalue], Text3dArray[index][Text3Dcolor],
-					Text3dArray[index][tPosX],Text3dArray[index][tPosY],
-					Text3dArray[index][tPosZ],Text3dArray[index][Text3Ddistance],
-					Text3dArray[index][Text3Ddistance]);
-					#else
-					format(buffer, sizeof buffer, 
-					"Create3DTextLabel(\"%s\", %s, %.2f, %.2f, %.2f, %.1f, 0);\r\n",
-					Text3dArray[index][Text3Dvalue], Text3dArray[index][Text3Dcolor], 
-					Text3dArray[index][tPosX],Text3dArray[index][tPosY],
-					Text3dArray[index][tPosZ],Text3dArray[index][Text3Ddistance]);
-					#endif
-					fwrite(pos, buffer);
-					fclose(pos);
-					SendClientMessage(playerid, -1,
-					"3D Text export to {FFD700}scriptfiles > mtools > 3DText.txt");
-				}
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_CREATEMENU);
-	}
-	if(dialogid == DIALOG_ACTORS)
-	{
-		if(response)
-		{
-			switch(listitem)
-			{
-				// ApplyDynamicActorAnimation(playerid, "VENDING", "VEND_EAT1_P", 4.1, 0, 0, 0, 0, 0);
-				case 0:	
-				{
-					if (GetPVarInt(playerid, "lang") == 0) {
-						ShowPlayerDialog(playerid, DIALOG_ACTORCREATE, DIALOG_STYLE_INPUT,
-						"Create actor", "{FFFFFF}Введите ид скина актера","OK"," < ");
-					} else {
-						ShowPlayerDialog(playerid, DIALOG_ACTORCREATE, DIALOG_STYLE_INPUT,
-						"Create actor", "{FFFFFF}Enter the actor's skin id","OK"," < ");
-					}
-				}
-				case 1:
-				{
-					if (GetPVarInt(playerid, "lang") == 0) 
-					{
-						ShowPlayerDialog(playerid, DIALOG_ACTORINDEX, DIALOG_STYLE_INPUT,
-						"ACTORS manager", "Выберите индекс актера (0-10):", "OK"," < ");
-					} else {
-						ShowPlayerDialog(playerid, DIALOG_ACTORINDEX, DIALOG_STYLE_INPUT,
-						"ACTORS manager", "Select actor index (0-10):", "OK"," < ");
-					}
-				}
-				case 2:
-				{
-					if (GetPVarInt(playerid, "lang") == 0)
-					{
-						ShowPlayerDialog(playerid, DIALOG_ACTORANIMLIB, DIALOG_STYLE_INPUT,
-						"Animlib",
-						"{FFFFFF}Введите название библиотеки анимаций (animlib[]) например PED",
-						"OK"," < ");
-					} else {
-						ShowPlayerDialog(playerid, DIALOG_ACTORANIMLIB, DIALOG_STYLE_INPUT,
-						"Animlib",
-						"{FFFFFF}Enter the name of the animation lib (animlib[]) example PED",
-						"OK"," < ");
-					}
-				}
-				case 3: 
-				{
-					#if defined _new_streamer_included
-					if(IsDynamicActorInvulnerable(Actors[indexActor])){
-						SetDynamicActorInvulnerable(Actors[indexActor], false);
-					}
-					else SetDynamicActorInvulnerable(Actors[indexActor], true);
-					#else
-					if(IsActorInvulnerable(Actors[indexActor])) SetActorInvulnerable(Actors[indexActor], false);
-					else SetActorInvulnerable(Actors[indexActor], true);
-					#endif
-				}
-				case 4:
-				{
-					new Float: x, Float: y, Float: z, Float:ang;  
-					GetPlayerPos(playerid, x, y, z);
-					GetPlayerFacingAngle(playerid, ang);
-					#if defined _new_streamer_included
-					SetDynamicActorPos(Actors[indexActor], x, y, z);
-					#else
-					SetActorFacingAngle(Actors[indexActor], ang-180.0);
-					SetActorPos(Actors[indexActor], x+1, y, z);
-					#endif
-				}
-				case 5:
-				{
-					new Float:ang, Float:actor_ang;
-					GetPlayerFacingAngle(playerid, ang);
-					#if defined _new_streamer_included
-					GetDynamicActorFacingAngle(Actors[indexActor], actor_ang);
-					SetDynamicActorFacingAngle(Actors[indexActor], ang -180.0);
-					#else
-					GetActorFacingAngle(Actors[indexActor], actor_ang);
-					SetActorFacingAngle(Actors[indexActor], ang-180.0);
-					#endif
-				}
-				case 6: 
-				{
-					#if defined _new_streamer_included
-					DestroyDynamicActor(Actors[indexActor]);
-					#else
-					DestroyActor(Actors[indexActor]);
-					#endif
-				}
-				case 7: 
-				{
-					ShowPlayerDialog(playerid, DIALOG_ACTORSMASSMENU, DIALOG_STYLE_LIST,
-					"Создать массовку",
-					"{FFFFFF}Создать массовку\n"\
-					"Кол-во актеров\n"\
-					"Назначить анимации\n"\
-					"Расположение массовки\n"\
-					"Тематическая постановка\n"\
-					"{FF0000}Распустить массовку\n",
-					"OK","Cancel");
-				}
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_CREATEMENU);
-	}
-	if(dialogid == DIALOG_ACTORINDEX)
-	{
-		if(response)
-		{
-			if(!isnull(inputtext) && isNumeric(inputtext))
-			{
-				if(strval(inputtext) > 0 && strval(inputtext) <= 10){
-					indexActor = strval(inputtext);
-				} 
-				else SendClientMessageEx(playerid, -1, "Некорректное значение","Incorrect value");
-			}
-		}
-	}
-	if(dialogid == DIALOG_ACTORCREATE)
-	{
-		if(response)
-		{
-			if(!isnull(inputtext) && isNumeric(inputtext))
-			{
-				new skinid = strval(inputtext);
-				if(skinid >= 1 && skinid < 305 && skinid != 74)
-				{
-					new Float:pos[4];
-					GetPlayerPos(playerid,pos[0],pos[1],pos[2]);
-					GetPlayerFacingAngle(playerid, pos[3]);
-					// Create test actor
-					#if defined _new_streamer_included
-					DestroyDynamicActor(Actors[indexActor]);
-					Actors[indexActor] = CreateDynamicActor(skinid, pos[0]+1, pos[1]+1, pos[2], pos[3],
-					0, 100.0, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), -1, STREAMER_ACTOR_SD, -1, 0);
-					#else
-					DestroyActor(Actors[indexActor]);
-					Actors[indexActor] = CreateActor(skinid, pos[0]+1, pos[1]+1, pos[2], pos[3]);
-					SetActorVirtualWorld(Actors[indexActor], GetPlayerVirtualWorld(playerid));
-					#endif
-				}
-				else SendClientMessageEx(playerid, -1, "Нужно ввести ид скина от 0 до 305","Need to enter the skin id (0 to 305)");
-			}
-		}
-		else ShowPlayerMenu(playerid, DIALOG_ACTORS);
-	}
-	if(dialogid == DIALOG_ACTORANIMLIB)
-	{
-		if(response)
-		{
-			if(isnull(inputtext)) return SendClientMessage(playerid, -1, "Вы оставили поле ввода пустым");
-			format(animactordatalib, sizeof animactordatalib, "%s", inputtext);
-			ShowPlayerDialog(playerid, DIALOG_ACTORANIMNAME, DIALOG_STYLE_INPUT, "Animlib",
-			"{FFFFFF}Полный список анимаций на сайте {00BFFF}http://wiki.pro-pawn.ru/wiki/Анимации\n\
-			 {FFFFFF}Введите название анимации. (animname[]) например IDLE_tired\n","Ok"," X ");
-		}
-		else ShowPlayerMenu(playerid, DIALOG_ACTORS);
-	}
-	if(dialogid == DIALOG_ACTORANIMNAME)
-	{
-		if(response)
-		{
-			if(isnull(inputtext)) return SendClientMessage(playerid, -1, "Вы оставили поле ввода пустым");
-			format(animactordataname, sizeof animactordataname, "%s", inputtext);
-			#if defined _new_streamer_included
-			ApplyDynamicActorAnimation(Actors[indexActor],animactordatalib,animactordataname, 4.1, 1, 0, 0, 0, 0);
-			#else 
-			ApplyActorAnimation(Actors[indexActor],animactordatalib,animactordataname, 4.1, 1, 0, 0, 0, 0); 
-			#endif
-			
-			#if defined _YSF_included
-			SendClientMessagef(playerid, -1, "animation %s - %s", animactordatalib, animactordataname);
-			#endif
-		}
-		else ShowPlayerMenu(playerid, DIALOG_ACTORS);
-	}
 	if(dialogid == DIALOG_WEAPONS)
 	{	
 		if(response)
@@ -5769,19 +5204,6 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			DestroyObject(Vehcam[playerid]);
 			SetCameraBehindPlayer(playerid);
 		}
-		if(GetPVarInt(playerid, "DashCam") > 0)
-		{
-			PlayerTextDrawHide(playerid, DashCam[playerid]);
-			PlayerTextDrawHide(playerid, DashCam2[playerid]);
-		}
-	}
-	if(newstate == PLAYER_STATE_DRIVER)
-	{
-		if(GetPVarInt(playerid, "DashCam") > 0)
-		{
-			PlayerTextDrawShow(playerid, DashCam[playerid]);
-			PlayerTextDrawShow(playerid, DashCam2[playerid]);
-		}
 	}
 	#if defined UGMP_POSTFX_INCLUDED
 	if (dialogid == DIALOG_UGMP_FEATURES)
@@ -5940,48 +5362,6 @@ public OnScriptUpdate()
 				}
 			} 
 		}
-		if(GetPVarInt(i, "DashCam") > 0 && GetPlayerState(i) == PLAYER_STATE_DRIVER)
-		{
-			new dashcam_data[64], dashcam_data2[64];
-			new year,month,day,hour,minute,second;
-			getdate(year, month, day);
-			gettime(hour, minute, second);
-			new copunit[12];
-			switch(GetVehicleModel(GetPlayerVehicleID(i)))
-			{
-				case 497, 523, 430: format(copunit, sizeof(copunit), "PD");
-				case 596: format(copunit, sizeof(copunit), "LSPD");
-				case 597: format(copunit, sizeof(copunit), "SFPD");
-				case 598: format(copunit, sizeof(copunit), "LVPD");
-				case 599: format(copunit, sizeof(copunit), "RANGER");
-				case 601, 427: format(copunit, sizeof(copunit), "S.W.A.T");
-				case 490, 528: format(copunit, sizeof(copunit), "F.B.I");
-				default: format(copunit, sizeof(copunit), "CAM");
-			}
-			if(hour < 12)
-			{
-				format(dashcam_data, sizeof(dashcam_data),
-				"AM %d:%d:%d ~n~%s %d~n~%d kph", hour, minute, second, copunit,
-				GetVehicleModel(GetPlayerVehicleID(i)), GetPlayerSpeed(i));
-			} else {
-				format(dashcam_data, sizeof(dashcam_data),
-				"PM %d:%d:%d ~n~%s %d~n~%d kph", hour, minute, second, copunit,
-				GetVehicleModel(GetPlayerVehicleID(i)), GetPlayerSpeed(i));
-			}
-			new rectimestr[48];
-			new rectime = NetStats_GetConnectedTime(i)/60000; 
-			if(rectime > 60)
-			{
-				format(rectimestr, sizeof(rectimestr), "%d:%d",
-				floatround(rectime / 60), rectime % 60);
-			} else {
-				format(rectimestr, sizeof(rectimestr), "0:%d", rectime);
-			}
-			PlayerTextDrawSetString(i, DashCam[i], dashcam_data);
-			format(dashcam_data2,sizeof(dashcam_data2),
-			"%d %d   %d~n~~r~.~w~REC %s", day, month, year, rectimestr);
-			PlayerTextDrawSetString(i, DashCam2[i], dashcam_data2);
-		}
 	}
 	return 1;
 }	
@@ -6097,7 +5477,7 @@ public ShowPlayerMenu(playerid, dialogid)
 			{		
 				format(tbtext, sizeof(tbtext),
 				"[>] Edit\n"\
-				"{A9A9A9}[>] Create\n"\
+				"{A9A9A9}[>] Objects\n"\
 				"[>] Remove\n"\
 				"{A9A9A9}[>] Textures\n"\
 				"[>] Map manage\n"\
@@ -6109,7 +5489,7 @@ public ShowPlayerMenu(playerid, dialogid)
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"[>] Редактировать\n"\
-				"{A9A9A9}[>] Создать\n"\
+				"{A9A9A9}[>] Объекты\n"\
 				"[>] Удалить\n"\
 				"{A9A9A9}[>] Текстуры\n"\
 				"[>] Управление картой\n"\
@@ -6179,32 +5559,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			
 			ShowPlayerDialog(playerid, DIALOG_ETC, DIALOG_STYLE_TABLIST,
 			"[ETC]",tbtext,"OK","Close");
-		}
-		case DIALOG_CREATEMENU:
-		{
-			new tbtext[400];
-			
-			if(GetPVarInt(playerid, "lang") == 0)
-			{		
-				format(tbtext, sizeof(tbtext),
-				"{A9A9A9}[>] Объект\n"\
-				"[>] 3D текст\n"\
-				"{A9A9A9}[>] Текст\n"\
-				"[>] Pickup\n"\
-				"{A9A9A9}[>] Актера\n"\
-				"[>] Карту\n");
-			} else {
-				format(tbtext, sizeof(tbtext),
-				"{A9A9A9}[>] Object\n"\
-				"[>] 3D text\n"\
-				"{A9A9A9}[>]  Text object\n"\
-				"[>] Pickup\n"\
-				"{A9A9A9}[>] Actor\n"\
-				"[>] New map\n");
-			}
-			
-			ShowPlayerDialog(playerid, DIALOG_CREATEMENU, DIALOG_STYLE_LIST,
-			"[CREATE]",tbtext, "OK","Cancel");
 		}
 		case DIALOG_OBJECTSCAT:
 		{
@@ -6291,24 +5645,26 @@ public ShowPlayerMenu(playerid, dialogid)
 			{
 				ShowPlayerDialog(playerid, DIALOG_OBJECTSMENU, DIALOG_STYLE_TABLIST, 
 				"[CREATE - Objects]",
-				"[>] Создать объект по номеру\t{00FF00}/oadd\n"\
-				"{A9A9A9}[>] Список загруженных объектов\t{00FF00}/lsel\n"\
-				"[>] Категории объектов\t\n"\
-				"{A9A9A9}[>] Поиск\t\n"\
+				"{A9A9A9}Создать объект по номеру\t{00FF00}/oadd\n"\
+				"Наложить текст\t{00FF00}/textobj\n"\
+				"{A9A9A9}Список загруженных объектов\t{00FF00}/lsel\n"\
+				"Категории объектов\t{00FF00}/ocat\n"\
+				"{A9A9A9}Поиск объектов\t{00FF00}/osearch\n"\
 				"Информация о модели объекта\t{00FF00}/minfo\n"\
 				"{A9A9A9}Показать скрытые объекты\t\n",
-				//"[>] Движение объектов\t\n",
+				//"Движение объектов\t\n",
 				"Select","Cancel");
 			} else {
 				ShowPlayerDialog(playerid, DIALOG_OBJECTSMENU, DIALOG_STYLE_TABLIST, 
 				"[CREATE - Objects]",
-				"[>] Create object by number\t{00FF00}/oadd\n"\
-				"{A9A9A9}[>] List of loaded objects\t{00FF00}/lsel\n"\
-				"[>] Object categories\t\n"\
-				"{A9A9A9}[>] Search\t\n"\
+				"{A9A9A9}Create object by number\t{00FF00}/oadd\n"\
+				"Add Text to object\t{00FF00}/textobj\n"\
+				"{A9A9A9}List of loaded objects\t{00FF00}/lsel\n"\
+				"Object categories\t{00FF00}/ocat\n"\
+				"{A9A9A9}Search objects\t{00FF00}/osearch\n"\
 				"Object model information\t{00FF00}/minfo\n"\	
-				"{A9A9A9}Show hidden objects\t\n",
-				//"[>] Object movement\t\n",
+				"Show hidden objects\t\n",
+				//"Object movement\t\n",
 				"Select","Cancel");
 			}
 		}
@@ -6481,114 +5837,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			ShowPlayerDialog(playerid, DIALOG_SOUNDTEST, DIALOG_STYLE_INPUT, "Soundtest",
 			tbtext, "Play", "Stop");
 		}
-		case DIALOG_CREATEPICKUP:
-		{
-			if (GetPVarInt(playerid, "lang") == 0)
-			{
-				ShowPlayerDialog(playerid, DIALOG_CREATEPICKUP, DIALOG_STYLE_LIST, 
-				"Создание pickup",
-				"{FFFFFF}Создать pickup по ID\n"\
-				"{AFDAFC}броня\n"\
-				"{FF0000}пополнение здоровья\n"\
-				"{191970}jetpack\n"\
-				"{008000}иконка бизнеса\n"\
-				"{ffff00}инфо\n"\
-				"{A9A9A9}вход в интерьер\n"\
-				"{00ffff}починка транспорта\n"\
-				"{008000}иконка дома\n"\
-				"{FFFFFF}Обновить все пикапы\n",
-				"Select","Cancel");
-			} else {
-				ShowPlayerDialog(playerid, DIALOG_CREATEPICKUP, DIALOG_STYLE_LIST, 
-				"Create pickup",
-				"{FFFFFF}Create pickup by ID \n"\
-				"{AFDAFC}armour\n"\
-				"{FF0000}health refill\n"\
-				"{191970}jetpack\n"\
-				"{008000}dollar icon\n"\
-				"{ffff00}info icon\n"\
-				"{A9A9A9}interior entrance\n"\
-				"{00ffff}vehicle fix\n"\
-				"{008000}house\n"\
-				"{ffffff}Update all pickups\n",
-				"Select","Cancel");
-			}	
-		}
-		case DIALOG_ACTORS:
-		{
-			new tbtext[300];
-			
-			new header[64];
-			if(indexActor > -1)
-			{
-				format(header, sizeof header, "[ACTORS] actorindex: %i", indexActor);
-			} else {
-				format(header, sizeof header, "[ACTORS]");
-			}
-			
-			if(GetPVarInt(playerid, "lang") == 0)
-			{		
-				format(tbtext, sizeof(tbtext),
-				"{FFFFFF}Создать актера и указать скин\n"\
-				"Сменить индекс\n"\
-				"Назначить анимацию\n"\
-				"Сделать актера бессмертным\n"\
-				"Переместить актера\n"\
-				"Повернуть актера лицом к игроку\n"\
-				"{FF0000}Удалить актера\n");
-				//"{FFFFFF}[>] Создать массовку\n");
-			} else {
-				format(tbtext, sizeof(tbtext),
-				"{FFFFFF}Create actor and set skin\n"\
-				"Change actor index\n"\
-				"Set animation\n"\
-				"Set actor invulnerable\n"\
-				"Move actor\n"\
-				"Rotate the actor to face the player\n"\
-				"{FF0000}Remove actor\n");
-				//"{FFFFFF}[>] Create crowd\n");
-			}
-			
-			ShowPlayerDialog(playerid, DIALOG_ACTORS, DIALOG_STYLE_LIST,
-			header, tbtext, "OK","Cancel");
-		}
-		case DIALOG_3DTEXTMENU:
-		{
-			new tbtext[450];
-			if(GetPVarInt(playerid, "lang") == 0)
-			{	
-				format(tbtext, sizeof(tbtext),
-				"Создать 3DText\t\n"\
-				"Индекс\t%i\n"\
-				"Изменить текст\t%s\n"\
-				"Изменить цвет\t\n"\
-				"Изменить дистанцию\t%.1f\n"\
-				"Изменить позицию\t\n"\
-				"{FF0000}Удалить 3Dtext\t\n"\
-				"Экспортировать в filterscript\t\n",
-				CurrentIndex3dText, 
-				Text3dArray[CurrentIndex3dText][Text3Dvalue],
-				Text3dArray[CurrentIndex3dText][Text3Dcolor],
-				Text3dArray[CurrentIndex3dText][Text3Ddistance]
-				);
-			} else {
-				format(tbtext, sizeof(tbtext),
-				"Create 3DText\t\n"\
-				"Index\t%i\n"\
-				"Change text\t%s\n"\
-				"Change color\t\n"\
-				"Change distance\t%.1f\n"\
-				"Change Position\t\n"\
-				"{FF0000}Delete 3Dtext\t\n"\
-				"Export to filterscript\t\n",
-				CurrentIndex3dText, 
-				Text3dArray[CurrentIndex3dText][Text3Dvalue],
-				Text3dArray[CurrentIndex3dText][Text3Dcolor],
-				Text3dArray[CurrentIndex3dText][Text3Ddistance]);
-			}
-			ShowPlayerDialog(playerid, DIALOG_3DTEXTMENU, DIALOG_STYLE_TABLIST,
-			"[3D TEXT]",tbtext, "OK","Cancel");
-		}
 		case DIALOG_VEHICLE:
 		{
 			new tbtext[450];
@@ -6722,12 +5970,10 @@ public ShowPlayerMenu(playerid, dialogid)
 		case DIALOG_CAMSET:
 		{
 			new tbtext[500];
-			new Firstperson_st[16], dashcam_st[16];
+			new Firstperson_st[16];
 			
 			if(GetPVarInt(playerid,"Firstperson") == 1)
 			Firstperson_st = "{00FF00}[ON]"; else Firstperson_st = "{FF0000}[OFF]";
-			if(GetPVarInt(playerid,"DashCam") == 1)
-			dashcam_st = "{00FF00}[ON]"; else dashcam_st = "{FF0000}[OFF]";
 			
 			if(GetPVarInt(playerid, "lang") == 1)
 			{		
@@ -6736,22 +5982,20 @@ public ShowPlayerMenu(playerid, dialogid)
 				"First person cam\t%s\n"\
 				"Take a photocamera\t{FFFF00}/camera\n"\
 				"Hide all textdraws\t{FFFF00}/hud\n"\
-				"Police dash cam\t%s\n"\
 				"[>] Camera position\t\n"\
 				"[>] Camera speed\t\n"\
 				"[>] Interpolate camera\t\n",
-				Firstperson_st, dashcam_st);
+				Firstperson_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Полет камерой\t{FFFF00}/flymode\n"\
 				"Вид от первого лица\t%s\n"\
 				"Взять фотоаппарат\t{FFFF00}/camera\n"\
 				"Спрятать все текстдравы\t{FFFF00}/hud\n"\
-				"Режим полицейской камеры\t%s\n"\
 				"[>] Позиция камеры\t\n"\
 				"[>] Скорость перемещения камеры\t\n"\
 				"[>] Интерполяция камеры\t\n",
-				Firstperson_st, dashcam_st);
+				Firstperson_st);
 			}
 			
 			ShowPlayerDialog(playerid, DIALOG_CAMSET, DIALOG_STYLE_TABLIST,
@@ -6843,17 +6087,17 @@ public ShowPlayerMenu(playerid, dialogid)
 				format(tbtext, sizeof(tbtext),
 				"Точка по центру экрана в полете\t%s\n\
 				Информация о объектах и транспорте в режиме полета\t%s\n\
-				установить максимальную скорость в режиме полета\t{00FF00}/fmspeed\n\
-				установить ускорение в режиме полета\t{00FF00}/fmaccel\n\
-				вкл-откл ускорение в режиме полета\t{00FF00}/fmtoggle\n",
+				Установить максимальную скорость в режиме полета\t{00FF00}/fmspeed\n\
+				Установить ускорение в режиме полета\t{00FF00}/fmaccel\n\
+				Вкл-откл ускорение в режиме полета\t{00FF00}/fmtoggle\n",
 				AIMTD_st,TargetInfo_st);
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Point in the center of the screen in flight\t%s\n\
 				Information about objects and vehicles in flymode\t%s\n\
-				set max speed in flymode\t{00FF00}/fmspeed\n\
-				set acceleration in flymode\t{00FF00}/fmaccel\n\
-				toggle acceleration in flymode\t{00FF00}/fmtoggle\n",
+				Set max speed in flymode\t{00FF00}/fmspeed\n\
+				Set acceleration in flymode\t{00FF00}/fmaccel\n\
+				Toggle acceleration in flymode\t{00FF00}/fmtoggle\n",
 				AIMTD_st,TargetInfo_st);
 			}
 			
