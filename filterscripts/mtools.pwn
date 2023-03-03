@@ -9,14 +9,12 @@ MTOOLS is a filterscript that complements Texture Studio and provides
 a classic dialog interface. Mtools gives mappers more features to be more productive.
 
 Requirements:
-- SA:MP 0.3.7 R2 server or highter (DL not supported now)
+- SA:MP 0.3.7 server or highter (DL not supported now)
 - Incognito Streamer plugin v 2.7+ (Last 2.9.4 supported)
-- mtools works correctly with Texture Studio 2.0 and above
 
 Installation:
 - Install latest version Texture Studio
-- Copy the mtools.amx file to the filterscripts folder
-- Create /scriptfiles/mtools folder
+- Copy the mtools.amx file to the tstudio filterscripts folder
 - Open the server.cfg file in any editor and add mtools to filtescripts.
 	filterscripts tstudio mtools
 	plugins crashdetect sscanf streamer filemanager
@@ -26,7 +24,7 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.25"
+#define VERSION              	"0.3.26"
 #define BUILD_DATE             	__date
 
 #define DIALOG_MAIN 				6001
@@ -54,7 +52,6 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_GRAVITY				6024
 #define DIALOG_ROTATION				6025
 #define DIALOG_VEHICLE				6026
-#define DIALOG_SOUNDPOINT			6027
 #define DIALOG_SKIN					6028
 #define DIALOG_CAMINTERPOLATE		6029
 #define DIALOG_EDITMENU				6030
@@ -133,7 +130,6 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_WEAPONS_HANDHELD		6129
 #define DIALOG_PICKUPS_ENTER		6131
 #define DIALOG_PICKUPS_HOUSE		6132
-#define DIALOG_UGMP_FEATURES		6133
 #define DIALOG_AUTOTIME				6134
 
 #define COLOR_SERVER_GREY		0x87bae7FF
@@ -173,7 +169,7 @@ IsPlayerSpawned(playerid)
 // old include streamer version 2.7.2 (TS 2.0 RU)
 #include "/modules/streamer.inc" 
 // new include streamer version 2.9.4 (TS 1.9 EN)
-//#include <streamer>
+//#include "/tstudio/streamer"
 
 // check old or new streamer plugin connected
 #if defined INVALID_STREAMER_ID
@@ -390,13 +386,12 @@ main()
 
 public LoadMtoolsDb()
 {
-	if(fexist("mtools/mtools.db"))
+	if(fexist("tstudio/mtools.db"))
 	{
-		mtoolsDB = db_open("mtools/mtools.db");
-		print("mtools.db loaded");
+		mtoolsDB = db_open("tstudio/mtools.db");
 	} else {
 		// Create table with default values
-		mtoolsDB = db_open("mtools/mtools.db");
+		mtoolsDB = db_open("tstudio/mtools.db");
 		db_query(mtoolsDB, "CREATE TABLE Settings (Option text, Value int)");
 		db_query(mtoolsDB, "INSERT INTO Settings (Option, Value) VALUES('Language',0)");
 		db_query(mtoolsDB, "INSERT INTO Settings (Option, Value) VALUES('mainMenuKeyCode',1024)");
@@ -417,8 +412,8 @@ public LoadMtoolsDb()
 		db_query(mtoolsDB, "INSERT INTO Settings (Option, Value) VALUES('autoLoadMap',1)");
 		db_query(mtoolsDB, "INSERT INTO Settings (Option, Value) VALUES('showEditMenu',1)");
 		db_query(mtoolsDB, "INSERT INTO Settings (Option, Value) VALUES('cSelector',1)");
-		if(fexist("mtools/mtools.db")) print("mtools.db created");
-		else print("[fail] create mtools.db. Check /scriptfiles/mtools the directory was created!");
+		if(fexist("tstudio/mtools.db")) print("mtools.db created");
+		else print("[fail] create mtools.db. Check /scriptfiles/tstudio the directory was created!");
 	}
 	
 	// Load settings
@@ -511,7 +506,7 @@ public OnFilterScriptInit()
 	LoadMtoolsDb();
 
 	// Check rcon mode
-	if(fexist("mtools/rcon.txt")) {
+	if(fexist("rcon.txt")) {
 		mtoolsRcon = true;
 	}
 
@@ -1658,65 +1653,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		}
 		return 1;
 	}
-	if(!strcmp(cmdtext, "/ugmp", true))
-	{
-		#if defined UGMP_POSTFX_INCLUDED
-		new
-			grass_state[14], rubbish_state[14],
-			sun_state[14], nightvision_state[14],
-			infared_state[14], cctv_state[14],
-			fogoverlay_state[14], vccam_state[14],
-			realtimeshadows_state[14]
-		;
-		
-		if (GetPVarInt(playerid, "TogglePlayerGrass") > 0) grass_state = "{00FF00}[ON]";
-		else grass_state = "{FF0000}[OFF]";
-		if (IsRubbishVisibleForPlayer(playerid)) rubbish_state = "{00FF00}[ON]";
-		else rubbish_state = "{FF0000}[OFF]";
-		if (GetPVarInt(playerid, "TogglePlayerSun") > 0) sun_state = "{00FF00}[ON]";
-		else sun_state = "{FF0000}[OFF]";
-		if (GetPVarInt(playerid, "TogglePlayerNightVision") > 0) nightvision_state = "{00FF00}[ON]";
-		else nightvision_state = "{FF0000}[OFF]";
-		if (GetPVarInt(playerid, "TogglePlayerInfraRed") > 0) infared_state = "{00FF00}[ON]";
-		else infared_state = "{FF0000}[OFF]";
-		if (GetPVarInt(playerid, "TogglePlayerCCTV") > 0) cctv_state = "{00FF00}[ON]";
-		else cctv_state = "{FF0000}[OFF]";
-		if (GetPVarInt(playerid, "TogglePlayerFogOverlay") > 0) fogoverlay_state = "{00FF00}[ON]";
-		else fogoverlay_state = "{FF0000}[OFF]";
-		if (GetPVarInt(playerid, "TogglePlayerVideoCameraOverlay") > 0) vccam_state = "{00FF00}[ON]";
-		else vccam_state = "{FF0000}[OFF]";
-		if (GetPVarInt(playerid, "TogglePlayerRealTimeShadows") > 0) realtimeshadows_state = "{00FF00}[ON]";
-		else realtimeshadows_state = "{FF0000}[OFF]";
-		
-		new tablisttext[350];
-		format(tablisttext, sizeof(tablisttext),
-		"Crass on floor\t%s\n\
-		Rubbish on ground\t%s\n\
-		Show sun to a player\t%s\n\
-		Night vision\t%s\n\
-		InfaRed vision\t%s\n\
-		CCTV\t%s\n\
-		FogOverlay\t%s\n\
-		VideoCameraOverlay\t%s\n\
-		RealTimeShadows\t%s\n",
-		grass_state, rubbish_state, 
-		sun_state, nightvision_state,
-		infared_state, cctv_state,
-		fogoverlay_state, vccam_state,
-		realtimeshadows_state);
-
-		ShowPlayerDialog(playerid, DIALOG_UGMP_FEATURES, DIALOG_STYLE_TABLIST,
-		"UG-MP Features", tablisttext, "Select", "Cancel");
-		#else
-		ShowPlayerDialog(playerid, DIALOG_UGMP_FEATURES, DIALOG_STYLE_MSGBOX,
-		"UG-MP Features", 
-		"UG:MP functions not included.\n\
-		Use ug-mp client and connect plugin.\n\
-		NOTE: If you really use ugmp client and plugin, try recompile this filterscript.",
-		"Select", "Cancel");
-		#endif
-		return 1;
-	}
 	// Debug commands
 	if(!strcmp(cmdtext, "/testf", true))
     {
@@ -1924,19 +1860,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			switch(listitem)
 			{
 				case 0: Jump(playerid);
-				case 1:
-				{
-					SurflyMode(playerid);
-					// failunder
-					//new Float:x, Float:y, Float:z;
-					//GetPlayerPos(playerid, x,y,z);
-					//SetPlayerPos(playerid,x,y,z-4);
-				}
-				/*case 3:
-				{
-					ShowPlayerDialog(playerid, DIALOG_SOUNDPOINT, DIALOG_STYLE_INPUT, "Soundpoint",
-					"{FFFFFF}Sets the radio to the player's current position(Example: 19800[bass])\nEnter sound ID:", "Select","Cancel");
-				}*/
+				case 1: SurflyMode(playerid);
 				case 2:
 				{
 					if (GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
@@ -3697,14 +3621,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			#endif
 			
 			//SetPlayerMapIcon(playerid, 46, X, Y, Z, strval(inputtext), 0 );
-			new File:pos2 = fopen("mtools/MapIcons.txt", io_append);
+			new File:pos2 = fopen("tstudio/MapIcons.txt", io_append);
 			format(nwMapicon, sizeof nwMapicon, 
 			"CreateDynamicMapIcon(%.2f, %.2f, %.2f, %i, 0, -1, -1, -1, 100.0);\r\n", 
 			X, Y, Z, strval(inputtext));
 			fwrite(pos2, nwMapicon);
 			fclose(pos2);
 			SendClientMessage(playerid, -1,
-			"Dynamic MapIcon export to {FFD700}scriptfiles > mtools > MapIcons.txt");
+			"Dynamic MapIcon export to {FFD700}scriptfiles > tstudio > MapIcons.txt");
 		}
 	}
 	if(dialogid == DIALOG_EDITMENU)
@@ -4028,7 +3952,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						return SendClientMessageEx(playerid, -1,
 						"Установите конечную позицию","Set end position");
 					}
-					new File: file = fopen("mtools/camdata.txt", io_append);
+					new File: file = fopen("tstudio/camdata.txt", io_append);
 					new tmpbuffer[200];
 
 					format(tmpbuffer, 200,
@@ -4126,7 +4050,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			if(!isnull(inputtext))
 			{
-				new File: file = fopen("mtools/camdata.txt", io_append);
+				new File: file = fopen("tstudio/camdata.txt", io_append);
 				
 				new tmpbuffer[200];
 				format(tmpbuffer, 200, "// %s \r\n", inputtext);
@@ -4969,22 +4893,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			StopAudioStreamForPlayer(playerid);
 		}
 	}
-	if(dialogid == DIALOG_SOUNDPOINT)
-	{
-		if(response)
-		{
-			if(!isnull(inputtext))
-			{
-				new Value = strval(inputtext);
-				format(string, sizeof(string), "Sound id: %d", Value);
-				SendClientMessage(playerid, -1, string);
-				new Float:pos[3];
-				GetPlayerPos(playerid, pos[0],pos[1],pos[2]);
-				PlayerPlaySound(playerid, Value, pos[0], pos[1], pos[2]);
-			}
-			CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/cobject 2226");
-		}
-	}
 	if(dialogid == DIALOG_WEAPONS)
 	{	
 		if(response)
@@ -5205,114 +5113,6 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			SetCameraBehindPlayer(playerid);
 		}
 	}
-	#if defined UGMP_POSTFX_INCLUDED
-	if (dialogid == DIALOG_UGMP_FEATURES)
-	{
-		if (response)
-		{
-			switch(listitem)
-			{
-				case 0:
-				{
-					if (GetPVarInt(playerid, "TogglePlayerGrass") > 0)
-					{
-						TogglePlayerGrass(playerid, false);
-						SetPVarInt(playerid, "TogglePlayerGrass", false);
-					} else {
-						TogglePlayerGrass(playerid, true);
-						SetPVarInt(playerid, "TogglePlayerGrass", true);
-					}
-				}
-				case 1: 
-				{
-					if (IsRubbishVisibleForPlayer(playerid)) {
-						TogglePlayerRubbish(playerid, false);
-					} else {
-						TogglePlayerRubbish(playerid, true);
-					}
-				}
-				case 2:
-				{
-					if (GetPVarInt(playerid, "TogglePlayerSun") > 0)
-					{
-						TogglePlayerSun(playerid, false);
-						SetPVarInt(playerid, "TogglePlayerSun", false);
-					} else {
-						TogglePlayerSun(playerid, true);
-						SetPVarInt(playerid, "TogglePlayerSun", true);
-					}
-				}
-				case 3:
-				{
-					if (GetPVarInt(playerid, "TogglePlayerNightVision") > 0)
-					{
-						TogglePlayerNightVision(playerid, false);
-						SetPVarInt(playerid, "TogglePlayerNightVision", false);
-					} else {
-						TogglePlayerNightVision(playerid, true);
-						SetPVarInt(playerid, "TogglePlayerNightVision", true);
-					}
-				}
-				case 4:
-				{
-					if (GetPVarInt(playerid, "TogglePlayerInfraRed") > 0)
-					{
-						TogglePlayerInfraRed(playerid, false);
-						SetPVarInt(playerid, "TogglePlayerInfraRed", false);
-					} else {
-						TogglePlayerInfraRed(playerid, true);
-						SetPVarInt(playerid, "TogglePlayerInfraRed", true);
-					}
-				}
-				case 5:
-				{
-					if (GetPVarInt(playerid, "TogglePlayerCCTV") > 0)
-					{
-						TogglePlayerCCTV(playerid, false);
-						SetPVarInt(playerid, "TogglePlayerCCTV", false);
-					} else {
-						TogglePlayerCCTV(playerid, true);
-						SetPVarInt(playerid, "TogglePlayerCCTV", true);
-					}
-				}
-				case 6:
-				{
-					if (GetPVarInt(playerid, "TogglePlayerFogOverlay") > 0)
-					{
-						TogglePlayerFogOverlay(playerid, false);
-						SetPVarInt(playerid, "TogglePlayerFogOverlay", false);
-					} else {
-						TogglePlayerFogOverlay(playerid, true);
-						SetPVarInt(playerid, "TogglePlayerFogOverlay", true);
-					}
-				}
-				case 7:
-				{
-					if (GetPVarInt(playerid, "TogglePlayerVideoCameraOverlay") > 0)
-					{
-						TogglePlayerVideoCameraOverlay(playerid, false);
-						SetPVarInt(playerid, "TogglePlayerVideoCameraOverlay", false);
-					} else {
-						TogglePlayerVideoCameraOverlay(playerid, true);
-						SetPVarInt(playerid, "TogglePlayerVideoCameraOverlay", true);
-					}
-				}
-				case 8:
-				{
-					if (GetPVarInt(playerid, "TogglePlayerRealTimeShadows") > 0)
-					{
-						TogglePlayerRealTimeShadows(playerid, false);
-						SetPVarInt(playerid, "TogglePlayerRealTimeShadows", false);
-					} else {
-						TogglePlayerRealTimeShadows(playerid, true);
-						SetPVarInt(playerid, "TogglePlayerRealTimeShadows", true);
-					}
-				}
-			}
-		}
-	}
-	#endif
-	// lastdialogid | lastdialog
 	return 1;
 }
 
@@ -5804,7 +5604,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				ShowPlayerDialog(playerid,DIALOG_CREATEOBJ,DIALOG_STYLE_INPUT, header,
 				"{FFFFFF}Введите ID модели объекта для того чтобы его создать\n"\
 				"Объект появится перед вами, далее вы будете изменять его\n\n"\
-				"{FFD700}615-18300 [GTASA], 18632-19521 [SAMP], 11754-11880 [UGMP]\n"\
+				"{FFD700}615-18300 [GTASA], 18632-19521 [SAMP]\n"\
 				"{FFFFFF}Список объектов по категориям можно посмотреть:\n"\
 				"на сайте {00BFFF}https://dev.prineside.com/ru",
 				"Create","Close");
@@ -5814,7 +5614,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				ShowPlayerDialog(playerid,DIALOG_CREATEOBJ,DIALOG_STYLE_INPUT, header,
 				"{FFFFFF} Enter the model ID of the object to create it \n"\
 				"The object will appear in front of you, then you will modify it\n\n"\
-				"{FFD700}615-18300 [GTASA], 18632-19521 [SAMP], 11754-11880 [UGMP]\n"\
+				"{FFD700}615-18300 [GTASA], 18632-19521 [SAMP]\n"\
 				"{FFFFFF} The list of objects by category can be viewed:\n"\
 				"on the site {00BFFF} https://dev.prineside.com/ru",
 				"Create","Close");
@@ -6556,34 +6356,6 @@ stock GetNearestVisibleItem(playerid,type)
 
 //================================END STOCKS====================================
 
-stock mCreatePickup(pickupid, playerid)
-{
-	// Custom pickup create function
-	// Support legacy and streamer mode
-	new nwPickup[126];
-	new Float:X, Float:Y, Float:Z;
-	GetPlayerPos(playerid, X, Y, Z);
-
-	#if defined _new_streamer_included
-	// Example: CreateDynamicPickup(modelid, type, Float:x, Float:y, Float:z,
-	//worldid = -1, interiorid = -1, playerid = -1, Float:streamdistance = 100.0);
-	CreateDynamicPickup(pickupid, 1, X, Y, Z, -1, GetPlayerInterior(playerid), -1, STREAMER_PICKUP_SD);
-	#else
-	// Example: AddStaticPickup( 1242, 2, 1503.3359, 1432.3585, 10.1191, 0);
-	AddStaticPickup(pickupid, 1, X, Y, Z, GetPlayerVirtualWorld(playerid));
-	#endif
-
-	new File:pickupstxt = fopen("mtools/Pickup.txt", io_append);
-	format(nwPickup, sizeof nwPickup, "CreateDynamicPickup(%i, 2, %.2f, %.2f, %.2f, %i, %i, -1, 250, -1, 0);\r\n",
-	pickupid, X, Y, Z, GetPlayerVirtualWorld(playerid),GetPlayerInterior(playerid));
-	fwrite(pickupstxt, nwPickup);
-	fclose(pickupstxt);
-
-	SendClientMessageEx(playerid, -1,
-	"Pickup был сохранен в папке {FFD700}scriptfiles > mtools > Pickups.txt",
-	"Pickup saved at {FFD700}scriptfiles > mtools > Pickups.txt");
-}
-
 stock CreateDynamicObjectByModelid(playerid, modelid)
 {
 	new Float:playerpos[3];
@@ -6619,13 +6391,12 @@ stock CreateDynamicObjectByModelid(playerid, modelid)
 stock RemoveTempMapEditorFiles(playerid)
 {
 	// Remove Temp files from mtolls folder
-	fremove("mtools/camdata.txt");
-	fremove("mtools/Coords.txt");
-	fremove("mtools/MapIcons.txt");
-	fremove("mtools/3DText.txt");
-	fremove("mtools/Pickup.txt");
-	SendClientMessageEx(playerid, -1, "Временные файлы из {FFD700}scriptfiles/mtools{FFFFFF} очищены",
-	"Temporary files from {FFD700}scriptfiles/mtools{FFFFFF} have been cleared");
+	fremove("tstudio/camdata.txt");
+	fremove("tstudio/Coords.txt");
+	fremove("tstudio/MapIcons.txt");
+	fremove("tstudio/Pickup.txt");
+	SendClientMessageEx(playerid, -1, "Временные файлы из {FFD700}scriptfiles/tstudio{FFFFFF} очищены",
+	"Temporary files from {FFD700}scriptfiles/tstudio{FFFFFF} have been cleared");
 }
 
 stock GetPlayerCoords(playerid)
@@ -6676,7 +6447,7 @@ stock SaveCoords(playerid, wmode = 0)
 	new Float:X,Float:Y,Float:Z,Float:ang;
 	GetPlayerPos(playerid, X, Y, Z);
 	GetPlayerFacingAngle(playerid, ang);
-	new File:coord = fopen("mtools/Coords.txt", io_append);
+	new File:coord = fopen("tstudio/Coords.txt", io_append);
 	new nwCoords[126];
 	if(wmode == 1) format(nwCoords, sizeof nwCoords, "( %f, %f, %f ),\r\n", X, Y, Z);
 	else if(wmode == 2) format(nwCoords, sizeof nwCoords, "%f, %f, %f, %f\r\n", X, Y, Z, ang);
@@ -6709,7 +6480,7 @@ stock SaveCoords(playerid, wmode = 0)
 	else format(nwCoords, sizeof nwCoords, "%f, %f, %f\r\n", X, Y, Z);
 	fwrite(coord, nwCoords);
 	fclose(coord);
-	SendClientMessage(playerid, -1, "Координаты были сохранены в папке {FFD700}scriptfiles > mtools > Coords.txt");
+	SendClientMessage(playerid, -1, "Координаты были сохранены в папке {FFD700}scriptfiles > tstudio > Coords.txt");
 	return 1;
 }
 
