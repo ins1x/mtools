@@ -13,7 +13,6 @@ For the list of all server commands and features type /help
 * Download [latest release mtools](https://github.com/ins1x/mtools/releases/tag/Release), unpack it into any folder
 * Copy files from this folder, pre-selecting the desired version TextureStudio
 * Copy the mtools.amx file to the filterscripts folder
-* Create /scriptfiles/mtools folder, copy mtools.db file
 * Open the [server.cfg](https://open.mp/docs/server/server.cfg) file in any editor and add mtools to filtescripts.
 
 ```
@@ -31,7 +30,3 @@ plugins crashdetect sscanf streamer filemanager
 * :gb: [Mtools English wiki](https://github.com/ins1x/mtools/wiki)
 * :ru: [Mtools Russian wiki](https://github.com/ins1x/mtools/wiki/Home-%5BRus%5D)  
 * [Texture Studio wiki](https://github.com/Crayder/Texture-Studio/wiki/Using-Texture-Studio)  
-
-## Disclaimer
-
-**This script** does not claim to be original and is provided as is. The developer is not tasked with making another map editor, but supplementing the existing one for the convenience of work.  
