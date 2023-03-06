@@ -138,9 +138,6 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define COLOR_LIME 				0x33DD1100
 
 #include <a_samp>
-// UG-MP optional and can work without it
-#tryinclude <ugmp>
-#tryinclude <ugmp_postfx>
 
 #include <foreach>
 #if !defined foreach
@@ -648,41 +645,7 @@ public OnPlayerConnect(playerid)
 	"Прежде чем приступать к работе создайте либо загрузите карту (/loadmap)",
 	"Create or load a map before getting started (/loadmap)");
 	
-	if(autoLoadMap) CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/loadmap");		
-
-	#if defined UGMP_POSTFX_INCLUDED
-	// Makes rubbish (e.g. the flying 'zombie elvis found' newspapers and leaves) (in)visible for a single player.
-	// Rubbish is visible by all players by default.
-	TogglePlayerRubbish(playerid, true);
-	// Makes procedural grass visible to a single player. 
-	// The grass will move with the in-game wind, and is visible to all players by default.
-	TogglePlayerGrass(playerid, true);
-	SetPVarInt(playerid, "TogglePlayerGrass", true);
-	// Enables or disables the sun for a single player.
-	TogglePlayerSun(playerid, true);
-	SetPVarInt(playerid, "TogglePlayerSun", true);
-	// Enables or disables the night vision effect inmediately.
-	TogglePlayerNightVision(playerid, true);
-	SetPVarInt(playerid, "TogglePlayerNightVision", true);
-	// Enables or disables the infrared effect inmediately.
-	TogglePlayerInfraRed(playerid, true);
-	SetPVarInt(playerid, "TogglePlayerInfraRed", true);
-	// Enables or disables the CCTV effect inmediately. This effect is never used in the original game.
-	TogglePlayerCCTV(playerid, true);
-	SetPVarInt(playerid, "TogglePlayerCCTV", true);
-	// Enables or disables the fog effect inmediately. This effect is never used in the original game.
-	TogglePlayerFogOverlay(playerid, true);
-	SetPVarInt(playerid, "TogglePlayerFogOverlay", true);
-	// Enables or disables the video camera effect inmediately. This effect is present in GTA: SA, but never used.
-	// It is used in GTA: VC as the camera overlay you see when entering/exiting the golf club or airport.
-	TogglePlayerVideoCameraOverlay(playerid, true);
-	SetPVarInt(playerid, "TogglePlayerVideoCameraOverlay", true);
-	// Makes real-time shadows visible to a single player.
-	// This includes the stencil shadow you see below the player on the PC version of GTA: SA. 
-	// By default, real-time shadows are enabled for all players.
-	TogglePlayerRealTimeShadows(playerid, true);
-	SetPVarInt(playerid, "TogglePlayerRealTimeShadows", true);
-	#endif 
+	if(autoLoadMap) CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/loadmap");
 
 	return 1;
 }
@@ -690,10 +653,7 @@ public OnPlayerConnect(playerid)
 public OnPlayerSpawn(playerid)
 {
 	SetPlayerHealth(playerid, 99999);
-	// TODO: Add save skin option
-	new hostname[64]; 
-    GetServerVarAsString("hostname", hostname, sizeof(hostname));
-	if(strfind(hostname,"1nsanemapping") != -1) SetPlayerSkin(playerid, 160);
+	
 	// Restore last position
 	if(savePlayerPos)
 	{
@@ -703,6 +663,7 @@ public OnPlayerSpawn(playerid)
 			SetActorFacingAngle(playerid, LastPlayerPos[playerid][LastPosA]);
 		}
 	}
+	
 	// Give selected Weapons 
 	ResetPlayerWeapons(playerid);
 	for(new i = sizeof(weapon) -1; i > -1; i--)
@@ -1692,11 +1653,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 
 //================================END CMDS======================================
 
-public OnPlayerText(playerid, text[])
-{
-   return 1;
-}
-
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	if(response) LAST_DIALOG[playerid] = dialogid;
@@ -1920,17 +1876,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	{
 		if(response)
 		{
-			#if defined UGMP_INCLUDED
-			switch(listitem)
-			{
-				case 0: SetPlayerPos(playerid,1765.7373,-1895.3802,14.1300); // LS
-				case 1: SetPlayerPos(playerid,-1984.3955,138.3253,27.9796); // SF
-				case 2: SetPlayerPos(playerid, 1317.222167, 1267.032104, 10.820312); // LV
-				case 3: SetPlayerPos(playerid, 6041.0176,-8327.3174,9.8347); // VC
-				case 4: SetPlayerPos(playerid, 9348.4795,7643.6357,16.4687); // LC
-				case 5: SetPlayerPos(playerid, 8754.6406,14210.1553,6.4485); // bullworth
-			}
-			#else 
 			switch(listitem)
 			{
 				case 0: SetPlayerPos(playerid,1765.7373,-1895.3802,14.1300); // LS
@@ -1942,7 +1887,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 6: SetPlayerPos(playerid,1078.4608,-331.7300,74.8740); // LS Red country 
 				case 7: SetPlayerPos(playerid,-2095.4441,-2368.0361,31.3874); // Whetsone - chilliad
 			}
-			#endif
 		}
 	}
 	if(dialogid == DIALOG_VEHICLE)
@@ -6168,17 +6112,6 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_TPLIST:
 		{
-			#if defined UGMP_INCLUDED
-			ShowPlayerDialog(playerid, DIALOG_TPLIST, DIALOG_STYLE_LIST,
-			"Teleports", 
-			"{FFD700}Los-Santos\n\
-			{FFD700}San Fierro\n\
-			{FFD700}Las-Venturas\n\
-			{FFD700}Vice City\n\
-			{FFD700}Liberty City\n\
-			{FFD700}Bullworth\n",
-			"OK","Cancel");
-			#else 
 			ShowPlayerDialog(playerid, DIALOG_TPLIST, DIALOG_STYLE_LIST,
 			"Teleports", 
 			"{F8F8FF}Los-Santos\n\
@@ -6190,7 +6123,6 @@ public ShowPlayerMenu(playerid, dialogid)
 			{F8F8FF}Red Country\n\
 			{A9A9A9}Whetstone\n",
 			"OK","Cancel");
-			#endif
 		}
 	}
 	return 1;
@@ -7020,14 +6952,6 @@ stock IsValidObjectModel(modelid)
 	else if(modelid == 18109 || modelid == 18112 || modelid >= 18200 && modelid <= 18859) return 1;
 	else if(modelid >= 18860 && modelid <= 19274 || modelid >= 19275 && modelid <= 19595) return 1;
 	else if(modelid >= 19596 && modelid <= 19999) return 1; 
-	//UG-MP Valid Object Models
-	#if defined UGMP_INCLUDED
-	if(modelid >= 11754 && modelid <= 11756) return 1;
-	else if(modelid >= 11759 && modelid <= 11803) return 1;
-	else if(modelid >= 11808 && modelid <= 11859) return 1;
-	else if(modelid >= 11863 && modelid <= 11865) return 1;
-	else if(modelid >= 11875 && modelid <= 11880) return 1;
-	#endif
 	else return 0;
 }
 
