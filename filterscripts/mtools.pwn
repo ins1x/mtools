@@ -24,7 +24,7 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.26"
+#define VERSION              	"0.3.28"
 #define BUILD_DATE             	__date
 
 #define DIALOG_MAIN 				6001
@@ -60,6 +60,8 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_MAPMENU				6033
 #define DIALOG_INTERFACE_SETTINGS	6034
 #define DIALOG_MAINMENU_KEYBINDSET	6035
+#define DIALOG_GROUPMODEL			6036
+#define DIALOG_MTEXTURESEARCH		6037
 #define DIALOG_OBJECTSMENU			6050
 #define DIALOG_FAVORITES			6051
 #define DIALOG_LIMITS				6052
@@ -638,9 +640,40 @@ public OnPlayerConnect(playerid)
 	//hide logo
 	//CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/logo");
 	
-	SendClientMessageToAllEx(0x33DD1100, 
-	"Нажмите <ALT> для вызова mtools. Подробнее /help ",
-	"Press <Y> to open mtools. Use /help to get more");
+	switch(mainMenuKeyCode)
+	{
+		case 1024:
+		{
+			SendClientMessageToAllEx(0x33DD1100, 
+			"Нажмите <ALT> для вызова mtools. Подробнее /help ",
+			"Press <ALT> to open mtools. Use /help to get more");
+		}
+		case 65536: 
+		{
+			SendClientMessageToAllEx(0x33DD1100, 
+			"Нажмите <Y> для вызова mtools. Подробнее /help ",
+			"Press <Y> to open mtools. Use /help to get more");
+		}
+		case 131072:
+		{
+			SendClientMessageToAllEx(0x33DD1100, 
+			"Нажмите <N> для вызова mtools. Подробнее /help ",
+			"Press <N> to open mtools. Use /help to get more");
+		}
+		case 262144: 
+		{
+			SendClientMessageToAllEx(0x33DD1100, 
+			"Нажмите <H> для вызова mtools. Подробнее /help ",
+			"Press <H> to open mtools. Use /help to get more");
+		}
+		case 512: 
+		{
+			SendClientMessageToAllEx(0x33DD1100, 
+			"Нажмите <MMB> для вызова mtools. Подробнее /help ",
+			"Press <MMB> to open mtools. Use /help to get more");
+		}
+	}
+	
 	SendClientMessageToAllEx(0x33DD1100, 
 	"Прежде чем приступать к работе создайте либо загрузите карту (/loadmap)",
 	"Create or load a map before getting started (/loadmap)");
@@ -1792,13 +1825,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"{FF0000}m{FFFFFF}tools — это filterscript который дополняет \n\
 						Texture Studio и предоставляет классический интерфейс на диалогах \n\
 						с основными функциями редактора карт\n\n\
-						Домашняя страница mtools: {4682b4}vk.com/1nsanemapping{FFFFFF}\n\
+						Домашняя страница mtools: {AFAFAF}https://github.com/ins1x/mtools{FFFFFF}\n\
 						Нашли баг? Сообщите о находке!\n");
 					} else {
 						format(tbtext, sizeof(tbtext),
 						"{FF0000}m{FFFFFF}tools is a filterscript that complements Texture Studio and provides\n"\
 						"a classic dialog interface with basic map editor functions\n\n"\
-						"mtools homepage: {4682b4}vk.com/1nsanemapping{FFFFFF}\n"\
+						"mtools homepage: {AFAFAF}https://github.com/ins1x/mtools{FFFFFF}\n"\
 						"Have you found a bug? Please report it!\n");
 					}
 					PlayerPlaySound(playerid, 32402, 0.0, 0.0, 0.0); //heli slah ped 
@@ -2557,24 +2590,47 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/stexture");		
 				case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/text");		
 				case 3: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/sindex");		
-				case 4: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/ttextures");		
+				case 4: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/ttextures");
 				case 5:
 				{
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
+						ShowPlayerDialog(playerid, DIALOG_MTEXTURESEARCH, DIALOG_STYLE_INPUT,
+						"Textures search /mtsearch", 
+						"Поиск текстуры по слову. Выведет результат в меню.\n\
+						Введите слово для поиска:\n",
+						"Select", "Cancel");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_MTEXTURESEARCH, DIALOG_STYLE_INPUT,
+						"Textures search /mtsearch", 
+						"Поиск текстуры по слову. Displays the result in the menu.\n\
+						Enter a search word:\n",
+						"Select", "Cancel");
+					}
+				}				
+				case 6:
+				{
+					if (GetPVarInt(playerid, "lang") == 0)
+					{
 						ShowPlayerDialog(playerid, DIALOG_TEXTURESEARCH, DIALOG_STYLE_INPUT,
-						"Textures search", 
+						"Textures search /tsearch", 
 						"Поиск текстуры по слову. Введите слово для поиска:\n",
 						"Select", "Cancel");
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_TEXTURESEARCH, DIALOG_STYLE_INPUT,
-						"Textures search", 
+						"Textures search /tsearch", 
 						"Поиск текстуры по слову. Enter a search word:\n",
 						"Select", "Cancel");
 					}
 				}
-				case 6: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtreset");		
-				case 7:	ShowPlayerMenu(playerid, DIALOG_TEXTUREBUFFER);
+				case 7:
+				{
+					SendClientMessageEx(playerid, COLOR_LIME,
+					"Введите /mtset <индекс> <номер текстуры>",
+					"Type /mtset <index> <texture number>");
+				}
+				case 8: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtreset");		
+				case 9: ShowPlayerMenu(playerid, DIALOG_TEXTUREBUFFER);
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -2836,8 +2892,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				case 1:
 				{
-					ShowPlayerDialog(playerid, DIALOG_MAINMENU_KEYBINDSET, DIALOG_STYLE_LIST, "Set key",
-					"{00FF00}< ALT >\n{00FF00}< Y >\n{00FF00}< N >\n{00FF00}< H >\n", "Select", "Cancel");
+					ShowPlayerDialog(playerid, DIALOG_MAINMENU_KEYBINDSET, DIALOG_STYLE_LIST,
+					"Set mtools main menu call key",
+					"{00FF00}< ALT >\n\
+					{00FF00}< Y >\n\
+					{00FF00}< N >\n\
+					{00FF00}< H >\n\
+					{00FF00}< MMB >\n",
+					"Select", "Cancel");
 				}
 				case 2:
 				{
@@ -2907,7 +2969,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 1: mainMenuKeyCode = 65536;
 				case 2: mainMenuKeyCode = 131072;
 				case 3: mainMenuKeyCode = 262144;
-				case 4: mainMenuKeyCode = 320;
+				case 4: mainMenuKeyCode = 512;
 			}
 			new query[128];
 			format(query,sizeof(query),
@@ -2920,12 +2982,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				"Не рекомендуется использовать эту клавишу - она задействована под стандартное меню TS",
 				"Not recommended to use this key - it is used under the standard TS menu");
 			}
-			if(mainMenuKeyCode == 320)
+			if(mainMenuKeyCode == 512)
 			{
 				SendClientMessageEx(playerid, -1,
 				"Нажмите колесико мышки для просмотра",
 				"Press Middle Mouse Button (MMB) to open main menu");
 			}
+			SendClientMessageEx(playerid, -1,
+			"Если меню перестало открываться, введите /mtools и вернитесь к предыдущему значению",
+			"If the menu has stopped opening, type /mtools and return to the previous value");
 		}
 		else ShowPlayerMenu(playerid, DIALOG_SETTINGS);
 	}
@@ -3520,7 +3585,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			new modelid = strval(inputtext);
 			if(!IsValidObjectModel(modelid)) {
 				SendClientMessageEx(playerid,COLOR_GREY,
-				"вы указали несуществующий ID модели!","Wrong objectid!");
+				"Вы указали несуществующий ID модели!","Wrong objectid!");
 				return ShowPlayerMenu(playerid, DIALOG_CREATEOBJ);
 			}
 			new param[24];
@@ -3634,13 +3699,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gsel");		
 					SELECTION_MODE[playerid] = 4;
 				}
-				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/setgroup");
-				case 2:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/selectgroup");
-				case 3: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editgroup");
-				case 4: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclone");
-				case 5: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclear");
-				case 6: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gdelete");
-				case 7: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/obmedit");
+				case 1: ShowPlayerMenu(playerid, DIALOG_GROUPMODEL);
+				case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gall");
+				case 3: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/setgroup");
+				case 4:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/selectgroup");
+				case 5: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/editgroup");
+				case 6: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclone");
+				case 7: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/grem");
+				case 8: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gclear");
+				case 9: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gdelete");
+				case 10: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/obmedit");
 			}
 		}
 	}
@@ -3682,7 +3750,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					#endif
 				}*/
-				case 4:
+				case 4: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gdelete");
+				case 5:
 				{
 					if(EDIT_OBJECT_ID[playerid] == -1){
 						return SendClientMessageEx(playerid, COLOR_GREY, 
@@ -3696,13 +3765,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						#endif
 					#endif
 				}
-				case 5:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/undo");		
-				case 6:
-			 	{ 
-					ShowPlayerDialog(playerid, DIALOG_CLEARTEMPFILES, DIALOG_STYLE_MSGBOX, "",
-					"{FFFFFF}This action {FF0000}delete all{FFFFFF} temporary files. You are sure?\n",
-					"Ок","<");
-				}
+				case 6:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/undo");		
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -4325,6 +4388,26 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			SetPVarInt(playerid, "AutoTime", 1);
 		}		
 	}
+	if (dialogid == DIALOG_GROUPMODEL)
+	{
+		if(response)
+		{
+			if(isnull(inputtext) || !isNumeric(inputtext))
+			{
+				return SendClientMessageEx(playerid, COLOR_GREY,
+				"Неверное значение", "Incorrect value");
+			}
+			new modelid = strval(inputtext);
+			if(!IsValidObjectModel(modelid)) {
+				SendClientMessageEx(playerid,COLOR_GREY,
+				"Вы указали несуществующий ID модели!","Wrong objectid!");
+				return ShowPlayerMenu(playerid, DIALOG_GROUPMODEL);
+			}
+			new param[24];
+			format(param, sizeof(param), "/gselmodel %d", modelid);
+			CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
+		}
+	}
 	if (dialogid == DIALOG_MOVINGOBJ)
 	{
 		if(response)
@@ -4624,6 +4707,21 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				new param[64];
 				format(param, sizeof(param), "/tsearch %s", inputtext);
+				CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
+			} else {
+				SendClientMessageEx(playerid, COLOR_GREY,
+				"Неверное значение", "Incorrect value");
+			}
+		}
+	}
+	if (dialogid == DIALOG_MTEXTURESEARCH)
+	{
+		if(response)
+		{
+			if (!isnull(inputtext))
+			{
+				new param[64];
+				format(param, sizeof(param), "/mtsearch %s", inputtext);
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);		
 			} else {
 				SendClientMessageEx(playerid, COLOR_GREY,
@@ -5435,28 +5533,34 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_GROUPEDIT:
 		{
-			new tbtext[450];
+			new tbtext[650];
 			
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
 				"Добавление/удаление объекта из группы\t{00FF00}/gsel\n"\
+				"Добавление объекта в группу по ID модели\t{00FF00}/gselmodel\n"\
+				"Добавление всех объектов в группу\t{00FF00}/gall\n"\
 				"Установить идентификатор группы\t{00FF00}/setgroup\n"\
 				"Выбрать группу\t{00FF00}/selectgroup\n"\
 				"Редактировать группу\t{00FF00}/editgroup\n"\
 				"Копировать объекты которые находятся в группе\t{00FF00}/gclone\n"\
-				"Удалить все объекты из группы\t{00FF00}/gclear\n"\
-				"Удалить объекты которые находятся в группе\t{00FF00}/gdelete\n"\
+				"Удалить объект из группы\t{FF0000}/grem\n"\
+				"Очистить все объекты из группы\t{FF0000}/gclear\n"\
+				"{FF0000}Удалить объекты которые находятся в группе\t{FF0000}/gdelete\n"\
 				"Создание objectmetry фигуры\t{00FF00}/obmedit\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Adding/removing an object from the group\t{00FF00}/gsel\n"\
+				"Adding an object to a group by modelid\t{00FF00}/gselmodel\n"\
+				"Adding all object to a group\t{00FF00}/gall\n"\
 				"Set group id \t{00FF00}/setgroup\n"\
 				"Select a group of objects to edit\t{00FF00}/selectgroup\n"\
 				"Start editing a group\t{00FF00}/editgroup\n"\
 				"Copy objects that are in the group\t{00FF00}/gclone\n"\
-				"Remove all objects from the group\t{00FF00}/gclear\n"\
-				"Delete objects that are in the group\t{00FF00}/gdelete\n"\
+				"Remove object from the group\t{FF0000}/grem\n"\
+				"Remove all objects from the group\t{FF0000}/gclear\n"\
+				"{FF0000}Delete objects that are in the group\t{FF0000}/gdelete\n"\
 				"Creating an objectmetry figure\t{00FF00}/obmedit\n");
 			}
 			
@@ -5474,18 +5578,18 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Удалить ближайший объект\t{FF0000}/dcsel\n"\
 				"Удалить объекты в радиусе\t{FF0000}/rangedel\n"\
 				"Удалить стандартный объект\t{FF0000}/remobject\n"\
+				"Удалить объекты которые находятся в группе\t{FF0000}/gdelete\n"\
 				"Скрыть объект\t\n"\
-				"<<< Вернуть удаленный объект\t{FFFF00}/undo\n"\
-				"Удалить временные файлы mtools\n");
+				"<<< Вернуть удаленный объект\t{FFFF00}/undo\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Delete current object\t{FF0000}/dobject\n"\
 				"Delete nearest object\t{FF0000}/dcsel\n"\
 				"Remove objects in radius\t{FF0000}/rangedel\n"\
 				"Delete default SA object\t{FF0000}/remobject\n"\
+				"Delete objects that are in the group\t{FF0000}/gdelete\n"\
 				"Hide object\t\n"\
-				"<<< Restore deleted object\t{FFFF00}/undo\n"\
-				"Delete temporary files mtools\n");
+				"<<< Restore deleted object\t{FFFF00}/undo\n");
 			}
 			
 			ShowPlayerDialog(playerid, DIALOG_REMMENU, DIALOG_STYLE_TABLIST,
@@ -5493,7 +5597,7 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_TEXTUREMENU:
 		{
-			new tbtext[450];
+			new tbtext[620];
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),	
@@ -5502,7 +5606,9 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Добавить текст на объект\t{00FF00}/text\n"\
 				"Показать индексы\t{00FF00}/sindex\n"\
 				"Сохраненные текстуры\t{00FF00}/ttextures\n"\
+				"Найти текстуру по части имени и вывести в 3D меню\t{00FF00}/mtsearch\n"\
 				"Найти текстуру по части имени\t{00FF00}/tsearch\n"\
+				"Установить текстуру объекту\t{00FF00}/mtset\n"\
 				"{FF0000}Сброс материала и цвета объекта\t{FF0000}/mtreset\n"\
 				"Буффер текстур\t{00FF00}/tbuffer\n");
 			} else {
@@ -5512,7 +5618,9 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Add text to object\t{00FF00}/text\n"\
 				"Show index\t{00FF00}/sindex\n"\
 				"Saved textures\t{00FF00}/ttextures\n"\
+				"Find texture by part of name and open 3D menu\t{00FF00}/mtsearch\n"\
 				"Find texture by part of name\t{00FF00}/tsearch\n"\
+				"Set texture to object\t{00FF00}/mtset\n"\
 				"{FF0000}Reset object material and color\t{FF0000}/mtreset\n"\
 				"Texture buffer\t{00FF00}/tbuffer\n");
 			}
@@ -5871,7 +5979,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				case 65536: mainMenuKeyCode_st = "{00FF00}< Y >";
 				case 131072: mainMenuKeyCode_st = "{00FF00}< N >";
 				case 262144: mainMenuKeyCode_st = "{00FF00}< H >";
-				case 320: mainMenuKeyCode_st = "{00FF00}< MMB >";
+				case 512: mainMenuKeyCode_st = "{00FF00}< MMB >";
 			}
 			
 			if(GetPVarInt(playerid, "lang") == 1)
@@ -6089,6 +6197,23 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Function to automatically change game time.\n\
 				Specify the interval through which the game time will be shifted by 1 hour.\n\
 				Enter the time in seconds:",
+				"Select", "Cancel");
+			}
+		}
+		case DIALOG_GROUPMODEL:
+		{
+			if(GetPVarInt(playerid, "lang") == 0)
+			{
+				ShowPlayerDialog(playerid, DIALOG_GROUPMODEL, DIALOG_STYLE_INPUT,
+				"Group select by model /gselmodel",
+				"Введите ид модели объекта, и система объединит их в одну группу\n\
+				Введите modelid:",
+				"Select", "Cancel");
+			} else {
+				ShowPlayerDialog(playerid, DIALOG_GROUPMODEL, DIALOG_STYLE_INPUT,
+				"Group select by model /gselmodel",
+				"Enter modelid of the object, and the system will combine them into one group\n\
+				Enter modelid:",
 				"Select", "Cancel");
 			}
 		}
