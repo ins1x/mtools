@@ -24,7 +24,7 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.28"
+#define VERSION              	"0.3.3"
 #define BUILD_DATE             	__date
 
 #define DIALOG_MAIN 				6001
@@ -106,7 +106,6 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_SETWORLD				6095
 #define DIALOG_ENVPRESETS			6096
 #define DIALOG_TEXTUREBUFFER		6097
-#define DIALOG_OBJECTSSEARCH		6098
 #define DIALOG_MTAFAVORITES			6099
 #define DIALOG_OBJECTSCAT			6100
 #define DIALOG_LST_LIGHTING			6101
@@ -420,7 +419,6 @@ public LoadMtoolsDb()
 	new field[64];
 	MtoolsSettings = db_query(mtoolsDB, "SELECT Option, Value FROM Settings"); 
 	db_get_field_assoc(MtoolsSettings, "Value", field, 24);
-	//printf("value lang: %i", strval(field));
 	LangSet = strval(field);
 	db_next_row(DBResult:MtoolsSettings);
 	
@@ -547,25 +545,16 @@ public OnPlayerConnect(playerid)
 	//SendClientMessage(playerid, COLOR_GREY, 
 	//"Visit mtools developers page: https://vk.com/1nsanemapping");
 	
-	//print("Streamer config:");
-	/*(new tmpstr[64];
-	format(tmpstr, sizeof(tmpstr), "STREAMER_OBJECT_SD: %.1f | STREAMER_OBJECT_DD: %.1f",
-	STREAMER_OBJECT_SD, STREAMER_OBJECT_DD);
-	printf("%s", tmpstr);
-	*/
-	//printf("MAX_VISIBLE_OBJECTS: %i", MAX_VISIBLE_OBJECTS);
 	SendRconCommand("language English/Russian");
 	
 	// This feature is disabled by default to save bandwidth. 
 	// But needto use GetPlayerCameraTargetVehicle(playerid)
 	EnablePlayerCameraTarget(playerid, true);
+	
 	// Texdraws 
-	// objects rate info
-	//Objrate[playerid] = CreatePlayerTextDraw(playerid, 34, 310, "_");
 	Objrate[playerid] = CreatePlayerTextDraw(playerid, 34, 435, "_");
 	PlayerTextDrawLetterSize(playerid, Objrate[playerid], 0.20, 1.2);
 	PlayerTextDrawAlignment(playerid, Objrate[playerid], 1);
-	//PlayerTextDrawColor(playerid, Objrate[playerid], 0xDFA906AA);
 	PlayerTextDrawColor(playerid, Objrate[playerid], 0xFFFFFFFF);
 	PlayerTextDrawSetShadow(playerid, Objrate[playerid], 0);
 	PlayerTextDrawSetOutline(playerid, Objrate[playerid], 0);
@@ -573,11 +562,9 @@ public OnPlayerConnect(playerid)
 	PlayerTextDrawFont(playerid, Objrate[playerid], 2);
 	PlayerTextDrawSetProportional(playerid, Objrate[playerid], 1);
 	
-	//FPSBAR[playerid] = CreatePlayerTextDraw(playerid, 34, 325, "_");
 	FPSBAR[playerid] = CreatePlayerTextDraw(playerid, 34, 425, "_");
 	PlayerTextDrawLetterSize(playerid, FPSBAR[playerid], 0.20, 1.2);
 	PlayerTextDrawAlignment(playerid, FPSBAR[playerid], 1);
-	//PlayerTextDrawColor(playerid, FPSBAR[playerid], 0xDFA906AA);
 	PlayerTextDrawColor(playerid, FPSBAR[playerid], 0xFFFFFFFF);
 	PlayerTextDrawSetShadow(playerid, FPSBAR[playerid], 0);
 	PlayerTextDrawSetOutline(playerid, FPSBAR[playerid], 0);
@@ -637,7 +624,7 @@ public OnPlayerConnect(playerid)
     LAST_DIALOG[playerid] = -1;
 
 	OnFly[playerid] = false;
-	//hide logo
+	//Hide TS logo
 	//CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/logo");
 	
 	switch(mainMenuKeyCode)
@@ -678,8 +665,12 @@ public OnPlayerConnect(playerid)
 	"Прежде чем приступать к работе создайте либо загрузите карту (/loadmap)",
 	"Create or load a map before getting started (/loadmap)");
 	
-	if(autoLoadMap) CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/loadmap");
-
+	if(autoLoadMap)
+	{
+		SetPVarInt(playerid, "FirstSpawn", 1);
+		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/loadmap");
+	}
+	
 	return 1;
 }
 
@@ -833,14 +824,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
 			}
 		} else {
-			/*
-			if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
-			{
-				if(GetPVarInt(playerid, "Editmode") != 5) { 
-					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
-				}
-			}
-			*/
 			if(OnFly[playerid])// disable surfly
 			{
 				new Float:x,Float:y,Float:z;
@@ -1631,6 +1614,26 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if(GetGravity() != 0.008) SetGravity(0.008);
 		SetPVarInt(playerid, "freezed", 0);
 		hideMtoolsMenu = false;
+		return 1;
+	}
+	if(!strcmp(cmdtext, "/respawn", true) || !strcmp(cmdtext, "/spawn", true))
+	{
+		if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING) return 1;
+	
+		new
+			vid = GetPlayerVehicleID(playerid);
+		if (vid)
+		{
+			new
+				Float:x,
+				Float:y,
+				Float:z;
+			// Remove them without the animation.
+			GetVehiclePos(vid, x, y, z),
+			SetPlayerPos(playerid, x, y, z);
+		}
+		SpawnPlayer(playerid);
+		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gotomap");
 		return 1;
 	}
 	if(!strcmp(cmdtext, "/autotime", true))
@@ -2663,7 +2666,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 6:	CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gtaobjects");		
 				case 7:	ShowPlayerMenu(playerid, DIALOG_PREFABMENU);
 				case 8: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/gall");		
-				case 9:
+				case 9: 
+				{
+					SendClientMessageEx(playerid, COLOR_LIME,
+					"Используйте /gotomap для перемещения на сохраненную позицию спавна",
+					"Use /gotomap to move to the saved spawn position");
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/setspawn");		
+				}
+				case 10:
 				{
 					if(GetPVarInt(playerid, "lang") == 0)
 					{
@@ -2676,7 +2686,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"{FFFFFF}Type {00FF00}mapicon ID:\n","Create","Back");
 					}
 				}
-				case 10:
+				case 11:
 				{
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
@@ -2699,7 +2709,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"Select","Cancel");
 					}
 				}
-				case 11:
+				case 12:
 				{
 					new tbtext[300], CountActors;
 					
@@ -2738,7 +2748,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowPlayerDialog(playerid, DIALOG_LIMITS, DIALOG_STYLE_TABLIST, "Limits",
 					tbtext,"OK","");
 				}
-				case 12:  CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/deletemap");
+				case 13:  CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/deletemap");
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -2978,17 +2988,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			ShowPlayerMenu(playerid, DIALOG_KEYBINDS);
 			if(mainMenuKeyCode == 131072)
 			{
-				SendClientMessageEx(playerid, -1,
+				SendClientMessageEx(playerid, COLOR_LIME,
 				"Не рекомендуется использовать эту клавишу - она задействована под стандартное меню TS",
 				"Not recommended to use this key - it is used under the standard TS menu");
 			}
 			if(mainMenuKeyCode == 512)
 			{
-				SendClientMessageEx(playerid, -1,
+				SendClientMessageEx(playerid, COLOR_LIME,
 				"Нажмите колесико мышки для просмотра",
 				"Press Middle Mouse Button (MMB) to open main menu");
 			}
-			SendClientMessageEx(playerid, -1,
+			SendClientMessageEx(playerid, COLOR_LIME,
 			"Если меню перестало открываться, введите /mtools и вернитесь к предыдущему значению",
 			"If the menu has stopped opening, type /mtools and return to the previous value");
 		}
@@ -3105,12 +3115,40 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		{
 			switch(listitem)
 			{
-				case 0: ShowPlayerMenu(playerid,DIALOG_CREATEOBJ);
+				case 0: ShowPlayerMenu(playerid,DIALOG_CREATEOBJ); // oadd
 				case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/textobj");
 				case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/lsel");
 				case 3:	ShowPlayerMenu(playerid,DIALOG_OBJECTSCAT);
-				case 4: ShowPlayerMenu(playerid,DIALOG_OBJECTSSEARCH);
+				case 4: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/ogoto");
 				case 5:
+				{
+					new tmpstr[64];
+					new objectid = GetNearestVisibleItem(playerid, STREAMER_TYPE_OBJECT);
+					if (GetPVarInt(playerid, "lang") == 0) {
+						format(tmpstr, sizeof(tmpstr), "Nearest object -  objectid: %i modelid: %i",
+						objectid, GetDynamicObjectModel(objectid));
+					} else {
+						format(tmpstr, sizeof(tmpstr), "Ближайший объект - objectid: %i modelid: %i",
+						objectid, GetDynamicObjectModel(objectid));
+					}
+					SendClientMessage(playerid, -1, tmpstr);
+				}
+				case 6:
+				{						
+					if (GetPVarInt(playerid, "lang") == 0)
+					{
+						ShowPlayerDialog(playerid, DIALOG_OBJSEARCH, DIALOG_STYLE_INPUT,
+						"Object search", 
+						"Поиск объектов по слову. Введите слово для поиска:\n",
+						"Search", "Cancel");
+					} else {
+						ShowPlayerDialog(playerid, DIALOG_OBJSEARCH, DIALOG_STYLE_INPUT,
+						"Object search", 
+						"Search for objects by word. Enter a search word:\n",
+						"Search", "Cancel");
+					}
+				}
+				case 7:
 				{
 					if (GetPVarInt(playerid, "lang") == 0)
 					{
@@ -3125,7 +3163,30 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						"Search", "Cancel");
 					}
 				}
-				case 6:
+				case 8: 
+				{
+					new tbtext[128];
+					new objectid = GetNearestVisibleItem(playerid, STREAMER_TYPE_OBJECT);
+					if (GetPVarInt(playerid, "lang") == 0) {
+						format(tbtext, sizeof(tbtext),
+						"{FFFFFF}Nearest object %i - modelid: %i\nEnter modelid to search:",
+						objectid, GetDynamicObjectModel(objectid));
+					} else {
+						format(tbtext, sizeof(tbtext),
+						"{FFFFFF}Ближайший объект %i - modelid: %i\nВведите modelid для поиска:",
+						objectid, GetDynamicObjectModel(objectid));
+					}
+					ShowPlayerDialog(playerid, DIALOG_DUPLICATESEARCH, DIALOG_STYLE_INPUT,
+					"Duplicate search",tbtext, "Search", "Cancel");
+				}
+				case 9:
+				{
+					ShowPlayerDialog(playerid, DIALOG_OBJDISTANCE, DIALOG_STYLE_INPUT,
+					"Distance [object #1]",
+					"{FFFFFF}Determine the distance between two objects. Enter objectid:",
+					"Next", "Cancel");
+				}
+				case 10:
 				{
 					#if defined STREAMER_ALL_TAGS
 					Streamer_ToggleAllItems(playerid, STREAMER_TYPE_OBJECT, 1);
@@ -3140,7 +3201,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					SendClientMessageEx(playerid, -1,
 					"Все скрытые объекты были показаны","All hidden objects have been revealed");
 				}
-				case 7:
+				case 11:
 				{
 					new tbtext[400];
 					
@@ -3167,67 +3228,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 		}
 		else ShowPlayerMenu(playerid, DIALOG_MAIN);
-	}
-	if(dialogid == DIALOG_OBJECTSSEARCH)
-	{
-		if(response)
-		{
-			switch(listitem)
-			{
-				case 0:
-				{
-					if (GetPVarInt(playerid, "lang") == 0)
-					{
-						ShowPlayerDialog(playerid, DIALOG_OBJSEARCH, DIALOG_STYLE_INPUT,
-						"Object search", 
-						"Поиск объектов по слову. Введите слово для поиска:\n",
-						"Search", "Cancel");
-					} else {
-						ShowPlayerDialog(playerid, DIALOG_OBJSEARCH, DIALOG_STYLE_INPUT,
-						"Object search", 
-						"Search for objects by word. Enter a search word:\n",
-						"Search", "Cancel");
-					}
-				}
-				case 1: 
-				{
-					new tbtext[128];
-					new objectid = GetNearestVisibleItem(playerid, STREAMER_TYPE_OBJECT);
-					if (GetPVarInt(playerid, "lang") == 0) {
-						format(tbtext, sizeof(tbtext),
-						"{FFFFFF}Nearest object %i - modelid: %i\nEnter modelid to search:",
-						objectid, GetDynamicObjectModel(objectid));
-					} else {
-						format(tbtext, sizeof(tbtext),
-						"{FFFFFF}Ближайший объект %i - modelid: %i\nВведите modelid для поиска:",
-						objectid, GetDynamicObjectModel(objectid));
-					}
-					ShowPlayerDialog(playerid, DIALOG_DUPLICATESEARCH, DIALOG_STYLE_INPUT,
-					"Duplicate search",tbtext, "Search", "Cancel");
-				}
-				case 2:
-				{
-					ShowPlayerDialog(playerid, DIALOG_OBJDISTANCE, DIALOG_STYLE_INPUT,
-					"Distance [object #1]",
-					"{FFFFFF}Determine the distance between two objects. Enter objectid:",
-					"Next", "Cancel");
-				}
-				case 3:
-				{
-					new tmpstr[64];
-					new objectid = GetNearestVisibleItem(playerid, STREAMER_TYPE_OBJECT);
-					if (GetPVarInt(playerid, "lang") == 0) {
-						format(tmpstr, sizeof(tmpstr), "Nearest object -  objectid: %i modelid: %i",
-						objectid, GetDynamicObjectModel(objectid));
-					} else {
-						format(tmpstr, sizeof(tmpstr), "Ближайший объект - objectid: %i modelid: %i",
-						objectid, GetDynamicObjectModel(objectid));
-					}
-					SendClientMessage(playerid, -1, tmpstr);
-				}
-			}
-		}
-		//else ShowPlayerMenu(playerid, DIALOG_OBJECTSMENU);
 	}
 	if(dialogid == DIALOG_FAVORITES)
 	{
@@ -5155,6 +5155,25 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			SetCameraBehindPlayer(playerid);
 		}
 	}
+	if(newstate == PLAYER_STATE_ONFOOT)
+	{
+		if(autoLoadMap)
+		{
+			if(GetPVarType(playerid, "FirstSpawn"))
+			{
+				CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/sel 0");
+				CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/ogoto");
+				DeletePVar(playerid, "FirstSpawn");
+			}
+		}
+	}
+	if(oldstate == PLAYER_STATE_DRIVER && newstate == PLAYER_STATE_SPECTATING)
+	{
+		// Dirty fix using flymode from transport
+		if(PlayerVehicle[playerid] != 0) DestroyVehicle(PlayerVehicle[playerid]);
+		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
+		CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/flymode");
+	}
 	return 1;
 }
 
@@ -5491,8 +5510,12 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Наложить текст\t{00FF00}/textobj\n"\
 				"{A9A9A9}Список загруженных объектов\t{00FF00}/lsel\n"\
 				"Категории объектов\t{00FF00}/ocat\n"\
+				"{A9A9A9}Переместить камеру к ближайшему объекту\t{00FF00}/ogoto\n"\
+				"Ближайший объект\t{00FF00}/nearest\n"\
 				"{A9A9A9}Поиск объектов\t{00FF00}/osearch\n"\
 				"Информация о модели объекта\t{00FF00}/minfo\n"\
+				"{A9A9A9}Поиск дубликатов объектов\t\n"\
+				"Определить расстояние между двумя объектами\t\n"\
 				"{A9A9A9}Показать скрытые объекты\t\n",
 				//"Движение объектов\t\n",
 				"Select","Cancel");
@@ -5503,31 +5526,14 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Add Text to object\t{00FF00}/textobj\n"\
 				"{A9A9A9}List of loaded objects\t{00FF00}/lsel\n"\
 				"Object categories\t{00FF00}/ocat\n"\
+				"{A9A9A9}Move the camera to the nearest object\t{00FF00}/ogoto\n"\
+				"Nearest object info\t{00FF00}/nearest\n"\
 				"{A9A9A9}Search objects\t{00FF00}/osearch\n"\
 				"Object model information\t{00FF00}/minfo\n"\	
-				"Show hidden objects\t\n",
+				"{A9A9A9}Finding duplicate objects\t\n"\
+				"Determine the distance between two objects\t\n"\
+				"{A9A9A9}Show hidden objects\t\n",
 				//"Object movement\t\n",
-				"Select","Cancel");
-			}
-		}
-		case DIALOG_OBJECTSSEARCH:
-		{
-			if (GetPVarInt(playerid, "lang") == 0)
-			{
-				ShowPlayerDialog(playerid, DIALOG_OBJECTSSEARCH, DIALOG_STYLE_TABLIST, 
-				"[CREATE - Objects]",
-				"{A9A9A9}Поиск объектов по слову\t{00FF00}/osearch\n"\
-				"Поиск дубликатов объектов\t\n"\
-				"{A9A9A9}Определить расстояние между двумя объектами\t\n"\
-				"Ближайший объект\t{00FF00}/nearest\n",
-				"Select","Cancel");
-			} else {
-				ShowPlayerDialog(playerid, DIALOG_OBJECTSSEARCH, DIALOG_STYLE_TABLIST, 
-				"[CREATE - Objects]",
-				"{A9A9A9}Search objects\t{00FF00}/osearch\n"\
-				"Finding duplicate objects\t\n"\
-				"{A9A9A9}Determine the distance between two objects\t\n"\
-				"Nearest object info\t{00FF00}/nearest\n",
 				"Select","Cancel");
 			}
 		}
@@ -5736,7 +5742,7 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_MAPMENU:
 		{
-			new tbtext[500];
+			new tbtext[600];
 			
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
@@ -5750,6 +5756,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Показать стандартные объекты на карте\t{800080}/gtaobjects\n"\
 				"Управление prefab\t{00FF00}/prefab\n"\
 				"Добавить все объекты в группу\t{00FF00}/gall\n"\
+				"Установить точку спавна\t{00FF00}/setspawn\n"\
 				"Добавить mapicon на карту\t\n"\
 				"Сохранить координаты\t\n"\
 				"Лимиты\t\n"\
@@ -5765,6 +5772,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Show default objects on map\t{800080}/gtaobjects\n"\
 				"Manage prefab\t{00FF00}/prefab\n"\
 				"Add all objects to group\t{00FF00}/gall\n"\
+				"Set map spawn point\t{00FF00}/setspawn\n"\
 				"Add mapicon\t\n"\
 				"Save coords\t\n"\
 				"Limits\t\n"\
