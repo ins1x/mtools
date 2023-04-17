@@ -24,7 +24,7 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION              	"0.3.3"
+#define VERSION              	"0.3.4"
 #define BUILD_DATE             	__date
 
 #define DIALOG_MAIN 				6001
@@ -167,7 +167,7 @@ IsPlayerSpawned(playerid)
 // old include streamer version 2.7.2 (TS 2.0 RU)
 #include "/modules/streamer.inc" 
 // new include streamer version 2.9.4 (TS 1.9 EN)
-//#include "/tstudio/streamer"
+// #include "/tstudio/streamer"
 
 // check old or new streamer plugin connected
 #if defined INVALID_STREAMER_ID
@@ -288,7 +288,6 @@ new MAX_VISIBLE_OBJECTS; //defined at OnGameMode init
 // PlayerTextDraws
 new PlayerText:Objrate[MAX_PLAYERS];
 new PlayerText:FPSBAR[MAX_PLAYERS];
-new PlayerText:TDspecbar[MAX_PLAYERS]; 
 new PlayerText:TDAIM[MAX_PLAYERS];
 new PlayerText:Logo[MAX_PLAYERS];
 new PlayerText:TDmessage[MAX_PLAYERS];
@@ -572,11 +571,6 @@ public OnPlayerConnect(playerid)
 	PlayerTextDrawFont(playerid, FPSBAR[playerid], 2);
 	PlayerTextDrawSetProportional(playerid, FPSBAR[playerid], 1);
 	
-	TDspecbar[playerid] = CreatePlayerTextDraw(playerid, 20.0, 150.0, " "); 
-	PlayerTextDrawFont(playerid, TDspecbar[playerid], 1); 
-	PlayerTextDrawLetterSize(playerid, TDspecbar[playerid], 0.195, 0.9); 
-	PlayerTextDrawSetOutline(playerid, TDspecbar[playerid], 1); 
-	
 	TDAIM[playerid] = CreatePlayerTextDraw(playerid, 320.5, 211.5, "."); //light
 	PlayerTextDrawFont(playerid, TDAIM[playerid], 1); 
 	PlayerTextDrawBackgroundColor(playerid, TDAIM[playerid], 255);
@@ -605,7 +599,6 @@ public OnPlayerConnect(playerid)
 	// vars init
 	SetPVarInt(playerid,"lang",LangSet); // Lang 0 - RU Lang 1 - EN
 	SetPVarInt(playerid,"hud",1); // toggle all internal textdraws 
-	SetPVarInt(playerid,"specbar",-1);  //toggle debug(spec) bar
 	SetPVarInt(playerid,"Firstperson",0); // toggle first person mod
 	SetPVarInt(playerid,"LightsStatus",0); // vehicle lights
 	SetPVarInt(playerid, "drunk", 0); // need for frs counter
@@ -718,7 +711,6 @@ public OnPlayerDisconnect(playerid, reason)
 	}
 	
 	PlayerTextDrawDestroy(playerid,	Logo[playerid]);
-	PlayerTextDrawDestroy(playerid, TDspecbar[playerid]);
 	PlayerTextDrawDestroy(playerid, TDAIM[playerid]);
 	PlayerTextDrawDestroy(playerid, FPSBAR[playerid]);
 	PlayerTextDrawDestroy(playerid, Objrate[playerid]);
@@ -1010,6 +1002,20 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		}
 		return true;
 	}
+	if (!strcmp(cmdtext, "/gametext", true))
+	{
+		ShowPlayerDialog(playerid, DIALOG_GAMETEXTSTYLE, DIALOG_STYLE_LIST,
+		"Select Gametext style",
+		"{FFFFFF}Game Text 0\n"\
+		"{00FF00}Game Text 1\n"\
+		"{FF0000}Game Text 2\n"\
+		"{FFFFFF}Game Text 3\n"\
+		"{FFFFFF}Game Text 4\n"\
+		"{FFFFFF}Game Text 5\n"\
+		"{FFFFFF}Game Text 6\n",
+		"OK","Cancel");
+		return true;
+	}
 	if (!strcmp(cmdtext, "/cam", true))
 	{
 		ShowPlayerMenu(playerid,DIALOG_CAMSET);
@@ -1216,31 +1222,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		}
 		return 1;
 	}
-	// debug
-	if(!strcmp(cmdtext, "/specbar", true, 8)) 
-	{
-		new specid;
-		if(!cmdtext[8]) 
-		{
-			if(GetPVarInt(playerid, "specbar") == -1)
-			{
-				PlayerTextDrawHide(playerid, TDspecbar[playerid]);
-				specid = playerid;
-				PlayerTextDrawShow(playerid, TDspecbar[playerid]);
-				SetPVarInt(playerid, "specbar", specid);
-				return true;
-			} else {
-				PlayerTextDrawHide(playerid, TDspecbar[playerid]);
-				SetPVarInt(playerid, "specbar",-1);
-				return true;
-			}
-		}
-		PlayerTextDrawHide(playerid, TDspecbar[playerid]);
-		specid = strval(cmdtext[9]);
-		PlayerTextDrawShow(playerid, TDspecbar[playerid]);
-		SetPVarInt(playerid, "specbar", specid);
-		return true;
-	}
 	// EDITOR cmds
 	if (!strcmp(cmd, "/rotate", true) || !strcmp(cmd, "/rot", true))
 	{
@@ -1276,33 +1257,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
 		format(param, sizeof(param), "/rz %d", rz);
 		CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
-		return 1;
-	}
-	if (!strcmp(cmd, "/spos", true))
-	{
-		new Float:pos[4];
-		GetPlayerPos(playerid, pos[0], pos[1], pos[2]);
-		GetPlayerFacingAngle(playerid, pos[3]);
-		SetPVarFloat(playerid, "lastPosX", pos[0]);
-		SetPVarFloat(playerid, "lastPosY", pos[1]);
-		SetPVarFloat(playerid, "lastPosZ", pos[2]);
-		SetPVarFloat(playerid, "lastPosA", pos[3]);
-		SendClientMessage(playerid, COLOR_GREY,
-		"OnFoot position saved. Use: /lpos to load saved position");
-		return 1;
-	}
-	if (!strcmp(cmd, "/lpos", true))
-	{
-		if(GetPVarType(playerid, "lastPosX") == PLAYER_VARTYPE_NONE)
-		{
-			return SendClientMessage(playerid, COLOR_GREY,
-			"Use: /spos to save current OnFoot position");
-		}
-		SetPlayerPos(playerid, GetPVarFloat(playerid, "lastPosX"),
-		GetPVarFloat(playerid, "lastPosY"), GetPVarFloat(playerid, "lastPosZ"));
-		SetPlayerFacingAngle(playerid, GetPVarFloat(playerid, "lastPosA"));
-		SendClientMessage(playerid, COLOR_GREY,
-		"Saved OnFoot position loaded");
 		return 1;
 	}
 	if (!strcmp(cmd, "/cpos", true) || !strcmp(cmd, "/coords", true))
@@ -1512,28 +1466,9 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		SendClientMessageEx(playerid, -1, "Вы замороженны","You are freezed");
 		return 1;
 	}
-	if(!strcmp(cmdtext, "/slowmo", true))
+	if (!strcmp(cmdtext, "/suicide", true) || !strcmp(cmdtext, "/kill", true))
 	{
-		if(GetGravity() == 0.008)
-		{
-			SendClientMessageEx(playerid, COLOR_LIME,
-			"Включен режим слоумо",
-			"Slow motion mode enabled");
-			SetGravity(0.001);
-		} else {
-			SetGravity(0.008);
-		}
-		return 1;
-	}
-	if (!strcmp(cmdtext, "/respawn", true) || !strcmp(cmdtext, "/kill", true))
-	{
-	    if (GetPlayerState(playerid) != PLAYER_STATE_ONFOOT)
-	    {
-	        SendClientMessageEx(playerid, COLOR_GREY,
-			"Сейчас Вы не можете заспавниться.", "You can't respawn yourself right now.");
-	        return true;
-	    }
-		SpawnPlayer(playerid);
+	    SetPlayerHealth(playerid, 0.0);
 		return true;
 	}
 	if(!strcmp(cmdtext, "/day", true))
@@ -1605,6 +1540,16 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		}
 		return 1;
 	}
+	if (!strcmp(cmdtext, "/avrespawn", true))
+	{
+		RespawnAllVehicles();
+		return 1;
+	}
+	if (!strcmp(cmdtext, "/avrepair", true))
+	{
+		RepairAllVehicles();
+		return 1;
+	}  
 	if(!strcmp(cmdtext, "/unbug", true))
 	{
 		//It is necessary to quickly return many variables to their original ones
@@ -1614,6 +1559,18 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		if(GetGravity() != 0.008) SetGravity(0.008);
 		SetPVarInt(playerid, "freezed", 0);
 		hideMtoolsMenu = false;
+		return 1;
+	}
+	if(!strcmp(cmdtext, "/update", true))
+	{
+		for(new i = 0, j = GetPlayerPoolSize(); i <= j; i++){
+			Streamer_Update(i);
+		}
+		// Note: dynamic objects are restored in 50 ms 
+		// (or through the specified value by the Streamer_TickRate function).
+		Streamer_DestroyAllVisibleItems(playerid, STREAMER_TYPE_OBJECT);
+		SendClientMessageEx(playerid, -1,
+		"Все динамические объекты были обновлены","All dynamic objects have been updated");
 		return 1;
 	}
 	if(!strcmp(cmdtext, "/respawn", true) || !strcmp(cmdtext, "/spawn", true))
@@ -1948,7 +1905,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				case 5: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avsetspawn");
 				case 6: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avexport");
 				case 7: RespawnAllVehicles();
-				case 8: 
+				case 8: RepairAllVehicles();
+				case 9: 
 				{
 					new tbtext[450];
 					if(GetPVarInt(playerid, "lang") == 0)
@@ -1975,7 +1933,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowPlayerDialog(playerid, DIALOG_VEHMOD, DIALOG_STYLE_TABLIST,
 					"[VEHICLE - TUNING]",tbtext, "OK","Cancel");
 				}
-				case 9: 
+				case 10: 
 				{
 					new tbtext[350];
 					if(GetPVarInt(playerid, "lang") == 0)
@@ -2000,7 +1958,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowPlayerDialog(playerid, DIALOG_VEHSPEC, DIALOG_STYLE_LIST,
 					"[VEHICLE - Spec]",tbtext, "OK","Cancel");
 				}
-				case 10: ShowPlayerMenu(playerid, DIALOG_VEHSETTINGS);
+				case 11: ShowPlayerMenu(playerid, DIALOG_VEHSETTINGS);
 			}
 		} else {
 			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -5229,8 +5187,6 @@ public OnScriptUpdate()
 
 public OnPlayerUpdate(playerid)
 {
-	new tdtext[500], string[128];
-	
 	if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING && targetInfo) 
 	{
 		new objectid = GetPlayerCameraTargetObject(playerid);
@@ -5273,55 +5229,6 @@ public OnPlayerUpdate(playerid)
 			SendTexdrawMessage(playerid, 2000, vehinfo);
 		}
 	}
-	
-	if (GetPVarInt(playerid, "specbar") != -1 && IsPlayerConnected(GetPVarInt(playerid,"specbar")))
-	{
-		new specid = GetPVarInt(playerid, "specbar");
-		format(string, sizeof(string), "[~w~DEBUG] ~r~M~w~tools v~r~%s~n~", VERSION);
-		strcat(tdtext, string);	
-		
-		new Float: health, Float: armour;
-		GetPlayerHealth(specid, health);
-		GetPlayerArmour(specid, armour);
-		//format(string, sizeof(string), "~r~HP = %.1f ~h~~b~Armour = %.1f~n~", health, armour);
-		format(string, sizeof(string), "~w~FPS:~r~%.0f ~w~Ping:~r~%d ~w~P.Loss:~r~%.1f~n~",
-		floatabs(GetPVarInt(specid, "fps")),GetPlayerPing(specid),GetPVarFloat(specid, "ploss"));
-		strcat(tdtext, string);			
-
-		new newstate[36];
-		switch(GetPlayerState(specid))
-		{
-			case 0: format(newstate, sizeof(newstate), "NONE");
-			case 1:	format(newstate, sizeof(newstate), "ONFOOT");
-			case 2:	format(newstate, sizeof(newstate), "DRIVER");
-			case 3:	format(newstate, sizeof(newstate), "PASSENGER");
-			case 4:	format(newstate, sizeof(newstate), "EXIT_VEHICLE");
-			case 5:	format(newstate, sizeof(newstate), "ENTER_VEHICLE_DRIVER");
-			case 6:	format(newstate, sizeof(newstate), "ENTER_VEHICLE_PASSENGER");	
-			case 7:	format(newstate, sizeof(newstate), "WASTED");
-			case 8:	format(newstate, sizeof(newstate), "SPAWNED");
-			case 9:	format(newstate, sizeof(newstate), "SPECTATING");
-			default: format(newstate, sizeof(newstate), "NONE");
-		}
-		
-		format(string, sizeof(string), "~w~Skin ~r~%d~w~ ~w~AnimIndex ~r~%d~w~ %s ~n~", 
-		GetPlayerSkin(specid),GetPlayerAnimationIndex(specid), newstate);
-		strcat(tdtext, string);
-		
-		format(string, sizeof(string), "~w~Freezed ~r~%d ~w~world ~r~%d~w~ interior ~r~%d~n~",
-		GetPVarInt(specid, "frz"),GetPlayerVirtualWorld(specid), GetPlayerInterior(specid));
-		strcat(tdtext, string);	
-					
-		format(string, sizeof(string), "~w~FlyMode ~r~%d ~w~Specing ~r~%d ~w~Player speed ~r~%d~n~",
-		GetPVarInt(specid, "FlyMode"), GetPVarInt(specid, "Specing"), GetPlayerSpeed(specid));
-		strcat(tdtext, string);			
-		
-		format(string, sizeof(string), "~w~PlayerCameraMode ~r~%i~w~ ~n~", 
-		GetPlayerCameraMode(playerid));
-		strcat(tdtext, string);
-		
-		PlayerTextDrawSetString(playerid, TDspecbar[playerid],tdtext);
-	}
 }
 
 //================================== [MENU] ====================================
@@ -5355,7 +5262,7 @@ public ShowPlayerMenu(playerid, dialogid)
 				"{A9A9A9}[>] Текстуры\n"\
 				"[>] Управление картой\n"\
 				"{A9A9A9}[>] Транспорт\n"\
-				"[>] Режим съемки\n"\
+				"[>] Управление камерой\n"\
 				"{A9A9A9}[>] Разное\n"\
 				"[>] Настройки\n"\
 				"{A9A9A9}[>] Информация\n");
@@ -5391,19 +5298,19 @@ public ShowPlayerMenu(playerid, dialogid)
 		case DIALOG_ETC:
 		{
 			// todo "Проверить карту на наличие дубликатов объектов\t\n"
-			new tbtext[550];
+			new tbtext[650];
 			
 			if(GetPVarInt(playerid, "lang") == 0)
 			{		
 				format(tbtext, sizeof(tbtext),
-				"Прыгнуть вперед\t{00FF00}/jump\n"\
-				"Surfly mode\t{00FF00}/surfly\n"\
+				"Прыгнуть вперед\t{FFFF00}/jump\n"\
+				"Surfly mode\t{FFFF00}/surfly\n"\
 				"Взять джетпак\t{FFFF00}/jetpack\n"\
 				"Телепортироваться в стандартный интерьер\t{FFFF00}/gotoint\n"\
 				"Телепортироваться в город\t{FFFF00}/tplist\n"\
-				"Обновить все динамические элементы\t\n"\
+				"Обновить все динамические элементы\t{FFFF00}/update\n"\
 				"Протестировать ID звука из игры\t\n"\
-				"Вывести Gametext\t\n"\
+				"Вывести Gametext\t{FFFF00}/gametext\n"\
 				"Оружие\t{FFFF00}/w\n");
 			} else {
 				format(tbtext, sizeof(tbtext),
@@ -5412,9 +5319,9 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Take a jetpack\t{FFFF00}/jetpack\n"\
 				"Teleport to standard interior\t{FFFF00}/gotoint\n"\
 				"Teleport to city\t{FFFF00}/tplist\n"\
-				"Update All Dynamic Elements\t\n"\
+				"Update All Dynamic Elements\t{FFFF00}/update\n"\
 				"Test sound ID from game\t\n"\
-				"Gametext\t\n"\
+				"Gametext\t{FFFF00}/gametext\n"\
 				"Weapons\t{FFFF00}/w\n");
 			}
 			
@@ -5697,7 +5604,7 @@ public ShowPlayerMenu(playerid, dialogid)
 		}
 		case DIALOG_VEHICLE:
 		{
-			new tbtext[450];
+			new tbtext[500];
 			new header[64];
 			
 			if(EDIT_VEHICLE_ID[playerid] > -1)
@@ -5718,7 +5625,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				"{FF0000}Удалить машину\t{FF0000}/avdeletecar\n"\
 				"Установить точку спавна\t{00FF00}/avsetspawn\n"\
 				"Экспорт выбранной машины\t{00FF00}/avexport\n"\
-				"Зареспавнить весь транспорт\t\n"\
+				"Зареспавнить весь транспорт\t{00FF00}/avrespawn\n"\
+				"Починить весь транспорт\t{00FF00}/avrepair\n"\
 				"[>] Тюнинг\t\n"\
 				"[>] Специальные возможности\t\n"\
 				"[>] Настройки\t\n");
@@ -5731,7 +5639,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				"{FF0000}Delete vehicle\t{FF0000}/avdeletecar\n"\
 				"Set spawn place\t{00FF00}/avsetspawn\n"\
 				"Export selected vehicle\t{00FF00}/avexport\n"\
-				"Respawn all vehicles\t\n"\
+				"Respawn all vehicles\t{00FF00}/avrespawn\n"\
+				"Repair all vehicles\t{00FF00}/avrepair\n"\
 				"[>] Tuning\t\n"\
 				"[>] Special abilities\t\n"\
 				"[>] Settings\t\n");
@@ -6229,18 +6138,21 @@ public ShowPlayerMenu(playerid, dialogid)
 		{
 			ShowPlayerDialog(playerid, DIALOG_CMDS, DIALOG_STYLE_MSGBOX, "CMDS", 
 			"{FFD700}Basic commands:\n"\
-			"{FFFFFF}/time, /weather, /day, /night, /hud\n"\
+			"{FFFFFF}/time, /weather, /day(/night) - toggle 9 am/pm, /hud, /jetpack\n"\
 			"{FFD700}Position commands:\n"\
-			"{FFFFFF}/respawn, /freeze, /unfreeze, /cpos, /spos, /lpos\n"\
+			"{FFFFFF}/respawn, /freeze, /unfreeze, /coords\n"\
 			"{FFD700}Editor commands:\n"\
-			"{FFFFFF}/map, /oadd, /rot [rx] [ry] [rz], /pos [ox] [oy] [oz]\n"\
+			"{FFFFFF}/edit, /oadd, /rot [rx] [ry] [rz], /pos [ox] [oy] [oz], /ocat, /stop\n"\
 			"{FFD700}Special commands:\n"\
-			"{FFFFFF}/jetpack, fly, /jump, /dive, /unbug\n"\
+			"{FFFFFF}/surfly, /jump, /dive, /unbug, /drunk, /tplist\n"\
 			"{FFD700}Vehicle commands:\n"\
-			"{FFFFFF}/v, /veh, /flip, /fix\n"\
+			"{FFFFFF}/v, /veh, /vehcolor, /flip, /fix, /wheels, /lights, /removepaintjob\n"\
 			"{FFD700}Camera commands:\n"\
-			"{FFFFFF}/cam, /fixcam, /flymode, /slowmo\n"\
-			"{FFFFFF}\nPress Y to open Main menu or use: /mtools\n",
+			"{FFFFFF}/cam, /fixcam, /flymode, /firstperson\n"\
+			"{FFD700}Map commands:\n"\
+			"{FFFFFF}/mapicon, /mapinfo, /mapload\n"\
+			"{FFFFFF}\nPress Y to open Main menu or cmd: /mtools\n"\
+			"{FFFFFF}Standart Texture Studio commands: /thelp\n",
 			"OK","Cancel");
 		}
 		case DIALOG_TPLIST:
@@ -7095,6 +7007,15 @@ stock RespawnAllVehicles()
 	SendClientMessageToAllEx(COLOR_GREY,
 	"Весь транспорт был возвращен на точку появления",
 	"All vehicles have been returned to the spawn point");
+}  
+
+stock RepairAllVehicles()
+{
+    for (new i = GetVehiclePoolSize()+1; --i != 0;)
+    RepairVehicle(i);
+	SendClientMessageToAllEx(COLOR_GREY,
+	"Весь транспорт был восстановлен",
+	"All vehicles have been reapired");
 }  
 
 public MtoolsHudToggle(playerid)
