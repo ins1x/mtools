@@ -5,8 +5,9 @@
 **MTOOLS** is a filterscript that complements Texture Studio and provides a classic dialog interface.  
 Mtools gives mappers more features to be more productive.
 
->The main menu is called by default on ALT (Can be changed in the settings)\
-For the list of all server commands and features type /help
+> The main menu is called by default on ALT (Can be changed in the settings)  
+For the list of all server commands and features type /help  
+Visit the [Mtools wiki](https://github.com/ins1x/mtools/wiki) to learn more  
 
 ## Installation
 * Download and install [Texture Studio 1.9](https://github.com/Pottus/Texture-Studio) or [Texture Studio 2.0 RUS](https://vk.com/@tip_mapper-texture-studio-20-rus) 
@@ -22,9 +23,9 @@ plugins crashdetect sscanf streamer filemanager
 > Note: mtools is connected after tstudio (server.cfg)  
 
 ## How to use
-* Run Texture Studio via samp-server.exe
-* In samp client add server localhost:7777
-* Connect to the server.
+* Run **Texture Studio** via samp-server.exe
+* In samp client add server [localhost:7777](samp://localhost:7777)
+* Connect to localhost the server
 * After loading, press <ALT> or type /mtools to open the main menu
 * At the first start, recommended open settings section, and configure mtools for yourself
 
@@ -32,8 +33,3 @@ plugins crashdetect sscanf streamer filemanager
 * Use the [Zeex's improved compiler](https://github.com/pawn-lang/compiler) to compile this filterscript!
 * [SA:MP 0.3.7 server](https://www.sa-mp.com/download.php) (DL not requred)
 * [Incognito Streamer plugin v2.7 - 2.9.4](https://github.com/samp-incognito/samp-streamer-plugin/releases)
-
-## Wiki
-* [Mtools wiki](https://github.com/ins1x/mtools/wiki)
-* [Texture Studio wiki](https://github.com/Crayder/Texture-Studio/wiki/Using-Texture-Studio)  
-* [Friendly Asked Questions (FAQ)](https://github.com/ins1x/mtools/wiki/FAQ)
