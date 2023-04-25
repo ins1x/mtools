@@ -1,6 +1,6 @@
 /*
 filterscript: MTOOLS
-homepage: https://vk.com/1nsanemapping
+homepage: https://github.com/ins1x/mtools
 wiki: https://github.com/ins1x/mtools/wiki
 
 About: MTOOLS for Texture Studio SA:MP
@@ -762,7 +762,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		} else {
 			hideMtoolsMenu = true;
 			SendClientMessageEx(playerid, -1,
-			"Вы скрыли основное меню, стобы вернуть нажмите (C + ALT)",
+			"Вы скрыли основное меню, чтобы вернуть нажмите (C + ALT)",
 			"You have hidden the main menu, to return press (C + ALT)");
 		}
 	}
@@ -1714,14 +1714,33 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					} else {
 						ShowPlayerDialog(playerid, DIALOG_TUTORIAL, DIALOG_STYLE_MSGBOX, 
 						"Hotkeys",
-						"GUI: When in fly mode to open the GUI press 'Jump Key'\n"\
-						"otherwise it can be opened by pressing 'N' Key\n"\
-						"{FFFFFF} mtools hotkeys: \n"\
-						"ALT - will open the map editor menu \n"\
-						"Escape - to exit the editor, or select an object \n"\
-						"Space - to rotate the camera while editing \n"\
-						"In the car \n"\
-						"2 - auto tuning \n\n",
+						"{FFFFFF}mtools keyboard shortcuts:\n"\
+						"ALT - opens the map editor menu\n"\
+						"Escape - to exit the editor, or object selection\n"\
+						"Space - to rotate the camera while editing\n"\
+						"In the car\n"\
+						"2 - autotuning\n\n"\
+						"Texture Studio keyboard shortcuts:\n"\
+						"Open the menu:\n"\
+						" in flymode - Shift in normal mode - N\n\n"\
+						"With the texture selection mode enabled /mtextures\n"\
+						"press Alt and the texture will stand on the object \n\n"\
+						"In flymode to scroll through textures:\n"\
+						" down - hold F+Num4\n"\
+						" up - hold F+Num6\n"\
+						" page left - Num4\n"\
+						" page to the right - Num6\n"\
+						"Flipping textures is not in /flymode:\n"\
+						" down - H\n"\
+						" up - Y\n"\
+						" page left - Num4\n"\
+						" page to the right - Num6\n\n"\
+						"Add texture to theme:\n"\
+						" in the flymode, when the /csel command is entered, a SPACE\n"\
+						" in normal mode, a SPACE + RMB\n\n"\
+						"With /editobject enabled, press Alt and the object with is copied.\n"\
+						"Copy object properties to clipboard - H+LMB by object\n"\
+						"Paste object properties from the clipboard - Alt+LMB on the object. \n",
 						"OK","");
 					}
 				}
@@ -1735,20 +1754,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						c+=1;
 					} while (c != 6);
 					
-					ShowPlayerDialog(playerid, DIALOG_COLORSTIP, DIALOG_STYLE_MSGBOX,
+					ShowPlayerDialog(playerid, DIALOG_COLORSTIP, DIALOG_STYLE_TABLIST,
 					"Color codes {FF0000}RR{008000}GG{0000FF}BB{FFFF00} - HEX",
-					"{FF0000}RED \t FF0000 \t 0xFF0000FF\n\
-					{008000}GREEN \t 008000 \t 0x008000FF\n\
-					{0000FF}BLUE \t 0000FF \t 0x0000FFFF\n\
-					{FFFF00}YELLOW \t FFFF00 \t 0xFFFF00FF\n\
-					{FF00FF}PINK \t FF00FF \t 0xFF0080FF\n\
-					{00ffff}AQUA \t 00FFFF \t 0x00FFFFFF\n\
-					{00ff00}LIME \t 00FF00 \t 0x00FF00FF\n\
-					{800080}PURPLE \t 800080 \t 0x800080FF\n\
-					{FFFFFF}WHITE \t FFFFFF \t 0xFFFFFFFF\n\
-					{808080}GREY \t 808080 \t 0x808080FF\n\
-					{363636}BLACK \t 000000 \t 0x000000FF\n",
-					"OK","Cancel");
+					"{FF0000}RED   \t {FF0000}FF0000 \t {FF0000}0xFF0000FF\n\
+					{008000}GREEN  \t {008000}008000 \t {008000}0x008000FF\n\
+					{0000FF}BLUE   \t {0000FF}0000FF \t {0000FF}0x0000FFFF\n\
+					{FFFF00}YELLOW \t {FFFF00}FFFF00 \t {FFFF00}0xFFFF00FF\n\
+					{FF00FF}PINK   \t {FF00FF}FF00FF \t {FF00FF}0xFF0080FF\n\
+					{00ffff}AQUA   \t {00ffff}00FFFF \t {00ffff}0x00FFFFFF\n\
+					{00ff00}LIME   \t {00ff00}00FF00 \t {00ff00}0x00FF00FF\n\
+					{800080}PURPLE \t {800080}800080 \t {800080}0x800080FF\n\
+					{FFFFFF}WHITE  \t {FFFFFF}FFFFFF \t {FFFFFF}0xFFFFFFFF\n\
+					{808080}GREY   \t {808080}808080 \t {808080}0x808080FF\n\
+					{363636}BLACK  \t {363636}000000 \t {363636}0x000000FF\n",
+					" <<< ","");
 					
 					format(tmpstr, sizeof(tmpstr),
 					"Random color: {%d%d%d%d%d%d}%d%d%d%d%d%d",
@@ -5795,12 +5814,6 @@ public ShowPlayerMenu(playerid, dialogid)
 		case DIALOG_SETTINGS:
 		{
 			new tbtext[420];
-			new 
-				Lang_st[48]
-			;
-			
-			if(GetPVarInt(playerid,"lang") == 1) 
-			Lang_st = "{ffffff}[English]"; else Lang_st = "{ffffff}[Ru{3A5FCD}ssi{ff0000}an]";
 
 			if(GetPVarInt(playerid, "lang") == 1)
 			{		
@@ -5817,7 +5830,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Gravity\t{00FF00}%.3f\n"\
 				"Interior\t{00FF00}%i\n"\
 				"World\t{00FF00}%i\n",
-				Lang_st, GetPlayerSkin(playerid), GetPVarInt(playerid,"Weather"),
+				(GetPVarInt(playerid,"lang") == 1) ? "[English]" : "[Russian]",
+				GetPlayerSkin(playerid), GetPVarInt(playerid,"Weather"),
 				GetPVarInt(playerid,"Hour"), GetGravity(),
 				 GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
 			} else {
@@ -5834,7 +5848,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				"Гравитация\t{00FF00}%.3f\n"\
 				"Интерьер\t{00FF00}%i\n"\
 				"Виртуальный мир\t{00FF00}%i\n",
-				Lang_st, GetPlayerSkin(playerid), GetPVarInt(playerid,"Weather"),
+				(GetPVarInt(playerid,"lang") == 1) ? "[English]" : "[Russian]",
+				GetPlayerSkin(playerid), GetPVarInt(playerid,"Weather"),
 				GetPVarInt(playerid,"Hour"), GetGravity(),
 				GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
 			}
@@ -5844,12 +5859,6 @@ public ShowPlayerMenu(playerid, dialogid)
 		case DIALOG_FLYMODESETTINGS:
 		{
 			new tbtext[300];
-			new AIMTD_st[16], TargetInfo_st[16];
-			
-			if(aimPoint) 
-			AIMTD_st = "{00FF00}[ON]"; else AIMTD_st = "{FF0000}[OFF]";
-			if(targetInfo) 
-			TargetInfo_st = "{00FF00}[ON]"; else TargetInfo_st = "{FF0000}[OFF]";
 
 			if (GetPVarInt(playerid, "lang") == 0)
 			{
@@ -5859,7 +5868,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				Установить максимальную скорость в режиме полета\t{00FF00}/fmspeed\n\
 				Установить ускорение в режиме полета\t{00FF00}/fmaccel\n\
 				Вкл-откл ускорение в режиме полета\t{00FF00}/fmtoggle\n",
-				AIMTD_st,TargetInfo_st);
+				(aimPoint) ? "{00FF00}[ON]" : "{FF0000}[OFF]",
+				(targetInfo) ? "{00FF00}[ON]" : "{FF0000}[OFF]");
 			} else {
 				format(tbtext, sizeof(tbtext),
 				"Point in the center of the screen in flight\t%s\n\
@@ -5867,7 +5877,8 @@ public ShowPlayerMenu(playerid, dialogid)
 				Set max speed in flymode\t{00FF00}/fmspeed\n\
 				Set acceleration in flymode\t{00FF00}/fmaccel\n\
 				Toggle acceleration in flymode\t{00FF00}/fmtoggle\n",
-				AIMTD_st,TargetInfo_st);
+				(aimPoint) ? "{00FF00}[ON]" : "{FF0000}[OFF]",
+				(targetInfo) ? "{00FF00}[ON]" : "{FF0000}[OFF]");
 			}
 			
 			ShowPlayerDialog(playerid, DIALOG_FLYMODESETTINGS, DIALOG_STYLE_TABLIST,
