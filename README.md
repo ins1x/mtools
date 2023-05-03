@@ -1,6 +1,6 @@
 # MTOOLS for Texture Studio SA:MP
 
-![logo](/img/logo_mtools.png)
+![logo](https://i.imgur.com/Cq7GYf9.png)
 
 **MTOOLS** is a filterscript that complements Texture Studio and provides a classic dialog interface.  
 Mtools gives mappers more features to be more productive. Visit the [Mtools wiki](https://github.com/ins1x/mtools/wiki) to learn more.  
