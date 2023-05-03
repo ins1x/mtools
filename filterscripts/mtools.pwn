@@ -24,7 +24,7 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION                 "0.3.4"
+#define VERSION                 "0.3.5"
 #define BUILD_DATE              __date
 
 #define DIALOG_MAIN                 6001
@@ -62,6 +62,7 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_MAINMENU_KEYBINDSET  6035
 #define DIALOG_GROUPMODEL           6036
 #define DIALOG_MTEXTURESEARCH       6037
+#define DIALOG_TSGUIDE              6038
 #define DIALOG_OBJECTSMENU          6050
 #define DIALOG_FAVORITES            6051
 #define DIALOG_LIMITS               6052
@@ -165,9 +166,9 @@ IsPlayerSpawned(playerid)
 #endif
 
 // old include streamer version 2.7.2 (TS 2.0 RU)
-#include "/modules/streamer.inc" 
+// #include "/modules/streamer.inc" 
 // new include streamer version 2.9.4 (TS 1.9 EN)
-// #include "/tstudio/streamer"
+#include "/tstudio/streamer"
 
 // check old or new streamer plugin connected
 #if defined INVALID_STREAMER_ID
@@ -1746,6 +1747,40 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 }
                 case 3:
                 {
+                    ShowPlayerDialog(playerid, DIALOG_TSGUIDE, DIALOG_STYLE_MSGBOX,
+                    "TextureStudio Guide",
+                    "{FFFFFF}Creating and editing an object\n\
+                    \n\
+                    Object creation is really simple. You can do it in two ways:\n\
+                    * By using /cobject [object ID] (you can also find and create models using the /osearch\n\
+                    command below), it will immediately create the object you want to create.\n\
+                    * By using /osearch [text], which allows you to search for an object by its name.\n\
+                    Once you've found the object you were looking for you can click Create to spawn it.\n\
+                    \n\
+                    After you created an object it will automatically select itself, so that you can edit it:\n\
+                    * /editobject - Brings up the SA:MP object editing interface, with three draggable\n\
+                    buttons, one for each axis. Very useful for situations when your object doesnt have\n\
+                    to be perfectly aligned with anything.\n\
+                    * /ox, /oy and /oz - Commands used to move an object on an axis by a certain amount.\n\
+                    For example, /ox 1 will move the object by 1 meter on axis X. These commands are\n\
+                    really useful for when you have to align objects (in such case they should be moved\n\
+                    by about 0.002 - remember to avoid flickering).\n\
+                    * /rx, /ry and /rz - Commands used to rotate an object. /rz is what youre going to use\n\
+                    the most, although all of them are really useful.\n\
+                    * /sel [created object ID] - Select an object youve created - uses the ID of a certain\n\
+                    spawned object (for example 1 or 2) and not the ID of a model(for example 19086).\n\
+                    * /csel can be used to select an object by clicking on it\n\
+                    (but its quite buggy because samp), and /lsel brings up a chronological list of all\n\
+                    the objects and lets you choose one of them.\n\
+                    * /dobject - Removes your selected object.\n\
+                    * /clone - Really useful command, perfect for when you have to place many identical\n\
+                    objects. It creates an identical object in the same position as your selected\n\
+                    object and automatically selects it. You will then have to move it to a different\n\
+                    position via /editobject or any other position editing command.",
+                    " >> ", " X ");
+                }
+                case 4:
+                {
                     new tmpstr[48];
                     // random color generate
                     new c, rcolor[6];
@@ -1775,23 +1810,23 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     rcolor[0],rcolor[1],rcolor[2],rcolor[3],rcolor[4],rcolor[5]);
                     SendClientMessage(playerid, -1, tmpstr);
                 }
-                case 4: //https://www.burgershot.gg/showthread.php?tid=174
+                case 5: //https://www.burgershot.gg/showthread.php?tid=174
                 {
                     PlayerPlaySound(playerid, 32402, 0.0, 0.0, 0.0); //heli slah ped 
                     ShowPlayerDialog(playerid, DIALOG_CREDITS, DIALOG_STYLE_MSGBOX, "Credits", 
                     "{FFFFFF}Texture Studio credits:\n\n"\
                     "Pottus - Creating the script itself\n"\
-                    "Crayder - New developer\n\n"\
+                    "Crayder - New TS developer\n\n"\
                     "Incognito - Streamer plugin\n"\
                     "Y_Less - sscanf - original object model sizes - YSI\n"\
                     "Slice - strlib - sqlitei\n"\
                     "JaTochNietDan Filemanager\n"\
                     "SDraw - 3D Menu include\n"\
                     "codectile - Objectmetry functions\n"\
-                    "Abyss Morgan - Streamer Functions\n",
-                    "OK", "");
+                    "Abyss Morgan - 3DTryg Functions\n",
+                    " X ", "");
                 }
-                case 5: 
+                case 6: 
                 {
                     new tbtext[500];
                     new header[100];
@@ -1888,6 +1923,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
     {
         if(response)
         {
+            if(listitem < 7) SetPlayerInterior(playerid, 0);
             switch(listitem)
             {
                 case 0: SetPlayerPos(playerid,1765.7373,-1895.3802,14.1300); // LS
@@ -1898,6 +1934,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 case 5: SetPlayerPos(playerid,-1064.1818,-1223.9795,130.1247); // SF Flint country
                 case 6: SetPlayerPos(playerid,1078.4608,-331.7300,74.8740); // LS Red country 
                 case 7: SetPlayerPos(playerid,-2095.4441,-2368.0361,31.3874); // Whetsone - chilliad
+                case 8: 
+                {
+                    SetPlayerPos(playerid,-741.84,493.00,1371.97); //Liberty
+                    SetPlayerInterior(playerid, 1);
+                }
             }
         }
     }
@@ -2648,6 +2689,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     SendClientMessageEx(playerid, COLOR_LIME,
                     "Используйте /gotomap для перемещения на сохраненную позицию спавна",
                     "Use /gotomap to move to the saved spawn position");
+                    SendClientMessageEx(playerid, COLOR_LIME,
+                    "mtools автоматически восстанавливает вашу позицию при вылете",
+                    "mtools automatically restores your position on crash");
                     CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/setspawn");     
                 }
                 case 10:
@@ -3027,14 +3071,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 {
                     if(use3dTextOnObjects)
                     {
+                        use3dTextOnObjects = false;
                         CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/hidetext3d");
-                        
                     } else {
+                        use3dTextOnObjects = true;
                         CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/showtext3d");
                     }
                     new query[128];
                     format(query,sizeof(query),
-                    "UPDATE `Settings` SET Value=%d WHERE Option='use3dTextOnObjects'", use3dTextOnObjects);
+                    "UPDATE `Settings` SET Value=%d WHERE Option='use3dTextOnObjects'",
+                    use3dTextOnObjects);
                     db_query(mtoolsDB,query);
                 }
                 case 4:
@@ -3045,7 +3091,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     } else { 
                         fpsBarTD = true;
                     }
-                    new query[128];
+                    new query[64];
                     format(query,sizeof(query),
                     "UPDATE `Settings` SET Value=%d WHERE Option='fpsBarTD'",
                     fpsBarTD);
@@ -3140,7 +3186,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                         "Search", "Cancel");
                     }
                 }
-                case 8: 
+                case 8: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/note");
+                //case 9: empty place
+                case 10: 
                 {
                     new tbtext[128];
                     new objectid = GetNearestVisibleItem(playerid, STREAMER_TYPE_OBJECT);
@@ -3156,14 +3204,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     ShowPlayerDialog(playerid, DIALOG_DUPLICATESEARCH, DIALOG_STYLE_INPUT,
                     "Duplicate search",tbtext, "Search", "Cancel");
                 }
-                case 9:
+                case 11:
                 {
                     ShowPlayerDialog(playerid, DIALOG_OBJDISTANCE, DIALOG_STYLE_INPUT,
                     "Distance [object #1]",
                     "{FFFFFF}Determine the distance between two objects. Enter objectid:",
                     "Next", "Cancel");
                 }
-                case 10:
+                case 12:
                 {
                     #if defined STREAMER_ALL_TAGS
                     Streamer_ToggleAllItems(playerid, STREAMER_TYPE_OBJECT, 1);
@@ -3178,7 +3226,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     SendClientMessageEx(playerid, -1,
                     "Все скрытые объекты были показаны","All hidden objects have been revealed");
                 }
-                case 11:
+                case 13:
                 {
                     new tbtext[400];
                     
@@ -3699,7 +3747,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/dcsel");        
                 case 2: 
                 {
-                    SendClientMessage(playerid, COLOR_GREY, "not available for demo version");
                     if (GetPVarInt(playerid, "lang") == 1) {
                         ShowPlayerDialog(playerid, DIALOG_RANGEDEL, DIALOG_STYLE_INPUT, "/rangedel",
                         "{FFFFFF}This action {FF0000}delete all{FFFFFF} in the specified radius. Enter radius:\n",
@@ -3739,6 +3786,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     #else
                         #if defined _YSF_included
                         HideObjectForPlayer(playerid, EDIT_OBJECT_ID[playerid]);
+                        #else
+                        SendClientMessageEx(playerid, COLOR_GREY, 
+                        "Обновите стрмиер до последней версии, либо подключите плагин YSF",
+                        "Update the streamer to the latest version, or connect the YSF plugin");
                         #endif
                     #endif
                 }
@@ -4220,30 +4271,27 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     {
                         PlayerTextDrawHide(playerid, TDAIM[playerid]);
                         aimPoint = false;
-                    } else { 
-                        aimPoint = true;
                     }
-                    new query[128];
+                    else aimPoint = true;
+                    
+                    new query[64];
                     format(query,sizeof(query),
                     "UPDATE `Settings` SET Value=%d WHERE Option='aimPoint'",
                     aimPoint);
                     db_query(mtoolsDB,query);
-                    ShowPlayerMenu(playerid, DIALOG_INTERFACE_SETTINGS);
+                    ShowPlayerMenu(playerid, DIALOG_CAMSET);
                 }
                 case 1:
                 {
-                    if(targetInfo) 
-                    {
-                        targetInfo = false;
-                    } else { 
-                        targetInfo = true;
-                    }
-                    new query[128];
+                    if(targetInfo) targetInfo = false;
+                    else targetInfo = true;
+                    
+                    new query[64];
                     format(query,sizeof(query),
                     "UPDATE `Settings` SET Value=%d WHERE Option='targetInfo'",
                     targetInfo);
                     db_query(mtoolsDB,query);
-                    ShowPlayerMenu(playerid, DIALOG_INTERFACE_SETTINGS);
+                    ShowPlayerMenu(playerid, DIALOG_CAMSET);
                 }
                 case 2:
                 {
@@ -5103,6 +5151,34 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
         }
     }
+    if(dialogid == DIALOG_TSGUIDE)
+    {
+        if(response)
+        {
+            ShowPlayerDialog(playerid, DIALOG_TSGUIDE, DIALOG_STYLE_MSGBOX,
+            "TextureStudio Guide", 
+            "{FFFFFF}Other vital or very useful commands:\n\
+            * /undo - Self explanatory. Note: there's no redo command, so be careful with it.\n\
+            * /hidetext3d - Hides all the floating text labels with object IDs, really useful\n\
+            for when your map is huge and they make you lag.\n\
+            * /showtext3d - Self explanatory.\n\
+            * /edittext3d - Allows you to edit the labels. By default the label displays the ID of an object\n\
+            and the ID of a group it's a part of, but you can greatly reduce lag (in large maps)\n\
+            by removing the group ID from the labels, as it's not really too useful.\n\
+            * /ogoto - TPs you to the object you've selected. Works only with flymode enabled.\n\
+            Really useful when you need to come back to your map after closing your game/server\n\
+            all you have to do it /sel 0 then /ogoto.\n\
+            * /stopedit - Sometimes you might end up bugging the SAMP object editing interface\n\
+            (for example by dying while adjusting an object)\n\
+            * /note - Lets you add a note to a certain object ID, which will be visible in the exported map code.\n\
+            Very useful for when you need to mark certain objects for future scripting purposes,\n\
+            * /oprop - Brings up a window with details of your selected object.\n\
+            * /bindeditor and /runbind - This command lets you create a <bind> - a series of commands that will \n\
+            trigger together if you use /runbind [bind ID].\n\
+            Useful for things that you use a lot, for example /mtcolor 0 0xFFFFFFFF.\n",
+            " >> ", " X ");
+        }
+    }
     // lastdialog last dialog
     return 1;
 }
@@ -5299,6 +5375,7 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Команды {FF0000}m{FFFFFF}tools\n"\
                 "Команды {00FF00}TextureStudio\n"\
                 "Управление и горячие клавиши\n"\
+                "Гайд по TextureStudio\n"\
                 "Цветовая палитра\n"\
                 "Credits\n"\
                 "О {FF0000}m{FFFFFF}tools\n");
@@ -5307,6 +5384,7 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Commands {FF0000}m{FFFFFF}tools\n"\
                 "Commands {00FF00}TextureStudio\n"\
                 "Controls and hotkeys\n"\
+                "TextureStudio Guide\n"\
                 "Color codes\n"\
                 "Credits\n"\
                 "About {FF0000}m{FFFFFF}tools\n");
@@ -5441,9 +5519,11 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Ближайший объект\t{00FF00}/nearest\n"\
                 "{A9A9A9}Поиск объектов\t{00FF00}/osearch\n"\
                 "Информация о модели объекта\t{00FF00}/minfo\n"\
-                "{A9A9A9}Поиск дубликатов объектов\t\n"\
-                "Определить расстояние между двумя объектами\t\n"\
-                "{A9A9A9}Показать скрытые объекты\t\n",
+                "{A9A9A9}Добавить заметку на объект\t{00FF00}/note\n"\
+                "\t\n"\
+                "Поиск дубликатов объектов\t\n"\
+                "{A9A9A9}Определить расстояние между двумя объектами\t\n"\
+                "Показать скрытые объекты\t\n",
                 //"Движение объектов\t\n",
                 "Select","Cancel");
             } else {
@@ -5456,10 +5536,12 @@ public ShowPlayerMenu(playerid, dialogid)
                 "{A9A9A9}Move the camera to the nearest object\t{00FF00}/ogoto\n"\
                 "Nearest object info\t{00FF00}/nearest\n"\
                 "{A9A9A9}Search objects\t{00FF00}/osearch\n"\
-                "Object model information\t{00FF00}/minfo\n"\   
-                "{A9A9A9}Finding duplicate objects\t\n"\
-                "Determine the distance between two objects\t\n"\
-                "{A9A9A9}Show hidden objects\t\n",
+                "Object model information\t{00FF00}/minfo\n"\  
+                "{A9A9A9}Add a note to object\t{00FF00}/note\n"\                
+                "\t\n"\
+                "Finding duplicate objects\t\n"\
+                "{A9A9A9}Determine the distance between two objects\t\n"\
+                "Show hidden objects\t\n",
                 //"Object movement\t\n",
                 "Select","Cancel");
             }
@@ -5481,7 +5563,7 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Удалить объект из группы\t{FF0000}/grem\n"\
                 "Очистить все объекты из группы\t{FF0000}/gclear\n"\
                 "{FF0000}Удалить объекты которые находятся в группе\t{FF0000}/gdelete\n"\
-                "Создание objectmetry фигуры\t{00FF00}/obmedit\n");
+                "Создание фигуры по параметрам\t{00FF00}/obmedit\n");
             } else {
                 format(tbtext, sizeof(tbtext),
                 "Adding/removing an object from the group\t{00FF00}/gsel\n"\
@@ -5494,7 +5576,7 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Remove object from the group\t{FF0000}/grem\n"\
                 "Remove all objects from the group\t{FF0000}/gclear\n"\
                 "{FF0000}Delete objects that are in the group\t{FF0000}/gdelete\n"\
-                "Creating an objectmetry figure\t{00FF00}/obmedit\n");
+                "Creating a shape by parameters\t{00FF00}/obmedit\n");
             }
             
             ShowPlayerDialog(playerid, DIALOG_GROUPEDIT, DIALOG_STYLE_TABLIST,
@@ -6041,15 +6123,28 @@ public ShowPlayerMenu(playerid, dialogid)
             new Float:RotX,Float:RotY,Float:RotZ;
             GetDynamicObjectRot(EDIT_OBJECT_ID[playerid], RotX, RotY, RotZ);
             
-            format(tbtext, sizeof(tbtext),
-            "Auto rotation\t/arot\n\
-            {3f70d6}/Rx \t %.2f\n\
-            {e0364e}/Ry \t %.2f\n\
-            {26b85d}/Rz \t %.2f\n\
-            Set anchor point\t{00FF00}/pivot\n\
-            Turn on/off pivot rotation\t{00FF00}/togpivot\n\
-            Reset object rotation\t{FF0000}/rotreset\n\
-            Basic movement commands\n", RotX, RotY, RotZ);
+            if(GetPVarInt(playerid, "lang") == 0)
+            {   
+                format(tbtext, sizeof(tbtext),
+                "Auto rotation\t/arot\n\
+                {3f70d6}/Rx \t %.2f\n\
+                {e0364e}/Ry \t %.2f\n\
+                {26b85d}/Rz \t %.2f\n\
+                Set anchor point\t{00FF00}/pivot\n\
+                Turn on/off pivot rotation\t{00FF00}/togpivot\n\
+                Reset object rotation\t{FF0000}/rotreset\n\
+                Basic movement commands\n", RotX, RotY, RotZ);
+            } else {
+                format(tbtext, sizeof(tbtext),
+                "Автоповорот\t/arot\n\
+                {3f70d6}/Rx \t %.2f\n\
+                {e0364e}/Ry \t %.2f\n\
+                {26b85d}/Rz \t %.2f\n\
+                Установить точку привязки\t{00FF00}/pivot\n\
+                Включить/выключить вращение по оси\t{00FF00}/togpivot\n\
+                Сброс RXYZ объекта\t{FF0000}/rotreset\n\
+                Основные команды перемещения\n", RotX, RotY, RotZ);
+            }
             
             ShowPlayerDialog(playerid, DIALOG_ROTATION, DIALOG_STYLE_TABLIST,
             "[EDIT - Rotate]",tbtext, "OK","Cancel");
@@ -6176,7 +6271,8 @@ public ShowPlayerMenu(playerid, dialogid)
             {F8F8FF}Bone Country\n\
             {A9A9A9}Flint Country\n\
             {F8F8FF}Red Country\n\
-            {A9A9A9}Whetstone\n",
+            {A9A9A9}Whetstone\n\
+            {F8F8FF}Liberty City\n",
             "OK","Cancel");
         }
     }
@@ -6659,7 +6755,7 @@ public SpawnNewVehicle(playerid, vehiclemodel) //spawn new veh by id
 {
     // Spawn new vehicle for a player
     // Return: vehicleid
-    //  if(IsApplyAnimation(playerid, "FALL_fall") return 0;
+    
     if(vehiclemodel < 400 && vehiclemodel > 611) return 0;
     new Float:x,Float:y,Float:z,Float:ang;
     if(PlayerVehicle[playerid] != 0) DestroyVehicle(PlayerVehicle[playerid]);
@@ -6674,7 +6770,7 @@ public SpawnNewVehicle(playerid, vehiclemodel) //spawn new veh by id
     new vehicleid = GetPlayerVehicleID(playerid);
     SetVehicleVirtualWorld(vehicleid, GetPlayerVirtualWorld(playerid));
     LinkVehicleToInterior(vehicleid, GetPlayerInterior(playerid));
-    //if(GetPlayerInterior(playerid) != 0) SetVehicleToRespawn(vehicleid);
+    
     PutPlayerInVehicle(playerid, PlayerVehicle[playerid], 0);
     SetVehicleZAngle(GetPlayerVehicleID(playerid),ang);
     return vehicleid;
