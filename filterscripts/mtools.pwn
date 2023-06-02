@@ -24,7 +24,7 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION                 "0.3.5"
+#define VERSION                 "0.3.6"
 #define BUILD_DATE              __date
 
 #define DIALOG_MAIN                 6001
@@ -166,9 +166,9 @@ IsPlayerSpawned(playerid)
 #endif
 
 // old include streamer version 2.7.2 (TS 2.0 RU)
-// #include "/modules/streamer.inc" 
+#include "/modules/streamer.inc" 
 // new include streamer version 2.9.4 (TS 1.9 EN)
-#include "/tstudio/streamer"
+//#include "/tstudio/streamer"
 
 // check old or new streamer plugin connected
 #if defined INVALID_STREAMER_ID
@@ -1296,6 +1296,39 @@ public OnPlayerCommandText(playerid, cmdtext[])
         CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
         format(param, sizeof(param), "/oz %d", oz);
         CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
+        return 1;
+    }
+    if (!strcmp(cmd, "/untexture", true))
+    {
+        new param[24];
+        new material = 0;
+        for(new materialindex = 0; materialindex < 15; materialindex++)
+        {
+            format(param, sizeof(param), "/mtset %d %d", materialindex, material);
+            CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);
+        }
+        return 1;
+    }
+    if (!strcmp(cmd, "/ohide", true))
+    {
+        #if defined STREAMER_ALL_TAGS
+        Streamer_ToggleItem(playerid, STREAMER_TYPE_OBJECT, EDIT_OBJECT_ID[playerid], 0);
+        #else 
+        SendClientMessageEx(playerid, COLOR_LIME,
+        "Недоступно. Нужен streamer версии 2.9+",
+        "Unavailable. Need streamer version 2.9+");
+        #endif
+        return 1;
+    }
+    if (!strcmp(cmd, "/oshow", true))
+    {
+        #if defined STREAMER_ALL_TAGS
+        Streamer_ToggleItem(playerid, STREAMER_TYPE_OBJECT, EDIT_OBJECT_ID[playerid], 1);
+        #else 
+        SendClientMessageEx(playerid, COLOR_LIME,
+        "Недоступно. Нужен streamer версии 2.9+",
+        "Unavailable. Need streamer version 2.9+");
+        #endif
         return 1;
     }
     if (!strcmp(cmd, "/tplist", true) || !strcmp(cmd, "/teles", true))
@@ -2651,7 +2684,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     "Type /mtset <index> <texture number>");
                 }
                 case 8: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/mtreset");      
-                case 9: ShowPlayerMenu(playerid, DIALOG_TEXTUREBUFFER);
+                case 9: 
+                {
+                    new param[64];
+                    format(param, sizeof(param), "/untexture");
+                    OnPlayerCommandText(playerid, param);
+                }
+                case 10: ShowPlayerMenu(playerid, DIALOG_TEXTUREBUFFER);
             }
         }
         else ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -3223,10 +3262,69 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                         }
                         #endif
                     #endif
-                    SendClientMessageEx(playerid, -1,
+                    SendClientMessageEx(playerid, COLOR_LIME,
                     "Все скрытые объекты были показаны","All hidden objects have been revealed");
                 }
                 case 13:
+                {
+                    new str[512], File: file;
+                    if(!fexist("tstudio/ExportMaps/savedobjects.txt")) {
+                        file = fopen("tstudio/ExportMaps/savedobjects.txt", io_write);
+                    }
+                    else file = fopen("tstudio/ExportMaps/savedobjects.txt", io_append);
+                 
+                    new Float:x, Float:y, Float:z;
+                    new Float:rx, Float:ry, Float:rz;
+                    new objectid = EDIT_OBJECT_ID[playerid];
+                    new worldid = GetPlayerVirtualWorld(playerid);
+                    new interiorid = GetPlayerInterior(playerid);
+                    new modelid = EDIT_OBJECT_MODELID[playerid];
+                    
+                    GetDynamicObjectPos(objectid, x, y, z);
+                    GetDynamicObjectRot(objectid, rx, ry, rz);
+                    
+                    fwrite(file, "\r\n");
+                    format(str, 256,
+                    "\r\ntmpobjid = CreateDynamicObject(%d, %f, %f, %f, %f, %f, %f, %d, %d);",
+                    modelid, x, y, z, rx, ry, rz, worldid, interiorid);
+                    fwrite(file, str);
+                    
+                    new model, txdname[256], texturename[256], materialcolor;
+                    for(new materialindex = 0; materialindex < 15; materialindex++)
+                    {
+                        //if(IsDynamicObjectMaterialUsed(objectid, materialindex))
+                        GetDynamicObjectMaterial(objectid, materialindex, model,
+                        txdname, texturename, materialcolor);
+                        
+                        if(model && strlen(txdname) && strcmp(txdname,"invalid")!=0
+                        && strlen(texturename) && strcmp(texturename,"invalid")!=0)
+                        {
+                            format(str, 512,
+                            "\r\nSetDynamicObjectMaterial(tmpobjid, %d, %d, %s, %s, %d);",
+                            materialindex, model, txdname, texturename, materialcolor);
+                            fwrite(file, str);
+                        }
+                    }
+                    
+                    new text[256], materialsize, fontface[256],
+                    fontsize, bold, fontcolor, backcolor,textaligment;
+                    GetDynamicObjectMaterialText(objectid, 0, text, materialsize,
+                    fontface, fontsize, bold, fontcolor, backcolor, textaligment);
+                    if(materialsize && fontsize)
+                    {
+                        format(str, 512,
+                        "\r\nSetDynamicObjectMaterialText(tmpobjid, 0, %s, %s, %d, %d);",
+                        text, materialsize, fontface, fontsize, bold, fontcolor, backcolor, textaligment);
+                        fwrite(file, str);
+                    }
+                    
+                    fwrite(file, "\r\n");
+                    fclose(file);
+                    
+                    SendClientMessage(playerid, COLOR_LIME,
+                    "Dynamic object export to: scriptfiles > tstudio > ExportMaps > savedobjects.txt");
+                }
+                case 14:
                 {
                     new tbtext[400];
                     
@@ -3661,8 +3759,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             X, Y, Z, strval(inputtext));
             fwrite(pos2, nwMapicon);
             fclose(pos2);
-            SendClientMessage(playerid, -1,
-            "Dynamic MapIcon export to {FFD700}scriptfiles > tstudio > MapIcons.txt");
+            SendClientMessage(playerid, COLOR_LIME,
+            "Dynamic MapIcon export to: scriptfiles > tstudio > MapIcons.txt");
         }
     }
     if(dialogid == DIALOG_EDITMENU)
@@ -5523,7 +5621,8 @@ public ShowPlayerMenu(playerid, dialogid)
                 "\t\n"\
                 "Поиск дубликатов объектов\t\n"\
                 "{A9A9A9}Определить расстояние между двумя объектами\t\n"\
-                "Показать скрытые объекты\t\n",
+                "Показать скрытые объекты\t\n"\
+                "{A9A9A9}Экспортировать текущий объект в файл\t\n",
                 //"Движение объектов\t\n",
                 "Select","Cancel");
             } else {
@@ -5537,11 +5636,12 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Nearest object info\t{00FF00}/nearest\n"\
                 "{A9A9A9}Search objects\t{00FF00}/osearch\n"\
                 "Object model information\t{00FF00}/minfo\n"\  
-                "{A9A9A9}Add a note to object\t{00FF00}/note\n"\                
+                "{A9A9A9}Add a note to object\t{00FF00}/note\n"\
                 "\t\n"\
                 "Finding duplicate objects\t\n"\
                 "{A9A9A9}Determine the distance between two objects\t\n"\
-                "Show hidden objects\t\n",
+                "Show hidden objects\t\n"\
+                "{A9A9A9}Export the current object to a file\t\n",
                 //"Object movement\t\n",
                 "Select","Cancel");
             }
@@ -5625,6 +5725,7 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Найти текстуру по части имени\t{00FF00}/tsearch\n"\
                 "Установить текстуру объекту\t{00FF00}/mtset\n"\
                 "{FF0000}Сброс материала и цвета объекта\t{FF0000}/mtreset\n"\
+                "{FF0000}Сброс материалов на всех индексах\t{FF0000}/untexture\n"\
                 "Буффер текстур\t{00FF00}/tbuffer\n");
             } else {
                 format(tbtext, sizeof(tbtext),  
@@ -5637,6 +5738,7 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Find texture by part of name\t{00FF00}/tsearch\n"\
                 "Set texture to object\t{00FF00}/mtset\n"\
                 "{FF0000}Reset object material and color\t{FF0000}/mtreset\n"\
+                "{FF0000}Resetting materials on all indexes\t{FF0000}/untexture\n"\
                 "Texture buffer\t{00FF00}/tbuffer\n");
             }
             
