@@ -24,7 +24,7 @@ After loading, press ALT or type /mtools to open the main menu
 Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 */
 
-#define VERSION                 "0.3.6"
+#define VERSION                 "0.3.7"
 #define BUILD_DATE              __date
 
 #define DIALOG_MAIN                 6001
@@ -63,11 +63,11 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_GROUPMODEL           6036
 #define DIALOG_MTEXTURESEARCH       6037
 #define DIALOG_TSGUIDE              6038
+#define DIALOG_AVATTACH             6039
 #define DIALOG_OBJECTSMENU          6050
 #define DIALOG_FAVORITES            6051
 #define DIALOG_LIMITS               6052
 #define DIALOG_REMDEFOBJECT         6053
-#define DIALOG_ACTORINDEX           6054
 #define DIALOG_VEHSETTINGS          6055
 #define DIALOG_VEHMOD               6056
 #define DIALOG_RANGEDEL             6057
@@ -79,7 +79,6 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_WHEELS               6063
 #define DIALOG_OBJSEARCH            6064
 #define DIALOG_TEXTURESEARCH        6065
-#define DIALOG_ACTORMASSANIM        6066
 #define DIALOG_VEHSPEC              6067
 #define DIALOG_VEHSTYLING           6068
 #define DIALOG_SPOILERS             6069
@@ -92,6 +91,7 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define DIALOG_FLYMODESETTINGS      6076
 #define DIALOG_FMACCEL              6077
 #define DIALOG_FMSPEED              6078
+#define DIALOG_SWAPBUILDING         6079
 #define DIALOG_DYNOBJSPEED          6083
 #define DIALOG_DISTANCE3DTEXT       6084
 #define DIALOG_COLOR3DTEXT          6085
@@ -140,7 +140,12 @@ Editor options: TABSIZE 4, encoding windows-1251, Lang EN-RU
 #define COLOR_LIME              0x33DD1100
 
 #include <a_samp>
-
+#if defined _samp_included
+	#if (!defined GetPlayerPoolSize || !defined GetSVarInt)
+		#error This filterscript requires SA:MP version 0.3.7
+	#endif
+#endif
+	
 #include <foreach>
 #if !defined foreach
     #define foreach(%1,%2) for (new %2 = 0; %2 < MAX_PLAYERS; %2++) if (IsPlayerConnected(%2))
@@ -166,9 +171,9 @@ IsPlayerSpawned(playerid)
 #endif
 
 // old include streamer version 2.7.2 (TS 2.0 RU)
-#include "/modules/streamer.inc" 
+//#include "/modules/streamer.inc" 
 // new include streamer version 2.9.4 (TS 1.9 EN)
-//#include "/tstudio/streamer"
+#include "/tstudio/streamer"
 
 // check old or new streamer plugin connected
 #if defined INVALID_STREAMER_ID
@@ -176,8 +181,6 @@ IsPlayerSpawned(playerid)
 #else 
     #define INVALID_STREAMER_ID (0)
 #endif
-
-#include <filemanager>
 
 /* ** Macros ** */
 // HOLDING(keys)
@@ -197,9 +200,16 @@ IsPlayerSpawned(playerid)
     (VectorSize(%0-%3,%1-%4,%2-%6))
 
 // Streamer macros
+// https://github.com/AbyssMorgan/SAMP/blob/main/Libs/StreamerFunction/StreamerFunction.inc
 #define GetStreamerVersion()                    Streamer_IncludeFileVersion
 #define GetDynamicObjectPoolSize()              Streamer_GetUpperBound(STREAMER_TYPE_OBJECT)
 #define GetDynamicObjectModel(%1)               Streamer_GetIntData(STREAMER_TYPE_OBJECT,(%1),E_STREAMER_MODEL_ID)
+//DynamicObject
+#define SetDynamicObjectModel(%1,%2)			Streamer_SetIntData(STREAMER_TYPE_OBJECT,(%1),E_STREAMER_MODEL_ID,(%2))
+#define GetDynamicObjectINT(%1)					Streamer_GetIntData(STREAMER_TYPE_OBJECT,(%1),E_STREAMER_INTERIOR_ID)
+#define SetDynamicObjectINT(%1,%2)				Streamer_SetIntData(STREAMER_TYPE_OBJECT,(%1),E_STREAMER_INTERIOR_ID,(%2))
+#define GetDynamicObjectVW(%1)					Streamer_GetIntData(STREAMER_TYPE_OBJECT,(%1),E_STREAMER_WORLD_ID)
+#define SetDynamicObjectVW(%1,%2)				Streamer_SetIntData(STREAMER_TYPE_OBJECT,(%1),E_STREAMER_WORLD_ID,(%2))
 //GetNearestVisibleItem
 #define GetNearestVisibleObject(%0)             GetNearestVisibleItem((%0),STREAMER_TYPE_OBJECT)
 #define GetNearestVisiblePickup(%0)             GetNearestVisibleItem((%0),STREAMER_TYPE_PICKUP)
@@ -245,7 +255,6 @@ IsPlayerSpawned(playerid)
 #define TEXT3D_DEFAULT_DISTANCE     20.0
 #define TEXT3D_DEFAULT_COLOR        0xAFAFAFAA
 
-#define TEXTURE_STUDIO
 #define FILTERSCRIPT
 
 // Variables without :bool tag because have problems with export to sql
@@ -1368,6 +1377,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
         if(!strlen(tmp))
         {
             ShowPlayerMenu(playerid,DIALOG_CREATEOBJ);
+			return 1;
         }
         new param[24];
         format(param, sizeof(param), "/cobject %d", strval(tmp));
@@ -1856,16 +1866,22 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     "JaTochNietDan Filemanager\n"\
                     "SDraw - 3D Menu include\n"\
                     "codectile - Objectmetry functions\n"\
-                    "Abyss Morgan - 3DTryg Functions\n",
+                    "Abyss Morgan - Streamer functions\n",
                     " X ", "");
                 }
                 case 6: 
                 {
                     new tbtext[500];
-                    new header[100];
+                    new header[128];
+					#if defined _new_streamer_included
                     format(header, sizeof(header),
-                    "{FF0000}M{FFFFFF}TOOLS {FFFFFF}Version: {FFD700}%s{FFFFFF} build %s\n",
+                    "{FF0000}M{FFFFFF}TOOLS {FFFFFF}Version: {FFD700}%s{FFFFFF} build new streamer %s\n",
                     VERSION, BUILD_DATE);
+					#else
+					format(header, sizeof(header),
+                    "{FF0000}M{FFFFFF}TOOLS {FFFFFF}Version: {FFD700}%s{FFFFFF} build old streamer %s\n",
+                    VERSION, BUILD_DATE);
+					#endif
                     if (GetPVarInt(playerid, "lang") == 0)
                     {
                         format(tbtext, sizeof(tbtext),
@@ -1999,7 +2015,26 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 case 6: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avexport");
                 case 7: RespawnAllVehicles();
                 case 8: RepairAllVehicles();
-                case 9: 
+				case 9:
+				{
+					new tbtext[200];
+                    if(GetPVarInt(playerid, "lang") == 0)
+                    {       
+                        format(tbtext, sizeof(tbtext),
+                        "Прикрепить текущий объект\t{00FF00}/avattach\n"\
+                        "Открепить объект\t{00FF00}/avdetach\n"\
+                        "Отразить объект\t{00FF00}/avmirror\n");
+                    } else {
+                       format(tbtext, sizeof(tbtext),
+                        "Attach the current object\t{00FF00}/avattach\n"\
+                        "Detach object\t{00FF00}/avdetach\n"\
+                        "Mirror object\t{00FF00}/avmirror\n");
+                    }
+                    
+                    ShowPlayerDialog(playerid, DIALOG_AVATTACH, DIALOG_STYLE_TABLIST,
+                    "[VEHICLE - ATTACH]", tbtext, "OK","Cancel");
+				}
+                case 10: 
                 {
                     new tbtext[450];
                     if(GetPVarInt(playerid, "lang") == 0)
@@ -2026,7 +2061,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     ShowPlayerDialog(playerid, DIALOG_VEHMOD, DIALOG_STYLE_TABLIST,
                     "[VEHICLE - TUNING]",tbtext, "OK","Cancel");
                 }
-                case 10: 
+                case 11: 
                 {
                     new tbtext[350];
                     if(GetPVarInt(playerid, "lang") == 0)
@@ -2051,7 +2086,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     ShowPlayerDialog(playerid, DIALOG_VEHSPEC, DIALOG_STYLE_LIST,
                     "[VEHICLE - Spec]",tbtext, "OK","Cancel");
                 }
-                case 11: ShowPlayerMenu(playerid, DIALOG_VEHSETTINGS);
+                case 12: ShowPlayerMenu(playerid, DIALOG_VEHSETTINGS);
             }
         } else {
             if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) ShowPlayerMenu(playerid, DIALOG_MAIN);
@@ -2536,6 +2571,28 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         }
         else ShowPlayerMenu(playerid, DIALOG_VEHICLE);
     }
+	if(dialogid == DIALOG_AVATTACH)
+	{
+		if(response)
+        {
+            switch(listitem)
+            {
+                case 0:
+				{
+					SendClientMessageEx(playerid, COLOR_LIME,
+                    "Для перемещения используйте /avox, /avoy, /avoz",
+					"To move attach use /avox, /avoy, /avoz");
+					SendClientMessageEx(playerid, COLOR_LIME,
+                    "Для поворота используйте /avrx, /avry, /avrz",
+					"To rotate attach use /avrx, /avry, /avrz");
+					CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avattach");
+				}
+                case 1: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avdetach");
+                case 2: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/avmirror");
+			}
+		}
+		else ShowPlayerMenu(playerid, DIALOG_VEHICLE);
+	}
     if(dialogid == DIALOG_VEHMOD)
     {
         if(response)
@@ -3167,6 +3224,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     db_query(mtoolsDB,query);
                     ShowPlayerMenu(playerid, DIALOG_INTERFACE_SETTINGS);
                 }
+				case 7:
+				{
+					if(hideMtoolsMenu) 
+                    {
+                        hideMtoolsMenu = false;
+                    } else { 
+						hideMtoolsMenu = true;
+                    }
+					ShowPlayerMenu(playerid, DIALOG_INTERFACE_SETTINGS);
+				}
             }
         }
         else ShowPlayerMenu(playerid, DIALOG_SETTINGS);
@@ -3201,12 +3268,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     {
                         ShowPlayerDialog(playerid, DIALOG_OBJSEARCH, DIALOG_STYLE_INPUT,
                         "Object search", 
-                        "Поиск объектов по слову. Введите слово для поиска:\n",
+                        "{FFFFFF}Поиск объектов по слову. Введите слово для поиска:\n",
                         "Search", "Cancel");
                     } else {
                         ShowPlayerDialog(playerid, DIALOG_OBJSEARCH, DIALOG_STYLE_INPUT,
                         "Object search", 
-                        "Search for objects by word. Enter a search word:\n",
+                        "{FFFFFF}Search for objects by word. Enter a search word:\n",
                         "Search", "Cancel");
                     }
                 }
@@ -3216,18 +3283,37 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     {
                         ShowPlayerDialog(playerid, DIALOG_MODELSIZEINFO, DIALOG_STYLE_INPUT,
                         "Object model information", 
-                        "Введите modelid для поиска:\n",
+                        "{FFFFFF}Введите modelid для поиска:\n",
                         "Search", "Cancel");
                     } else {
                         ShowPlayerDialog(playerid, DIALOG_MODELSIZEINFO, DIALOG_STYLE_INPUT,
                         "Object model information", 
-                        "Enter modelid to search:\n",
+                        "{FFFFFF}Enter modelid to search:\n",
                         "Search", "Cancel");
                     }
                 }
                 case 8: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/note");
+                case 9: 
+				{
+					if (GetPVarInt(playerid, "lang") == 0)
+                    {
+                        ShowPlayerDialog(playerid, DIALOG_SWAPBUILDING, DIALOG_STYLE_INPUT,
+                        "Swapbuilding", 
+                        "{FFFFFF}Позволяет заменить стандартный объект динамическим.\n\
+						- Чтобы показать стандартные объекты и узнать индекс введите: /gtaobjects\n\
+						Введите индекс для замены:",
+                        "Swap", "Cancel");
+                    } else {
+                        ShowPlayerDialog(playerid, DIALOG_SWAPBUILDING, DIALOG_STYLE_INPUT,
+                        "Swapbuilding", 
+                        "{FFFFFF}Allows you replace a standard object to dynamic.\n\
+						- To show standard objects and find out the index type: /gtaobjects\n\
+						Enter index to replace:",
+                        "Swap", "Cancel");
+                    }
+				}
                 //case 9: empty place
-                case 10: 
+                case 11: 
                 {
                     new tbtext[128];
                     new objectid = GetNearestVisibleItem(playerid, STREAMER_TYPE_OBJECT);
@@ -3243,14 +3329,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     ShowPlayerDialog(playerid, DIALOG_DUPLICATESEARCH, DIALOG_STYLE_INPUT,
                     "Duplicate search",tbtext, "Search", "Cancel");
                 }
-                case 11:
+                case 12:
                 {
                     ShowPlayerDialog(playerid, DIALOG_OBJDISTANCE, DIALOG_STYLE_INPUT,
                     "Distance [object #1]",
                     "{FFFFFF}Determine the distance between two objects. Enter objectid:",
                     "Next", "Cancel");
                 }
-                case 12:
+                case 13:
                 {
                     #if defined STREAMER_ALL_TAGS
                     Streamer_ToggleAllItems(playerid, STREAMER_TYPE_OBJECT, 1);
@@ -3265,7 +3351,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     SendClientMessageEx(playerid, COLOR_LIME,
                     "Все скрытые объекты были показаны","All hidden objects have been revealed");
                 }
-                case 13:
+                case 14:
                 {
                     new str[512], File: file;
                     if(!fexist("tstudio/ExportMaps/savedobjects.txt")) {
@@ -3276,8 +3362,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     new Float:x, Float:y, Float:z;
                     new Float:rx, Float:ry, Float:rz;
                     new objectid = EDIT_OBJECT_ID[playerid];
-                    new worldid = GetPlayerVirtualWorld(playerid);
-                    new interiorid = GetPlayerInterior(playerid);
+                    new worldid = GetDynamicObjectVW(objectid);
+                    new interiorid = GetDynamicObjectINT(objectid);
                     new modelid = EDIT_OBJECT_MODELID[playerid];
                     
                     GetDynamicObjectPos(objectid, x, y, z);
@@ -3324,7 +3410,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     SendClientMessage(playerid, COLOR_LIME,
                     "Dynamic object export to: scriptfiles > tstudio > ExportMaps > savedobjects.txt");
                 }
-                case 14:
+                case 15:
                 {
                     new tbtext[400];
                     
@@ -3790,19 +3876,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     GetDynamicObjectModel(EDIT_OBJECT_ID[playerid]));
                     CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);                   
                 }*/
-                case 6: ShowPlayerMenu(playerid, DIALOG_TEXTUREMENU);
-                case 7: ShowPlayerMenu(playerid, DIALOG_GROUPEDIT);
-                case 8: 
+				case 6: ShowPlayerMenu(playerid, DIALOG_TEXTUREBUFFER);
+                case 7: ShowPlayerMenu(playerid, DIALOG_TEXTUREMENU);
+                case 8: ShowPlayerMenu(playerid, DIALOG_GROUPEDIT);
+                case 9: 
                 {
                     CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/undo");
                     SendClientMessageEx(playerid, -1, 
                     "{00FF00}>>>{FFFFFF} Возврат предыдущего действия {00FF00}/redo",
                     "{00FF00}>>>{FFFFFF} Reverting the previous action {00FF00}/redo" );
                 }
-                /*
-                case 9: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/redo");
-                */
-                case 9: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/oprop");
+                //case 9: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/redo");
+                case 10: CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/oprop");
             }
         } else {
             if(LAST_DIALOG[playerid] == DIALOG_MAIN) {
@@ -4823,6 +4908,21 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             }
         }
     }
+	if (dialogid == DIALOG_SWAPBUILDING)
+    {
+        if(response)
+        {
+            if (!isnull(inputtext))
+            {
+                new param[64];
+                format(param, sizeof(param), "/swapbuilding %d", strval(inputtext));
+                CallRemoteFunction("OnPlayerCommandText", "is", playerid, param);       
+            } else {
+                SendClientMessageEx(playerid, COLOR_GREY,
+                "Неверное значение", "Incorrect value");
+            }
+        }
+    }
     if (dialogid == DIALOG_TEXTURESEARCH)
     {
         if(response)
@@ -5313,6 +5413,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
         {
             if(GetPVarType(playerid, "FirstSpawn"))
             {
+				//GameTextForPlayer(playerid, "~w~Loading...", 2500, 4);
                 CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/sel 0");
                 CallRemoteFunction("OnPlayerCommandText", "is", playerid, "/ogoto");
                 DeletePVar(playerid, "FirstSpawn");
@@ -5582,6 +5683,7 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Выбрать объект стоящий рядом\t{00FF00}/scsel\n"\
                 "Копировать объект\t{00FF00}/clone\n"\
                 "Удалить объект\t{FF0000}/dobject\n"\
+                "Буффер текстур\t{00FF00}/tbuffer\n"\
                 "[>] Ретекстур\t\n"\
                 "[>] Редактирование группы\t\n"\
                 "{00FF00}<<<{FFFFFF} Отмена последнего действия\t{00FF00}/undo\n"\
@@ -5594,6 +5696,7 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Select a nearby object\t{00FF00}/scsel\n"\
                 "Copy object\t{00FF00}/clone\n"\
                 "Delete object\t{FF0000}/dobject\n"\
+				"Texture buffer\t{00FF00}/tbuffer\n"\
                 "[>] Textures edit\t\n"\
                 "[>] Groups edit\t\n"\
                 "{00FF00}<<<{FFFFFF} Undo the last action\t{00FF00}/undo\n"\
@@ -5613,11 +5716,12 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Наложить текст\t{00FF00}/textobj\n"\
                 "{A9A9A9}Список загруженных объектов\t{00FF00}/lsel\n"\
                 "Категории объектов\t{00FF00}/ocat\n"\
-                "{A9A9A9}Переместить камеру к ближайшему объекту\t{00FF00}/ogoto\n"\
+                "{A9A9A9}Переместить камеру к объекту\t{00FF00}/ogoto\n"\
                 "Ближайший объект\t{00FF00}/nearest\n"\
                 "{A9A9A9}Поиск объектов\t{00FF00}/osearch\n"\
                 "Информация о модели объекта\t{00FF00}/minfo\n"\
                 "{A9A9A9}Добавить заметку на объект\t{00FF00}/note\n"\
+                "Свапнуть стандартный объект динамическим\t{00FF00}/swapbuilding\n"\
                 "\t\n"\
                 "Поиск дубликатов объектов\t\n"\
                 "{A9A9A9}Определить расстояние между двумя объектами\t\n"\
@@ -5632,11 +5736,12 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Add Text to object\t{00FF00}/textobj\n"\
                 "{A9A9A9}List of loaded objects\t{00FF00}/lsel\n"\
                 "Object categories\t{00FF00}/ocat\n"\
-                "{A9A9A9}Move the camera to the nearest object\t{00FF00}/ogoto\n"\
+                "{A9A9A9}Move the camera to object\t{00FF00}/ogoto\n"\
                 "Nearest object info\t{00FF00}/nearest\n"\
                 "{A9A9A9}Search objects\t{00FF00}/osearch\n"\
                 "Object model information\t{00FF00}/minfo\n"\  
                 "{A9A9A9}Add a note to object\t{00FF00}/note\n"\
+				"Swap a standard object to dynamic\t{00FF00}/swapbuilding\n"\
                 "\t\n"\
                 "Finding duplicate objects\t\n"\
                 "{A9A9A9}Determine the distance between two objects\t\n"\
@@ -5724,8 +5829,8 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Найти текстуру по части имени и вывести в 3D меню\t{00FF00}/mtsearch\n"\
                 "Найти текстуру по части имени\t{00FF00}/tsearch\n"\
                 "Установить текстуру объекту\t{00FF00}/mtset\n"\
-                "{FF0000}Сброс материала и цвета объекта\t{FF0000}/mtreset\n"\
-                "{FF0000}Сброс материалов на всех индексах\t{FF0000}/untexture\n"\
+                "Сброс материала и цвета объекта\t{FF0000}/mtreset\n"\
+                "Сброс материалов на всех индексах\t{FF0000}/untexture\n"\
                 "Буффер текстур\t{00FF00}/tbuffer\n");
             } else {
                 format(tbtext, sizeof(tbtext),  
@@ -5737,8 +5842,8 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Find texture by part of name and open 3D menu\t{00FF00}/mtsearch\n"\
                 "Find texture by part of name\t{00FF00}/tsearch\n"\
                 "Set texture to object\t{00FF00}/mtset\n"\
-                "{FF0000}Reset object material and color\t{FF0000}/mtreset\n"\
-                "{FF0000}Resetting materials on all indexes\t{FF0000}/untexture\n"\
+                "Reset object material and color\t{FF0000}/mtreset\n"\
+                "Resetting materials on all indexes\t{FF0000}/untexture\n"\
                 "Texture buffer\t{00FF00}/tbuffer\n");
             }
             
@@ -5768,24 +5873,28 @@ public ShowPlayerMenu(playerid, dialogid)
         {
             new header[64];
             if (GetPVarInt(playerid, "lang") == 0){
-                format(header, sizeof(header), "Создать объект. Последний объект: %d",
+                format(header, sizeof(header), "Создать объект (/oadd). Последний объект: %d",
                 EDIT_OBJECT_MODELID[playerid]);
                 ShowPlayerDialog(playerid,DIALOG_CREATEOBJ,DIALOG_STYLE_INPUT, header,
-                "{FFFFFF}Введите ID модели объекта для того чтобы его создать\n"\
-                "Объект появится перед вами, далее вы будете изменять его\n\n"\
-                "{FFD700}615-18300 [GTASA], 18632-19521 [SAMP]\n"\
-                "{FFFFFF}Список объектов по категориям можно посмотреть:\n"\
-                "на сайте {00BFFF}https://dev.prineside.com/ru",
-                "Create","Close");
+                "{FFFFFF}Введите ID модели объекта для того чтобы его создать\n\
+                Объект появится перед вами, далее вы будете изменять его\n\n\
+                {FFFFFF}Найти нужный объект можно через {AFAFAF}/osearch{FFFFFF}\n\
+				Список объектов по категориям можно посмотреть:\n\
+                на сайте {00BFFF}https://dev.prineside.com/ru\n\n\
+				{FFFFFF}Объекты для текста: {AFAFAF}19481, 19480, 19482, 19477\n\
+				{FFFFFF}Введите ID {FFD700}615-18300 [GTASA], 18632-19521 [SAMP]:\n",
+                "Создать","Отмена");
             } else {
-                format(header, sizeof(header), "Create object. Last object modelid: %d",
+                format(header, sizeof(header), "Create object (/oadd). Last object modelid: %d",
                 EDIT_OBJECT_MODELID[playerid]);
                 ShowPlayerDialog(playerid,DIALOG_CREATEOBJ,DIALOG_STYLE_INPUT, header,
-                "{FFFFFF} Enter the model ID of the object to create it \n"\
-                "The object will appear in front of you, then you will modify it\n\n"\
-                "{FFD700}615-18300 [GTASA], 18632-19521 [SAMP]\n"\
-                "{FFFFFF} The list of objects by category can be viewed:\n"\
-                "on the site {00BFFF} https://dev.prineside.com/ru",
+                "{FFFFFF} Enter the model ID of the object to create it \n\
+                The object will appear in front of you, then you will modify it\n\n\
+				{FFFFFF}You can find the desired object via {AFAFAF}/osearch{FFFFFF}\n\
+                The list of objects by category can be viewed:\n\
+                on the site {00BFFF} https://dev.prineside.com/ru\n\n\
+				{FFFFFF}Object for text labels: {AFAFAF}19481, 19480, 19482, 19477\n\
+				{FFFFFF}Enter ID {FFD700}615-18300 [GTASA], 18632-19521 [SAMP:]\n",
                 "Create","Close");
                 
             }
@@ -5831,6 +5940,7 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Экспорт выбранной машины\t{00FF00}/avexport\n"\
                 "Зареспавнить весь транспорт\t{00FF00}/avrespawn\n"\
                 "Починить весь транспорт\t{00FF00}/avrepair\n"\
+                "[>] Аттачи на транспорт\t\n"\
                 "[>] Тюнинг\t\n"\
                 "[>] Специальные возможности\t\n"\
                 "[>] Настройки\t\n");
@@ -5845,6 +5955,7 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Export selected vehicle\t{00FF00}/avexport\n"\
                 "Respawn all vehicles\t{00FF00}/avrespawn\n"\
                 "Repair all vehicles\t{00FF00}/avrepair\n"\
+                "[>] Attachments\t\n"\
                 "[>] Tuning\t\n"\
                 "[>] Special abilities\t\n"\
                 "[>] Settings\t\n");
@@ -5996,7 +6107,7 @@ public ShowPlayerMenu(playerid, dialogid)
         }
         case DIALOG_SETTINGS:
         {
-            new tbtext[420];
+            new tbtext[520];
 
             if(GetPVarInt(playerid, "lang") == 1)
             {       
@@ -6006,14 +6117,14 @@ public ShowPlayerMenu(playerid, dialogid)
                 "[>] Vehicles settings\t\n"\
                 "{A9A9A9}[>] Bindeditor\t\n"\
                 "[>] Flymode settings\t\n"\
-                "Language\t%s\n"\
+                "Language\t{00FF00}%s\n"\
                 "Change skin\t{00FF00}%i\n"\
                 "Weather\t{00FF00}%i\n"\
                 "Time\t{00FF00}%i\n"\
                 "Gravity\t{00FF00}%.3f\n"\
                 "Interior\t{00FF00}%i\n"\
                 "World\t{00FF00}%i\n",
-                (GetPVarInt(playerid,"lang") == 1) ? "[English]" : "[Russian]",
+                (GetPVarInt(playerid,"lang") == 1) ? "English" : "Russian",
                 GetPlayerSkin(playerid), GetPVarInt(playerid,"Weather"),
                 GetPVarInt(playerid,"Hour"), GetGravity(),
                  GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
@@ -6024,14 +6135,14 @@ public ShowPlayerMenu(playerid, dialogid)
                 "[>] Настройки транспорта\t\n"\
                 "{A9A9A9}[>] Bind редактор\t\n"\
                 "[>] Настройки режима полета\t\n"\
-                "Язык\t%s\n"\
+                "Язык\t{00FF00}%s\n"\
                 "Сменить скин\t{00FF00}%i\n"\
                 "Погода\t{00FF00}%i\n"\
                 "Время\t{00FF00}%i\n"\
                 "Гравитация\t{00FF00}%.3f\n"\
                 "Интерьер\t{00FF00}%i\n"\
                 "Виртуальный мир\t{00FF00}%i\n",
-                (GetPVarInt(playerid,"lang") == 1) ? "[English]" : "[Russian]",
+                (GetPVarInt(playerid,"lang") == 1) ? "English" : "Russian",
                 GetPlayerSkin(playerid), GetPVarInt(playerid,"Weather"),
                 GetPVarInt(playerid,"Hour"), GetGravity(),
                 GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
@@ -6120,19 +6231,6 @@ public ShowPlayerMenu(playerid, dialogid)
         case DIALOG_INTERFACE_SETTINGS:
         {
             new tbtext[650];
-            new 
-                StreamedObjectsTD_st[16], fpsBarTD_st[16],
-                autoLoadMap_st[16], showEditMenu_st[16]
-            ;
-            
-            if(streamedObjectsTD) 
-            StreamedObjectsTD_st = "{00FF00}[ON]"; else StreamedObjectsTD_st = "{FF0000}[OFF]";
-            if(fpsBarTD) 
-            fpsBarTD_st = "{00FF00}[ON]"; else fpsBarTD_st = "{FF0000}[OFF]";
-            if(autoLoadMap)
-            autoLoadMap_st = "{00FF00}[ON]"; else autoLoadMap_st = "{FF0000}[OFF]";
-            if(showEditMenu)
-            showEditMenu_st = "{00FF00}[ON]"; else showEditMenu_st = "{FF0000}[OFF]";
         
             if(GetPVarInt(playerid, "lang") == 1)
             {       
@@ -6143,9 +6241,13 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Show 3d text on objects\t/objtext3d\n"\
                 "Show FPS under the radar\t%s\n"\
                 "Show map loading window at login\t%s\n"\
-                "Show EditMenu when editing object\t%s\n",
-                StreamedObjectsTD_st, fpsBarTD_st,
-                 autoLoadMap_st, showEditMenu_st);
+                "Show EditMenu when editing object\t%s\n"\
+                "Show mtools menu\t%s\n",
+                (streamedObjectsTD) ? "{00FF00}[ON]" : "{FF0000}[OFF]",
+                (fpsBarTD) ? "{00FF00}[ON]" : "{FF0000}[OFF]",
+                (autoLoadMap) ? "{00FF00}[ON]" : "{FF0000}[OFF]",
+                (showEditMenu) ? "{00FF00}[ON]" : "{FF0000}[OFF]",
+				(!hideMtoolsMenu) ? "{00FF00}[ON]" : "{FF0000}[OFF]");
             } else {
                 format(tbtext, sizeof(tbtext),
                 "TD подсчета объектов в области стрима\t%s\n"\
@@ -6154,9 +6256,13 @@ public ShowPlayerMenu(playerid, dialogid)
                 "Показывать 3d текст на объектах\t/objtext3d\n"\
                 "Показывать FPS под радаром\t%s\n"\
                 "Показывать окно загрузки карты при входе\t%s\n"\
-                "Показывать EditMenu при редактировании объекта\t%s\n",
-                StreamedObjectsTD_st, fpsBarTD_st,
-                autoLoadMap_st, showEditMenu_st);
+                "Показывать EditMenu при редактировании объекта\t%s\n"\
+                "Показывать основное меню mtools\t%s\n",
+                (streamedObjectsTD) ? "{00FF00}[ON]" : "{FF0000}[OFF]",
+                (fpsBarTD) ? "{00FF00}[ON]" : "{FF0000}[OFF]",
+                (autoLoadMap) ? "{00FF00}[ON]" : "{FF0000}[OFF]",
+                (showEditMenu) ? "{00FF00}[ON]" : "{FF0000}[OFF]",
+				(!hideMtoolsMenu) ? "{00FF00}[ON]" : "{FF0000}[OFF]");
             }
             
             ShowPlayerDialog(playerid, DIALOG_INTERFACE_SETTINGS, DIALOG_STYLE_TABLIST,
